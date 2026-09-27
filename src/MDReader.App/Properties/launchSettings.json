@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "MDReader.App (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "MDReader.App (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

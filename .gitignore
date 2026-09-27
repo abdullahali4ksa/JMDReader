@@ -1,0 +1,113 @@
+# ============================================
+# .NET / C# / MSBuild
+# ============================================
+# Build output
+bin/
+obj/
+
+# NuGet
+packages/
+*.nuget.props
+*.nuget.targets
+!**/packages/{ }
+!**/packages/Microsoft/
+!**/packages/build/
+
+# Rider
+.idea/
+*.sln.docstates
+
+# Visual Studio
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.vspscc
+*.vssscc
+!*.csproj
+!*.sln
+
+# VS Code — ignore contents but allow specific config files to be tracked
+**/.vscode/*
+!**/.vscode/settings.json
+!**/.vscode/tasks.json
+!**/.vscode/launch.json
+!**/.vscode/extensions.json
+
+# Visual Studio
+*/.vs/
+**/.vs/
+
+# Build outputs for MSIX / Windows App SDK
+AppPackages/
+BundleArtifacts/
+._SQL_CENotifications.rgus
+*.mumi
+*.db
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+
+# MSIX packaging
+*.msix
+*.msixbundle
+*.appx
+*.appxbundle
+*.appxupload
+*_SigningCertificates/*.pfx
+*_SigningCertificates/*.pvk
+*_SigningCertificates/*.spc
+
+# Windows App SDK build artifacts
+WinMIDL/
+Generated Files/
+ipch/
+*.tlog
+
+# ============================================
+# OS / Editor
+# ============================================
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+
+# Linux
+*~
+
+# Shell history
+.bash_history
+
+# ============================================
+# Project-specific
+# ============================================
+# Secrets / keys
+*.pfx
+*.pvk
+*.key
+*.pem
+.env
+.env.*
+secrets.json
+
+# Test results
+TestResults/
+*.testresults
+nunit*.xml
+*/[Tt]est/[Rr]esult*
+
+# Logs
+*.log
+logs/
+
+# Temporary
+*.tmp
+*.temp

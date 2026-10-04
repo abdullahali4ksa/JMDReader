@@ -75,3 +75,8 @@
 ## P01-T008 — Add Core project unit tests
 - Added DocumentInfo and CommandRequest/CommandResult initialization tests.
 - Tests: PASS (8/8: 2 existing + 6 new)
+
+## P01-T009 — Phase 1 verification gate
+- Build: PASS (0 warnings, 0 errors); Tests: PASS (8/8).
+- Launch verified: `dotnet run` launched `MDReader.App.exe` (PID 12912) successfully; Developer Mode enabled.
+- ROADMAP.md updated; STATE.json set to READY; Phase 1 progress: 9/9 tasks verified.

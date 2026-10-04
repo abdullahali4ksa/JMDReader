@@ -5,8 +5,8 @@
 ## Phase 0 — Environment and Architecture — DONE
 Baseline environment, solution, feature-based structure, architecture and documentation established. Reported verification: build PASS (0 warnings/errors); tests PASS (2/2); baseline `5f81c9e`.
 
-## Phase 1 — Application Shell — READY, NOT STARTED
-Implement shell, MVVM foundation, window sizing/DPI, system theme, empty reader state, keyboard accessibility, and Core initialization tests. Preserve existing task IDs P01-T001 through P01-T009. Exit gate: build/test pass and launch verified or limitation recorded. No Markdown reading in this phase.
+## Phase 1 — Application Shell — IN PROGRESS (6/9 tasks completed: T001–T006 verified; build PASS 0 warnings, tests PASS 8/8, launch verified, Developer Mode available)
+Shell, MVVM, window size/position, theme service, empty reader state, keyboard accessibility, shared styles completed. Gate P01-T009 remains; Phase 2 (P02 tasks) follows after gate verification. Launch test: `MDReader.App.exe` launched successfully; no runtime errors.
 
 ## Phase 2 — File Open and Basic Reader — PLANNED
 Open one `.md`/`.markdown` file via picker and CLI; read safely; parse with documented Markdig dependency; render MVP Markdown nodes in a scrollable view; handle failures. Test Core parsing and file behavior. No folder crawling or editing.

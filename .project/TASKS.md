@@ -248,7 +248,7 @@ MarkdownDocument tests (2/2) remain as-is.
 ### P01-T009: Phase 1 build and launch verification
 
 **FEATURE:** Shell (verification)
-**STATUS:** READY
+**STATUS:** DONE
 **PRIORITY:** P0
 **DEPENDS_ON:** P01-T003, P01-T006, P01-T007, P01-T008
 **PURPOSE:** Final verification gate for Phase 1. Run full build, all tests, and

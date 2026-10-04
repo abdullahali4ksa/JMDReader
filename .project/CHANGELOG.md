@@ -71,3 +71,7 @@
 - Added AutomationProperties names/heading levels and TabFocusNavigation=Cycle to Shell and Reader views.
 - Alt+F4 close and standard Windows keyboard behavior remain native.
 - Build: PASS (0 warnings, 0 errors)
+
+## P01-T008 — Add Core project unit tests
+- Added DocumentInfo and CommandRequest/CommandResult initialization tests.
+- Tests: PASS (8/8: 2 existing + 6 new)

@@ -13,7 +13,7 @@
 COMPLETED
 
 ### Phase 1:
-7 / 9 tasks completed
+8 / 9 tasks completed
 
 ### Phase 2:
 PLANNED
@@ -228,7 +228,7 @@ supports standard keyboard operations.
 ### P01-T008: Add Core project unit tests
 
 **FEATURE:** Core (tests)
-**STATUS:** READY
+**STATUS:** DONE
 **PRIORITY:** P1
 **DEPENDS_ON:** (none)
 **PURPOSE:** Add unit tests for Core project types (DocumentInfo, CommandRequest,

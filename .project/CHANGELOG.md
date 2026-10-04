@@ -90,6 +90,15 @@
 - Build: PASS; Tests: PASS (11/11: 2 original MarkdownDocument + 6 contract + 3 parse = 11 total verified)
 
 ## P02-T002 — Implement Markdown file reading and validation
-- Added MarkdownFileReader (read-only, UTF-8, .md/.markdown filter, size warning 5MB, recoverable errors).
-- Added MarkdownFileReaderTests (valid extensions, unsupported, missing, empty, size warning simulated via large text).
-- Build: PASS; Tests: PASS (16/16 total verified)
+|- Added MarkdownFileReader (read-only, UTF-8, .md/.markdown filter, size warning 5MB, recoverable errors).
+|- Added MarkdownFileReaderTests (valid extensions, unsupported, missing, empty, size warning simulated via large text).
+|- Build: PASS; Tests: PASS (16/16 total verified)
+
+## P02-T003 — Add Open picker and command-line file entry
+|- Added FileOpenViewModel with Markdown-filtered FileOpenPicker (.md, .markdown) using COM interop (IInitializeWithWindow) for unpackaged WinUI 3 HWND attachment.
+|- Added ShellViewModel.OpenDocument command (single entry point for both picker and CLI) with recoverable error handling (ArgumentException, FileNotFoundException, UnauthorizedAccessException).
+|- Updated ReaderViewModel with LoadDocument/ShowError/Clear methods and IsEmpty/HasDocument/HasError visual state properties — opening a second document replaces the first.
+|- Updated MainWindow.xaml with File > Open menu bar item bound to OpenDocumentCommand.
+|- Updated MainWindow.xaml.cs to handle `mdreader.exe <path>` CLI arguments and pass ReaderViewModel through navigation.
+|- Added WindowHandleService helper (Shared/Helpers) using IWindowNative COM interop for HWND retrieval (Win32Interop unavailable in current App SDK configuration).
+|- Build: PASS (0 warnings, 0 errors); Tests: PASS (16/16); App launches and accepts CLI file argument without crash.

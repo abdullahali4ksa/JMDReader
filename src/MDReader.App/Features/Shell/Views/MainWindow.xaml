@@ -5,6 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:MDReader.App.Features.Shell.Views"
+    xmlns:mu="using:Microsoft.UI.Xaml.Controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="{Binding WindowTitle}"
     mc:Ignorable="d">
@@ -13,22 +14,26 @@
     </Window.SystemBackdrop>
 
     <Grid x:Name="RootGrid" TabFocusNavigation="Cycle" AutomationProperties.Name="MDReader application">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
 
-            <TitleBar x:Name="AppTitleBar" Title="{Binding WindowTitle}" AutomationProperties.Name="MDReader title bar">
+        <TitleBar x:Name="AppTitleBar" Grid.Row="0" Title="{Binding WindowTitle}" AutomationProperties.Name="MDReader title bar">
             <TitleBar.IconSource>
                 <ImageIconSource ImageSource="Assets/AppIcon.ico" />
             </TitleBar.IconSource>
         </TitleBar>
 
-        <!--
-            The Frame hosts pages for your application content. Add your UI to
-            MainPage.xaml rather than here so you can use Page features such as
-            navigation events and the Loaded lifecycle.
-        -->
-        <Frame x:Name="RootFrame" Grid.Row="1" />
+        <!-- Menu bar: File -> Open -->
+        <MenuBar Grid.Row="1" Background="{ThemeResource AppBackgroundBrush}">
+            <MenuBarItem Title="File">
+                <MenuFlyoutItem Text="Open..." Command="{Binding OpenDocumentCommand}" />
+            </MenuBarItem>
+        </MenuBar>
+
+        <!-- Main content area -->
+        <Frame x:Name="RootFrame" Grid.Row="2" />
     </Grid>
 </Window>

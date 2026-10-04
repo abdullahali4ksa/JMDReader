@@ -320,7 +320,7 @@ The `FILES_SCOPE` on each original P01 task is the allowlist. Dependencies are d
 - **VERIFICATION:** `dotnet build`, `dotnet test`; manual read-only file check.
 
 ### P02-T003 — Add Open picker and command-line file entry
-**STATUS:** PLANNED · **PRIORITY:** P0 · **DEPENDS_ON:** P01-T009, P02-T002 · **FILES_SCOPE:** `src/MDReader.App/Features/FileOpen/`, `src/MDReader.App/Features/Shell/`, `src/MDReader.App/Features/Reader/`
+**STATUS:** DONE · **PRIORITY:** P0 · **DEPENDS_ON:** P01-T009, P02-T002 · **FILES_SCOPE:** `src/MDReader.App/Features/FileOpen/`, `src/MDReader.App/Features/Shell/`, `src/MDReader.App/Features/Reader/`
 
 - **SUBTASKS:** Add Markdown-filtered picker; accept one CLI path; route both through one open command; expose recoverable errors.
 - **ACCEPTANCE CRITERIA:** Picker and `mdreader.exe <path>` open one selected Markdown document; opening a second replaces the first; errors do not crash; no multi-tab/folder scanning.
@@ -328,7 +328,7 @@ The `FILES_SCOPE` on each original P01 task is the allowlist. Dependencies are d
 - **VERIFICATION:** Build/test plus recorded launch checks.
 
 ### P02-T004 — Parse and render basic Markdown
-**STATUS:** PLANNED · **PRIORITY:** P0 · **DEPENDS_ON:** P02-T001, P02-T003 · **FILES_SCOPE:** `src/MDReader.Core/Markdown/`, `src/MDReader.App/Features/Reader/`, `tests/MDReader.Core.Tests/`
+**STATUS:** READY · **PRIORITY:** P0 · **DEPENDS_ON:** P02-T001, P02-T003 · **FILES_SCOPE:** `src/MDReader.Core/Markdown/`, `src/MDReader.App/Features/Reader/`, `tests/MDReader.Core.Tests/`
 
 - **SUBTASKS:** Parse headings/paragraphs/emphasis/lists/code/quotes/rules/tables; render AST nodes as WinUI controls; inert handling for HTML.
 - **ACCEPTANCE CRITERIA:** MVP elements are readable and styled; long code lines scroll horizontally; unsupported nodes degrade safely; no WebView, edit, or save path.

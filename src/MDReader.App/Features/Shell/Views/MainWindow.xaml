@@ -12,13 +12,13 @@
         <MicaBackdrop />
     </Window.SystemBackdrop>
 
-    <Grid x:Name="RootGrid">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
+    <Grid x:Name="RootGrid" TabFocusNavigation="Cycle" AutomationProperties.Name="MDReader application">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
 
-        <TitleBar x:Name="AppTitleBar" Title="{Binding WindowTitle}">
+            <TitleBar x:Name="AppTitleBar" Title="{Binding WindowTitle}" AutomationProperties.Name="MDReader title bar">
             <TitleBar.IconSource>
                 <ImageIconSource ImageSource="Assets/AppIcon.ico" />
             </TitleBar.IconSource>

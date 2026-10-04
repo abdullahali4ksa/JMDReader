@@ -66,3 +66,8 @@
 - MainPage.xaml: centered welcome/empty state using theme-aware shared styles.
 - No Markdown parsing or file opening added.
 - Build: PASS (0 warnings, 0 errors)
+
+## P01-T007 — Keyboard accessibility baseline
+- Added AutomationProperties names/heading levels and TabFocusNavigation=Cycle to Shell and Reader views.
+- Alt+F4 close and standard Windows keyboard behavior remain native.
+- Build: PASS (0 warnings, 0 errors)

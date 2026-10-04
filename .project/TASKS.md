@@ -13,7 +13,7 @@
 COMPLETED
 
 ### Phase 1:
-6 / 9 tasks completed
+7 / 9 tasks completed
 
 ### Phase 2:
 PLANNED
@@ -209,7 +209,7 @@ functionality is added — this is purely the empty placeholder UI.
 ### P01-T007: Keyboard accessibility baseline
 
 **FEATURE:** Shell (accessibility)
-**STATUS:** READY
+**STATUS:** DONE
 **PRIORITY:** P1
 **DEPENDS_ON:** P01-T002, P01-T003
 **PURPOSE:** Ensure basic keyboard accessibility in the application window. Verify

@@ -13,18 +13,22 @@
             Phase 1: shows the empty-reader welcome state. No file opening or
             Markdown rendering is implemented yet (Phase 2).
         -->
-        <Grid Background="{ThemeResource AppBackgroundBrush}">
+        <Grid
+            Background="{ThemeResource AppBackgroundBrush}"
+            TabFocusNavigation="Cycle">
             <StackPanel
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
                 Spacing="12"
-                MaxWidth="480">
+                MaxWidth="480"
+                AutomationProperties.Name="Empty reader state">
                 <TextBlock
                     Text="MDReader"
                     FontSize="{StaticResource AppHeadingFontSize}"
                     FontWeight="SemiBold"
                     Foreground="{ThemeResource AppTextBrush}"
-                    HorizontalAlignment="Center" />
+                    HorizontalAlignment="Center"
+                    AutomationProperties.HeadingLevel="Level1" />
                 <TextBlock
                     Text="No document open"
                     Style="{StaticResource AppBodyTextStyle}"

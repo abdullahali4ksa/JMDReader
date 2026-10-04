@@ -13,7 +13,7 @@
 COMPLETED
 
 ### Phase 1:
-0 / 9 tasks completed
+4 / 9 tasks completed
 
 ### Phase 2:
 PLANNED
@@ -108,7 +108,7 @@ DEVELOPMENT_RULES.md §3.
 ### P01-T002: Establish Shell ViewModel with MVVM binding
 
 **FEATURE:** Shell
-**STATUS:** READY
+**STATUS:** DONE
 **PRIORITY:** P0
 **DEPENDS_ON:** P01-T001
 **PURPOSE:** Convert `ShellViewModel` from a placeholder to an MVVM `ObservableObject`,
@@ -128,7 +128,7 @@ set it as `MainWindow`'s `DataContext`, and bind the window title to the
 ### P01-T003: Configure window sizing, positioning, and DPI awareness
 
 **FEATURE:** Shell (MainWindow)
-**STATUS:** READY
+**STATUS:** DONE
 **PRIORITY:** P1
 **DEPENDS_ON:** P01-T002
 **PURPOSE:** Configure `MainWindow` with sensible default dimensions, minimum size,
@@ -149,7 +149,7 @@ center-on-screen positioning, and DPI awareness. Fix the window title from
 ### P01-T004: Implement theme service
 
 **FEATURE:** Theme
-**STATUS:** READY
+**STATUS:** DONE
 **PRIORITY:** P1
 **DEPENDS_ON:** (none)
 **PURPOSE:** Implement `IThemeService` to manage light/dark/system theme. Integrate

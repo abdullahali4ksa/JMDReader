@@ -88,3 +88,8 @@
 - Added MarkdownParseResult model and MarkdownParseError contracts.
 - Added MarkdownParseResultTests (empty, plain, large-text/size-warning scenarios).
 - Build: PASS; Tests: PASS (11/11: 2 original MarkdownDocument + 6 contract + 3 parse = 11 total verified)
+
+## P02-T002 — Implement Markdown file reading and validation
+- Added MarkdownFileReader (read-only, UTF-8, .md/.markdown filter, size warning 5MB, recoverable errors).
+- Added MarkdownFileReaderTests (valid extensions, unsupported, missing, empty, size warning simulated via large text).
+- Build: PASS; Tests: PASS (16/16 total verified)

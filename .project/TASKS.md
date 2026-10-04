@@ -312,7 +312,7 @@ The `FILES_SCOPE` on each original P01 task is the allowlist. Dependencies are d
 - **VERIFICATION:** `dotnet build` and `dotnet test`; review dependency and Core boundary.
 
 ### P02-T002 — Implement Markdown file reading and validation
-**STATUS:** PLANNED · **PRIORITY:** P0 · **DEPENDS_ON:** P02-T001 · **FILES_SCOPE:** `src/MDReader.Core/`, `tests/MDReader.Core.Tests/`
+**STATUS:** DONE · **PRIORITY:** P0 · **DEPENDS_ON:** P02-T001 · **FILES_SCOPE:** `src/MDReader.Core/`, `tests/MDReader.Core.Tests/`
 
 - **SUBTASKS:** Read selected path; validate supported extension/access; handle disappearance, lock, encoding and size warning.
 - **ACCEPTANCE CRITERIA:** `.md` and `.markdown` local files are read without modifying them; expected I/O failures become typed/recoverable results; no directory crawl or persistent data.

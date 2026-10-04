@@ -1,4 +1,5 @@
 using Microsoft.UI.Xaml;
+using MDReader.App.Features.Shell.ViewModels;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -15,6 +16,9 @@ public sealed partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+
+        // Set MVVM DataContext on root grid
+        RootGrid.DataContext = new ShellViewModel();
 
         ExtendsContentIntoTitleBar = true;
         SetTitleBar(AppTitleBar);

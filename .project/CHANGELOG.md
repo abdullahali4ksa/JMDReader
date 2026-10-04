@@ -46,3 +46,10 @@
 - Documented in docs/ARCHITECTURE.md (Dependency Decisions)
 - Build: PASS (0 warnings, 0 errors)
 - Tests: PASS (2/2 passed)
+
+## P01-T002 — Establish Shell ViewModel with MVVM binding
+- ShellViewModel converted to ObservableObject with [ObservableProperty] replaced by SetProperty for AOT compatibility.
+- MainWindow.xaml binds Title and TitleBar to ShellViewModel.WindowTitle.
+- MainWindow.xaml.cs creates ShellViewModel and assigns RootGrid.DataContext.
+- Build: PASS (0 warnings, 0 errors)
+- Tests: PASS (2/2)

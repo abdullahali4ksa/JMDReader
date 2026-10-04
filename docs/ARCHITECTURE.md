@@ -151,9 +151,19 @@ MDReader.Core.Tests  ───depends on───>  MDReader.Core
 ||`Microsoft.Windows.SDK.BuildTools.WinApp`| 0.7.0 | Windows App SDK-specific build tools (MSIX packaging, debug identity) | MS-RL | Hooks `dotnet run` for packaged WinUI apps |
 ||`CommunityToolkit.Mvvm`| 8.4.0 | MVVM framework (ObservableObject, ObservableProperty, RelayCommand) for Shell and feature ViewModels | MIT (CommunityToolkit) | .NET does not include a standard MVVM framework; required for feature-based MVVM architecture defined in ARCHITECTURE.md §2.2 |
 
-### Pending Decision: Markdown Parser
+### Dependency Decision: Markdown Parser (P02-T001)
 
-**Status:** Decision documented, dependency not yet added (Phase 0 only).
+**Status:** Accepted and added in Phase 2.
+**Version added:** 0.40.0 (stable, MIT-licensed).
+**Purpose:** Parse Markdown source (`.md`/`.markdown`) into a deterministic syntax-tree (AST) model in `MDReader.Core` (`Markdown/MarkdownDocument`). Render the AST in `MDReader.App` (WinUI 3 `TextBlock`, `Image`, etc.). Keeps parsing testable and Windows-independent; rendering Windows-specific.
+**License:** MIT.
+**Why built-in is insufficient:** .NET 10 does not ship `System.Text.Markdown` or any official Markdown parsing library in the BCL. Markdig is the de facto standard, actively maintained, MIT-licensed, and supports GitHub Flavored Markdown extensions (tables, code blocks, task lists, etc.) needed for the MVP.
+**Security / boundary rules (from `docs/PRODUCT_BLUEPRINT.md` §5 and §6):**
+- Raw embedded HTML nodes (`HtmlBlock`, `HtmlInline`) must be treated as inert text or omitted; never executed, never rendered via WebView.
+- File access is explicit (picker/CLI/drop); no directory crawl.
+- File reading uses `System.IO` with UTF-8; size warnings apply; access errors become recoverable typed errors.
+- Parser errors (invalid byte sequences, malformed input) are surfaced without crashing; error model lives in `MDReader.Core`.
+**File scope:** `src/MDReader.Core/Markdown/` (parser/model), `docs/ARCHITECTURE.md` (this entry), `.project/TASKS.md` (P02-T001 dependency entry).
 
 **Options evaluated:**
 1. **Built-in .NET (`System.Text.Markdown`)** — If available in .NET 10, this would be the zero-dependency choice. As of .NET 8/9, there is no official `System.Text.Markdown` for parsing to an AST. System.Text.Json is available but that is for JSON, not Markdown. **Insufficient.**

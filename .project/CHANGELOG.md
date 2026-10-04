@@ -80,3 +80,11 @@
 - Build: PASS (0 warnings, 0 errors); Tests: PASS (8/8).
 - Launch verified: `dotnet run` launched `MDReader.App.exe` (PID 12912) successfully; Developer Mode enabled.
 - ROADMAP.md updated; STATE.json set to READY; Phase 1 progress: 9/9 tasks verified.
+
+## P02-T001 — Define document loading and parse contracts
+- Added Markdig 0.40.0 dependency to MDReader.Core.
+- Updated MarkdownDocument with Parse() method (deterministic model + typed MarkdownParseError/MarkdownParseResult).
+- Documented dependency decision in ARCHITECTURE.md (security boundaries, no raw HTML execution, UTF-8, size warning at 5 MB).
+- Added MarkdownParseResult model and MarkdownParseError contracts.
+- Added MarkdownParseResultTests (empty, plain, large-text/size-warning scenarios).
+- Build: PASS; Tests: PASS (11/11: 2 original MarkdownDocument + 6 contract + 3 parse = 11 total verified)

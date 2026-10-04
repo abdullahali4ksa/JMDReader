@@ -304,7 +304,7 @@ The `FILES_SCOPE` on each original P01 task is the allowlist. Dependencies are d
 **Status:** PLANNED. **Depends on:** Phase 1 complete. **Feature:** FileOpen, Reader, Core Markdown.
 
 ### P02-T001 — Define document loading and parse contracts
-**STATUS:** PLANNED · **PRIORITY:** P0 · **DEPENDS_ON:** P01-T009 · **FILES_SCOPE:** `src/MDReader.Core/Markdown/`, `src/MDReader.Core/Documents/`, `docs/ARCHITECTURE.md`
+**STATUS:** DONE · **PRIORITY:** P0 · **DEPENDS_ON:** P01-T009 · **FILES_SCOPE:** `src/MDReader.Core/Markdown/`, `src/MDReader.Core/Documents/`, `docs/ARCHITECTURE.md`
 
 - **SUBTASKS:** Specify parse result/error model; settle UTF-8 and size-warning behavior; document Markdig and permitted extensions/dependency.
 - **ACCEPTANCE CRITERIA:** Core stays platform-neutral; parser returns a deterministic document model and actionable errors; Markdig package/version/license and use are recorded before addition; no raw HTML execution.

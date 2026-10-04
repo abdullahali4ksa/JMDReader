@@ -13,7 +13,7 @@
 COMPLETED
 
 ### Phase 1:
-5 / 9 tasks completed
+6 / 9 tasks completed
 
 ### Phase 2:
 PLANNED
@@ -189,7 +189,7 @@ by the Shell and empty reader state. This replaces the current empty placeholder
 ### P01-T006: Implement empty reader state
 
 **FEATURE:** Reader
-**STATUS:** READY
+**STATUS:** DONE
 **PRIORITY:** P0
 **DEPENDS_ON:** P01-T004, P01-T005
 **PURPOSE:** Replace the empty `Grid` in `MainPage.xaml` with a welcome/empty

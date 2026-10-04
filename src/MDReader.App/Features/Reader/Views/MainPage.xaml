@@ -9,10 +9,31 @@
     mc:Ignorable="d">
 
     <!--
-        This is the main content area of your application.
-        Add your UI elements here — for example, controls, layouts, and data-bound views.
-        Use 'dotnet new winui-page' to create additional pages and navigate to them via
-        the Frame in MainWindow (RootFrame).
-    -->
-    <Grid />
+            Main content area of the application.
+            Phase 1: shows the empty-reader welcome state. No file opening or
+            Markdown rendering is implemented yet (Phase 2).
+        -->
+        <Grid Background="{ThemeResource AppBackgroundBrush}">
+            <StackPanel
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Spacing="12"
+                MaxWidth="480">
+                <TextBlock
+                    Text="MDReader"
+                    FontSize="{StaticResource AppHeadingFontSize}"
+                    FontWeight="SemiBold"
+                    Foreground="{ThemeResource AppTextBrush}"
+                    HorizontalAlignment="Center" />
+                <TextBlock
+                    Text="No document open"
+                    Style="{StaticResource AppBodyTextStyle}"
+                    HorizontalAlignment="Center" />
+                <TextBlock
+                    Text="Select a Markdown file to read."
+                    Style="{StaticResource AppSecondaryTextStyle}"
+                    HorizontalAlignment="Center"
+                    TextAlignment="Center" />
+            </StackPanel>
+        </Grid>
 </Page>

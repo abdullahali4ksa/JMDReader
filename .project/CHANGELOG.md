@@ -61,3 +61,8 @@
 - Shared/Styles/App.xaml: theme dictionaries (Light/Dark) with App brushes and typography styles.
 - App.xaml merge reference corrected to match filename casing.
 - Build: PASS (0 warnings, 0 errors); Tests: PASS (2/2)
+
+## P01-T006 — Implement empty reader state
+- MainPage.xaml: centered welcome/empty state using theme-aware shared styles.
+- No Markdown parsing or file opening added.
+- Build: PASS (0 warnings, 0 errors)

@@ -13,7 +13,7 @@
 COMPLETED
 
 ### Phase 1:
-4 / 9 tasks completed
+5 / 9 tasks completed
 
 ### Phase 2:
 PLANNED
@@ -170,7 +170,7 @@ theme by default at startup.
 ### P01-T005: Define shared application styles
 
 **FEATURE:** Shared (Styles)
-**STATUS:** READY
+**STATUS:** DONE
 **PRIORITY:** P1
 **DEPENDS_ON:** (none)
 **PURPOSE:** Populate `Shared/Styles/App.xaml` with basic application styles and

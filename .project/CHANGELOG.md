@@ -56,3 +56,8 @@
 ## P01-T004 — Implement theme service
 - Implemented ThemeService (IThemeService)
 - Build PASS, Tests PASS
+
+## P01-T005 — Define shared application styles
+- Shared/Styles/App.xaml: theme dictionaries (Light/Dark) with App brushes and typography styles.
+- App.xaml merge reference corrected to match filename casing.
+- Build: PASS (0 warnings, 0 errors); Tests: PASS (2/2)

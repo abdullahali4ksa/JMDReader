@@ -2,52 +2,93 @@
 
 ## How an Autonomous Hermes Session Should Work
 
+> **Mandatory entry point for every autonomous session.** A new Hermes session
+> must recover using ONLY the repository — no session or conversation history.
+
 ```
-1. READ PROJECT DOCS
-   docs/*.md (PRODUCT_SPEC, ARCHITECTURE, FEATURE_MAP, AI_INTERFACE, DEVELOPMENT_RULES)
+1. LOCATE REPOSITORY ROOT
+   Identify D:\AI_PROJECTS\MDReader and confirm git HEAD.
 
-2. SELECT TASK
-   Choose from docs/ROADMAP.md (Phase 1, 2, 3...)
+2. READ PROJECT CONTROL LAYER
+   .project/PROJECT.md
+   .project/STATE.json
+   .project/TASKS.md
+   .project/CHANGELOG.md
 
-3. IDENTIFY FEATURE OWNER
+3. READ PROJECT DOCS
+   docs/PRODUCT_SPEC.md
+   docs/ARCHITECTURE.md
+   docs/FEATURE_MAP.md
+   docs/UI_DESIGN.md
+   docs/DEVELOPMENT_RULES.md
+   docs/DECISIONS.md
+   docs/ROADMAP.md
+
+4. INSPECT GIT STATE
+   git status
+   git log (verify current HEAD)
+
+5. VERIFY STATE
+   Compare .project/STATE.json against actual git HEAD, build, and test status.
+
+6. SELECT NEXT ELIGIBLE TASK
+   From .project/TASKS.md: choose the next READY task whose dependencies are DONE.
+   Do NOT start a task whose dependencies are not DONE.
+   Do NOT skip or reorder phases.
+
+7. IDENTIFY FEATURE OWNER
    Find the feature directory from docs/FEATURE_MAP.md
    e.g., Features/Reader/ for Markdown rendering
 
-4. PLAN
-   What files to create/modify, what tests to write
-   Ensure the plan stays within the feature boundary
-
-5. UPDATE DESIGN IF NECESSARY
-   Add new features or commands to FEATURE_MAP.md and AI_INTERFACE.md
-
-6. IMPLEMENT ONLY INSIDE RELEVANT BOUNDARIES
-   Never modify unrelated features
+8. IMPLEMENT ONLY INSIDE THE TASK'S FILES_SCOPE
+   Never modify unrelated features.
    e.g., implementing Reader should NOT touch FileOpen XAML
 
-7. BUILD
-   C:/Users/ZAACO/.dotnet/dotnet.exe build MDReader.sln --nologo
+9. BUILD
+   dotnet build
 
-8. TEST
-   C:/Users/ZAACO/.dotnet/dotnet.exe test MDReader.sln --nologo --no-build
+10. TEST
+    dotnet test
 
-9. REVIEW DIFF
-   git diff --stat
-   Check: no unintended changes, all changes within feature scope
+11. RUNTIME VERIFY
+    Verify acceptance criteria. If runtime verification is impossible
+    (e.g., Developer Mode not enabled), record the limitation — do not
+    falsely claim runtime verification passed.
 
-10. FIX
-    Address warnings, errors, or unintended changes
+12. MARK TASK DONE
+    Only if build passes, tests pass, and acceptance criteria are met.
+    Update .project/TASKS.md, .project/STATE.json, .project/CHANGELOG.md.
 
-11. UPDATE DOCS
-    Update FEATURE_MAP.md if new commands/features added
-    Update ROADMAP.md to reflect progress
+13. UPDATE DOCS
+    Update docs/FEATURE_MAP.md, docs/ROADMAP.md, docs/ARCHITECTURE.md
+    if the task introduced new decisions or scope changes.
 
-12. COMMIT
+14. REVIEW DIFF
+    git diff --stat
+    Check: no unintended changes, all changes within feature scope
+
+15. COMMIT
     git add -A
-    git commit -m "Phase X: <feature description>"
+    git commit -m "<task-id>: <feature description>"
+    Commit message includes the task ID (e.g., P01-T001: add CommunityToolkit.Mvvm)
 
-13. NEXT TASK
-    Return to step 2
+16. NEXT TASK
+    Return to step 6
 ```
+
+### Task Lifecycle States
+
+| State | Meaning |
+|---|---|
+| **PLANNED** | Phase exists but tasks not yet decomposed |
+| **READY** | Task is decomposed, dependencies are DONE, ready to start |
+| **IN_PROGRESS** | Agent is actively implementing the task |
+| **VERIFYING** | Implementation done; build/test/runtime verification in progress |
+| **DONE** | All acceptance criteria verified — build, tests, and criteria pass |
+| **BLOCKED** | Task cannot proceed; reason recorded in TASKS.md |
+| **CANCELLED** | Task removed; ID never reused |
+
+A task is only **DONE** when implementation, build, test, and verification all pass.
 
 ## Environment Setup
 
@@ -87,3 +128,9 @@ C:/Users/ZAACO/.dotnet/dotnet.exe --version
 - Opening network ports
 - Implementing AI transport (MCP, IPC, HTTP)
 - Creating cross-application shared framework
+
+## Product Plan Review Gate (Planning checkpoint)
+
+Before any autonomous implementation session, read `docs/PRODUCT_BLUEPRINT.md` and the complete `.project/TASKS.md` backlog. The current planning state is `PLAN_REVIEW`: do not select or start a READY coding task until the project owner explicitly accepts/edits the blueprint and authorizes the Autonomous Developer Loop. Planning/documentation work is not a Phase completion and must not change code, build/test claims, `last_verified_commit`, or phase completion. After owner acceptance, update this gate/state metadata and begin only the first eligible task whose dependencies are DONE.
+
+For each task, maintain the permanent `Pxx-Txxx` ID and record its feature, priority, dependencies, allowed file scope, subtasks, acceptance criteria, and verification command/check. A change outside the stated file scope requires revising the task/backlog first. A planning task has document-only scope and does not authorize app changes.

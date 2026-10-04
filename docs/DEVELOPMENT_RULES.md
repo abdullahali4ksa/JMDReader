@@ -144,6 +144,30 @@ Before adding any NuGet package:
 
 ---
 
+## 18. Project Control Lifecycle
+
+Every change to MDReader follows the task lifecycle defined in the Project Control
+Layer (`.project/`):
+
+1. **Read control layer first** — every session starts by reading
+   `.project/PROJECT.md`, `.project/STATE.json`, `.project/TASKS.md`, and
+   `.project/CHANGELOG.md` before writing any code.
+2. **Select only READY tasks** — start only from `.project/TASKS.md`. A task is
+   READY only when all its dependencies are DONE. Do not skip or reorder phases.
+3. **Do not implement Phase 1 in a Phase 0 control-layer session** — creating
+   `.project/` files is itself the work; implementation tasks start only after
+   the control layer is committed and marked READY.
+4. **Verify before DONE** — a task is DONE only when `dotnet build`, `dotnet test`,
+   and the task's acceptance criteria all pass. If runtime verification is
+   impossible (e.g., Developer Mode disabled), record the limitation — do not
+   falsely claim runtime verification passed.
+5. **Commit coherently** — each commit maps to one verified task. Commit messages
+   include the task ID (e.g., `P01-T001: add CommunityToolkit.Mvvm dependency`).
+6. **Update state atomically** — after each DONE task, update `.project/TASKS.md`,
+   `.project/STATE.json`, and `.project/CHANGELOG.md` together before committing.
+
+---
+
 ## Developer Setup Checklist
 
 Before writing code, ensure:

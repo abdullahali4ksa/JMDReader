@@ -148,7 +148,8 @@ MDReader.Core.Tests  ───depends on───>  MDReader.Core
 |---------|---------|---------|---------|------------------------------|
 |`Microsoft.WindowsAppSDK`| 2.5.1 | Provides WinUI 3, Windows App SDK runtime API bindings | Microsoft MIT | .NET does not ship UI frameworks; WinUI 3 is required for the Windows-native UI |
 |`Microsoft.Windows.SDK.BuildTools`| 10.0.26100.9169 | Windows SDK headers, libraries, and build tools (makeappx, signtool) | MS-RL | Replaces the need for a system-level Windows SDK installation during build |
-|`Microsoft.Windows.SDK.BuildTools.WinApp`| 0.7.0 | Windows App SDK-specific build tools (MSIX packaging, debug identity) | MS-RL | Hooks `dotnet run` for packaged WinUI apps |
+||`Microsoft.Windows.SDK.BuildTools.WinApp`| 0.7.0 | Windows App SDK-specific build tools (MSIX packaging, debug identity) | MS-RL | Hooks `dotnet run` for packaged WinUI apps |
+||`CommunityToolkit.Mvvm`| 8.4.0 | MVVM framework (ObservableObject, ObservableProperty, RelayCommand) for Shell and feature ViewModels | MIT (CommunityToolkit) | .NET does not include a standard MVVM framework; required for feature-based MVVM architecture defined in ARCHITECTURE.md §2.2 |
 
 ### Pending Decision: Markdown Parser
 

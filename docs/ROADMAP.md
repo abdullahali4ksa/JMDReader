@@ -1,195 +1,33 @@
 # MDReader — Roadmap
 
-> A phased delivery plan for the MDReader Markdown reader application. Each phase is self-contained, testable, and builds on the previous one. **Phase 0 is the current phase.**
+> Phase 0 is complete at baseline `5f81c9e`. Phase 1 remains unstarted. This roadmap is planning-only and subject to owner review of [`PRODUCT_BLUEPRINT.md`](PRODUCT_BLUEPRINT.md). Task-level scope, permanent IDs, dependencies, and verification live in [`.project/TASKS.md`](../.project/TASKS.md); machine state lives in [`.project/STATE.json`](../.project/STATE.json).
 
----
+## Phase 0 — Environment and Architecture — DONE
+Baseline environment, solution, feature-based structure, architecture and documentation established. Reported verification: build PASS (0 warnings/errors); tests PASS (2/2); baseline `5f81c9e`.
 
-## Phase 0 — Environment and Architecture
+## Phase 1 — Application Shell — READY, NOT STARTED
+Implement shell, MVVM foundation, window sizing/DPI, system theme, empty reader state, keyboard accessibility, and Core initialization tests. Preserve existing task IDs P01-T001 through P01-T009. Exit gate: build/test pass and launch verified or limitation recorded. No Markdown reading in this phase.
 
-**Status:** Complete
+## Phase 2 — File Open and Basic Reader — PLANNED
+Open one `.md`/`.markdown` file via picker and CLI; read safely; parse with documented Markdig dependency; render MVP Markdown nodes in a scrollable view; handle failures. Test Core parsing and file behavior. No folder crawling or editing.
 
-**Goals:**
-- Audit the Windows development environment
-- Install all required tools (verify no redundant installs)
-- Document architecture and design decisions
-- Create the project skeleton (solution, projects, docs, gitignore)
-- Verify the build compiles
+## Phase 3 — Rendering Quality and Safe References — PLANNED
+Complete agreed Markdown subset, Arabic/RTL behavior, safe in-tree local images, internal anchors, user-clicked external URLs and defined file-relative Markdown navigation. Add GFM cases. HTML stays inert; no remote content retrieval.
 
-**Deliverables:**
-- [x] Environment audit report
-- [x] `.gitignore` created
-- [x] `docs/DEVELOPMENT_RULES.md` created
-- [x] `docs/ARCHITECTURE.md` created
-- [x] `docs/ROADMAP.md` created (this file)
-- [x] `README.md` created
-- [x] Feature-based directory structure (Features/{Shell,Reader,FileOpen,Settings,Theme})
-- [x] Source files moved to feature-based locations with updated namespaces
-- [x] App.xaml/App.xaml.cs moved to Features/Shell/
-- [x] MainWindow.xaml/xaml.cs moved to Features/Shell/Views/
-- [x] MainPage.xaml/xaml.cs moved to Features/Reader/Views/
-- [x] MarkdownDocument.cs moved to Core/Markdown/
-- [x] AI control surface architecture (AI/Contracts, AI/Commands, AI/Gateway, AI/Security)
-- [x] Shared components (Shared/Styles, Shared/Converters, Shared/Helpers)
-- [x] ViewModels for Shell, Reader, FileOpen, Settings
-- [x] Core contracts (Contracts/ICommandGateway, Documents/DocumentInfo)
-- [x] Documentation suite created (9 docs: PRODUCT_SPEC, ARCHITECTURE, FEATURE_MAP, UI_DESIGN, AI_INTERFACE, DEVELOPMENT_RULES, DECISIONS, ROADMAP, AGENT_WORKFLOW)
-- [x] Project skeleton (App + Core + Tests projects, solution file)
-- [x] `dotnet build` succeeds (0 warnings, 0 errors)
-- [x] `dotnet test` succeeds (2/2 tests passing)
-- [x] Package.appxmanifest updated (Identity Name, DisplayName, GUIDs)
-- [x] `.gitignore` created and verified
-- [x] Git repository initialized
+## Phase 4 — Windows UX and Accessibility — PLANNED
+Refine native shell/title/menu, keyboard shortcuts, find within current document, single-file drag/drop, in-memory recent list, theme/language UI behavior, accessibility and high-DPI checks. Print remains deferred unless the owner approves it in the Blueprint.
 
-**Stop condition:** Report complete. **Do NOT** implement Markdown reading or UI features.
+## Phase 5 — Reliability and Performance — PLANNED
+Malformed/unreadable and rapid-switch scenarios, large document measurements (including >=10 MB), startup measurement, memory review, Core coverage target, and CI decision. Only add complexity such as virtualization when evidence requires it.
 
----
+## Phase 6 — MSIX Packaging — PLANNED
+Build, sign through a non-committed development/distribution process, install/uninstall, and launch the MSIX package. No custom updater.
 
-## Phase 1 — Minimal Window
+## Phase 7 — Microsoft Store Readiness — PLANNED
+Review capabilities and certification, privacy/legal disclosures, manifest and listing assets. Prepare a submission-ready package; actual publication requires a separate owner action.
 
-**Status:** Pending Approval
+## Global exclusions
+No editing, accounts/cloud sync, database, telemetry, plugin marketplace, collaboration, browser automation, embedded HTML/script execution, custom updater, or AI provider integration. Persistent recent/session/preferences remain deferred until the owner resolves the Blueprint storage conflict.
 
-**Goals:**
-- Create a minimal WinUI 3 window that launches and displays
-- Follow Windows app silhouette (title bar, minimize/maximize/close)
-- Respect system light/dark theme
-- Handle basic window sizing and positioning
-- Graceful shutdown
-
-**Deliverables:**
-- [ ] WinUI 3 app project builds and runs via `dotnet run`
-- [ ] Empty window appears with correct dimensions
-- [ ] Window respects system theme
-- [ ] Window is DPI-aware
-- [ ] Basic keyboard accessibility (Tab navigation)
-- [ ] Unit tests for Core project initialization
-
----
-
-## Phase 2 — Open and Read Markdown File
-
-**Goals:**
-- Open a `.md` file via Windows File Picker
-- Read file contents as UTF-8
-- Parse Markdown to an intermediate document model
-- Render basic Markdown elements (headings, paragraphs, lists, code blocks)
-- Display rendered content in a scrollable view
-- Handle invalid/missing/unreadable files with graceful error messages
-- Open another file (replaces current document)
-
-**Deliverables:**
-- [ ] File picker opens and filters for `.md` files
-- [ ] UTF-8 file reading with proper encoding
-- [ ] Markdown parsing via `Markdig` (NuGet dependency documented)
-- [ ] Basic Markdown rendering (headings, paragraphs, bold, italic, lists, code blocks)
-- [ ] ScrollViewer for content navigation
-- [ ] Error handling for missing/locked/invalid files
-- [ ] Unit tests for Markdown parsing and document model
-
----
-
-## Phase 3 — Markdown Rendering Quality
-
-**Goals:**
-- Full GitHub Flavored Markdown support
-- Images referenced by relative paths
-- Links (external → browser, internal → document navigation)
-- Syntax highlighting for code blocks
-- RTL text support (Arabic, Hebrew)
-- Horizontal rule, blockquotes, tables
-- Inline elements (inline code, links, image alt text)
-
-**Deliverables:**
-- [ ] GFM tables, strikethrough, task lists
-- [ ] Image loading from relative paths (same directory as .md file)
-- [ ] External link handling (launch in default browser)
-- [ ] Syntax highlighting for common languages
-- [ ] RTL paragraph support
-- [ ] Unit tests for complex Markdown constructs
-
----
-
-## Phase 4 — Windows UX Refinement
-
-**Goals:**
-- Native Windows-app title bar (custom title bar with window controls)
-- Context menu for file operations
-- Keyboard shortcuts (Ctrl+O for Open, Ctrl+R for Reload, Ctrl+F for Find)
-- Print support
-- Accessibility audit (Narrator, keyboard navigation, high-contrast)
-- High-DPI testing at multiple scaling factors
-
-**Deliverables:**
-- [ ] Custom title bar following Windows app silhouette
-- [ ] Keyboard shortcuts
-- [ ] Print dialog
-- [ ] Accessibility passes Narrator verification
-- [ ] Tested at 100%, 150%, 200%, 250% DPI scaling
-
----
-
-## Phase 5 — Reliability and Testing
-
-**Goals:**
-- Error boundary around all file I/O and rendering
-- Performance testing with large files (>5MB)
-- Memory profiling
-- Unit test coverage ≥ 80% for Core
-- Load testing for rapid document switching
-
-**Deliverables:**
-- [ ] Unit test coverage report
-- [ ] Large file handling tested (≥ 10MB)
-- [ ] Startup time < 1 second
-- [ ] Memory usage profiling
-- [ ] Automated test in CI (GitHub Actions or similar)
-
----
-
-## Phase 6 — MSIX Packaging
-
-**Goals:**
-- Package the application as MSIX
-- Code-signing certificate (self-signed for dev)
-- Application manifest with correct capabilities
-- Installer/uninstaller tested
-- Update mechanism not included (MSIX handles updates via Store or sideloading)
-
-**Deliverables:**
-- [ ] MSIX package builds successfully
-- [ ] `makeappx.exe` and `signtool.exe` used from Windows SDK
-- [ ] App installs and uninstalls cleanly
-- [ ] App runs from installed MSIX package
-
----
-
-## Phase 7 — Microsoft Store Readiness
-
-**Goals:**
-- Verify Store certification compliance
-- Remove any blocked APIs
-- App manifest updated for Store submission
-- Privacy policy and EULA prepared
-- Store listing assets (icons, screenshots, description)
-
-**Deliverables:**
-- [ ] Store certification checklist passed
-- [ ] App package ready for Store submission
-- [ ] README updated with Store install instructions
-
----
-
-## Out of Scope (Never in MVP)
-
-- Markdown editing
-- Cloud synchronization
-- Accounts/login
-- AI provider integration (LLM, OpenAI, OpenRouter, MCP)
-- Database
-- Plugins
-- Collaboration
-- Browser automation
-- Complex settings
-- Telemetry
-- Custom updater
-
-*These can only be proposed later, after MVP.*
+## Planning gate
+The owner reviews and edits `PRODUCT_BLUEPRINT.md` and `.project/TASKS.md` before any Phase starts. Until explicit acceptance and loop authorization, `.project/STATE.json` remains `PLAN_REVIEW`, current task null, and no implementation task may be selected.

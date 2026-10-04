@@ -25,6 +25,14 @@ public sealed partial class MainWindow : Window
 
         AppWindow.SetIcon("Assets/AppIcon.ico");
 
+        // Set initial window size and center
+        var displayArea = Microsoft.UI.Windowing.DisplayArea.GetFromWindowId(AppWindow.Id, Microsoft.UI.Windowing.DisplayAreaFallback.Primary);
+        AppWindow.Resize(new Windows.Graphics.SizeInt32(1200, 800));
+        var centerPosition = new Windows.Graphics.PointInt32(
+            (displayArea.WorkArea.Width - 1200) / 2,
+            (displayArea.WorkArea.Height - 800) / 2);
+        AppWindow.Move(centerPosition);
+
         // Navigate the root frame to the main page on startup.
         RootFrame.Navigate(typeof(MDReader.App.Features.Reader.Views.MainPage));
     }

@@ -53,3 +53,6 @@
 - MainWindow.xaml.cs creates ShellViewModel and assigns RootGrid.DataContext.
 - Build: PASS (0 warnings, 0 errors)
 - Tests: PASS (2/2)
+## P01-T004 — Implement theme service
+- Implemented ThemeService (IThemeService)
+- Build PASS, Tests PASS

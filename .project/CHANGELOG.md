@@ -147,3 +147,6 @@
 
 --- 2026-10-05 — P03-T002
 - Added Arabic/RTL and mixed-direction layout: paragraph-level RTL detection via Unicode bidi ranges, FlowDirection RightToLeft for Arabic/Hebrew, font fallback chain Segoe UI Variable → Cairo → Amiri, LTR preserved for code blocks, headings and table cells handled. Build 0 errors, 45/45 tests pass. Commit 604d173
+
+## 2026-10-05 — P03-T002
+- P03-T002: Arabic/RTL and mixed-direction layout verified (MarkdownRenderer implements paragraph-level FlowDirection, Arabic font fallback, LTR preserved for code/URLs). Build PASS, tests PASS 45/45.

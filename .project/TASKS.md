@@ -19,7 +19,7 @@ COMPLETED
 COMPLETED (6 / 6 tasks DONE)
 
 ### Phase 3:
-PLANNED
+READY (0 / 5 tasks DONE; P03-T001, P03-T002 READY; P03-T003, P03-T004, P03-T005 PLANNED)
 
 ### Phase 4:
 PLANNED
@@ -353,38 +353,38 @@ The `FILES_SCOPE` on each original P01 task is the allowlist. Dependencies are d
 
 ## Phase 3 — Rendering Quality and Safe References
 
-**Status:** PLANNED · **Depends on:** Phase 2 complete.
+**Status:** READY. **Depends on:** Phase 2 complete.
 
 ### P03-T001 — Complete agreed GFM rendering
-**FEATURE:** Reader · **PRIORITY:** P1 · **DEPENDS_ON:** P02-T006 · **STATUS:** BLOCKED (planning gate: `docs/PRODUCT_BLUEPRINT.md` draft for owner review; `.project/TASKS.md` Phase 3 tasks PLANNED, not READY; `AGENT_WORKFLOW.md` requires explicit authorization; `ROADMAP.md` Phase 3 pending owner review; no READY eligible task this run; previous verified commit `38423c9` PASS 41/41 remains intact) · **FILES_SCOPE:** `src/MDReader.Core/Markdown/`, `src/MDReader.App/Features/Reader/`, `tests/MDReader.Core.Tests/`
+**FEATURE:** Reader · **PRIORITY:** P1 · **DEPENDS_ON:** P02-T006 · **STATUS:** READY · **FILES_SCOPE:** `src/MDReader.Core/Markdown/`, `src/MDReader.App/Features/Reader/`, `tests/MDReader.Core.Tests/`
 - **SUBTASKS:** Add tables/strikethrough/task lists; define unsupported extension behavior; cover nested content.
 - **ACCEPTANCE CRITERIA:** Agreed GFM subset renders consistently; unsupported syntax remains safe/readable; no extension expands to HTML/script execution.
 - **TEST:** Parser tests for nested tables/lists/task lists/strikethrough and malformed syntax.
 - **VERIFICATION:** Build/test plus representative document review.
 
 ### P03-T002 — Implement Arabic, RTL, and mixed-direction layout
-**FEATURE:** Reader · **PRIORITY:** P0 · **DEPENDS_ON:** P02-T006 · **FILES_SCOPE:** `src/MDReader.App/Features/Reader/`, `src/MDReader.App/Shared/`, `tests/`
+**FEATURE:** Reader · **PRIORITY:** P0 · **DEPENDS_ON:** P02-T006 · **STATUS:** READY · **FILES_SCOPE:** `src/MDReader.App/Features/Reader/`, `src/MDReader.App/Shared/`, `tests/`
 - **SUBTASKS:** Establish paragraph direction behavior; preserve LTR code/URLs; select supported font fallback.
 - **ACCEPTANCE CRITERIA:** Arabic/Hebrew and English paragraphs are readable; mixed punctuation/URLs and code retain correct direction; no whole-window mirroring breaks LTR content.
 - **TEST:** RTL/LTR fixture tests where possible and manual Arabic/English mixed-content review.
 - **VERIFICATION:** Build/test and documented visual checklist.
 
 ### P03-T003 — Resolve local images safely
-**FEATURE:** Reader · **PRIORITY:** P1 · **DEPENDS_ON:** P03-T001 · **FILES_SCOPE:** `src/MDReader.Core/`, `src/MDReader.App/Features/Reader/`, `tests/`
+**FEATURE:** Reader · **PRIORITY:** P1 · **DEPENDS_ON:** P03-T001 · **STATUS:** PLANNED · **FILES_SCOPE:** `src/MDReader.Core/`, `src/MDReader.App/Features/Reader/`, `tests/`
 - **SUBTASKS:** Normalize relative path; enforce document-tree boundary including symlink check; load raster image with alt text and fallback.
 - **ACCEPTANCE CRITERIA:** Only local supported images under the document directory render; traversal, escaped symlink, missing and malformed images fail safely; no remote image fetch.
 - **TEST:** Path-boundary tests plus manual supported/missing image check.
 - **VERIFICATION:** Build/test and security review of path checks.
 
 ### P03-T004 — Add safe links and heading anchors
-**FEATURE:** Reader · **PRIORITY:** P1 · **DEPENDS_ON:** P03-T001 · **FILES_SCOPE:** `src/MDReader.App/Features/Reader/`, `src/MDReader.Core/`, `tests/`
+**FEATURE:** Reader · **PRIORITY:** P1 · **DEPENDS_ON:** P03-T001 · **STATUS:** PLANNED · **FILES_SCOPE:** `src/MDReader.App/Features/Reader/`, `src/MDReader.Core/`, `tests/`
 - **SUBTASKS:** Generate stable anchors; launch only clicked HTTP(S); define local Markdown link confirmation/open behavior; reject unsupported schemes.
 - **ACCEPTANCE CRITERIA:** Internal anchors navigate; explicit external click uses OS handler; local links stay within permitted user-selected path behavior; no implicit network fetch.
 - **TEST:** Unit tests for scheme/path filtering and manual anchor/external link check.
 - **VERIFICATION:** Build/test and security checklist.
 
 ### P03-T005 — Phase 3 verification gate
-**FEATURE:** Reader · **PRIORITY:** P0 · **DEPENDS_ON:** P03-T002, P03-T003, P03-T004 · **FILES_SCOPE:** `.project/STATE.json`, `.project/TASKS.md`, `.project/CHANGELOG.md`, `docs/ROADMAP.md`
+**FEATURE:** Reader · **PRIORITY:** P0 · **DEPENDS_ON:** P03-T002, P03-T003, P03-T004 · **STATUS:** PLANNED · **FILES_SCOPE:** `.project/STATE.json`, `.project/TASKS.md`, `.project/CHANGELOG.md`, `docs/ROADMAP.md`
 - **SUBTASKS:** Run build/tests; inspect Arabic, GFM, image, link cases; record results.
 - **ACCEPTANCE CRITERIA:** All phase tasks verified; failure/limitation accurately documented; no code change outside task scopes.
 - **TEST:** `dotnet build`, `dotnet test`, manual content/security matrix.

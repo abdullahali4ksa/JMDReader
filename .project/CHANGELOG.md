@@ -128,3 +128,10 @@
 - Runtime acceptance: CLI valid path renders full Markdown (headings, paragraphs, emphasis, inline code, bullet+ordered lists, blockquote, code block, table, hyperlink); CLI invalid path shows a recoverable "File not found" error with no crash; long document scrolls (vertical ScrollBar active).
 - Fixed a duplicate error prefix in ShellViewModel ("File not found: File not found: ...") — reader messages are now used directly.
 - ROADMAP updated: Phase 1 DONE (9/9), Phase 2 DONE (6/6). STATE advanced to PHASE-03 / P03-T001.
+
+## Owner acceptance — planning gate cleared (2026-10-05)
+- Owner accepted `docs/PRODUCT_BLUEPRINT.md` and `.project/TASKS.md`; authorized the Autonomous Developer Loop.
+- PRODUCT_BLUEPRINT.md status changed from "Draft for owner review" to "Accepted by the project owner".
+- AGENT_WORKFLOW.md planning gate and ROADMAP.md planning gate marked CLEARED; STATE.json plan_review.implementation_authorized = true.
+- Phase 3 tasks: P03-T001 and P03-T002 set to READY; P03-T003..P03-T005 remain PLANNED (dependencies not yet DONE). STATE.json current_task = P03-T001, status = READY, blocked = false.
+- No application code changed in this run.

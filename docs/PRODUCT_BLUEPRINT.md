@@ -1,6 +1,6 @@
 # MDReader Product Blueprint
 
-**Status:** Draft for owner review — planning only; no implementation is authorized by this document.
+**Status:** Accepted by the project owner (2026-10-05). This blueprint is the authoritative product plan; implementation is authorized via the Autonomous Developer Loop, task by task, within the file scopes and acceptance criteria defined in `.project/TASKS.md`.
 **Authority:** This blueprint expands `docs/PRODUCT_SPEC.md` and must remain consistent with `docs/ARCHITECTURE.md`, `docs/UI_DESIGN.md`, `docs/FEATURE_MAP.md`, `docs/ROADMAP.md`, `docs/DECISIONS.md`, `.project/PROJECT.md`, and `.project/STATE.json`.
 **Product:** MDReader — a focused, offline Windows Markdown reader.
 

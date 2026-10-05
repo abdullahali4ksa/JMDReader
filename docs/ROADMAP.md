@@ -11,7 +11,7 @@ Shell, MVVM, window size/position, theme service, empty reader state, keyboard a
 ## Phase 2 — File Open and Basic Reader — DONE (6/6 tasks: P02-T001..P02-T006 verified; build PASS 0 warnings, tests PASS 41/41, runtime verified via AX tree)
 Open one `.md`/`.markdown` file via picker and CLI; read safely; parse with documented Markdig dependency; render MVP Markdown nodes in a scrollable view; handle failures. Verified: CLI valid path renders headings/paragraphs/emphasis/code/lists/quotes/rules/tables/links; invalid path shows a recoverable error (no crash); scroll works; loading/empty/error/content states distinct. No folder crawling or editing.
 
-## Phase 3 — Rendering Quality and Safe References — PLANNED
+## Phase 3 — Rendering Quality and Safe References — READY (5 tasks: P03-T001..P03-T005)
 Complete agreed Markdown subset, Arabic/RTL behavior, safe in-tree local images, internal anchors, user-clicked external URLs and defined file-relative Markdown navigation. Add GFM cases. HTML stays inert; no remote content retrieval.
 
 ## Phase 4 — Windows UX and Accessibility — PLANNED
@@ -29,5 +29,5 @@ Review capabilities and certification, privacy/legal disclosures, manifest and l
 ## Global exclusions
 No editing, accounts/cloud sync, database, telemetry, plugin marketplace, collaboration, browser automation, embedded HTML/script execution, custom updater, or AI provider integration. Persistent recent/session/preferences remain deferred until the owner resolves the Blueprint storage conflict.
 
-## Planning gate
-The owner reviews and edits `PRODUCT_BLUEPRINT.md` and `.project/TASKS.md` before any Phase starts. Until explicit acceptance and loop authorization, `.project/STATE.json` remains `PLAN_REVIEW`, current task null, and no implementation task may be selected.
+## Planning gate — CLEARED
+The owner accepted `PRODUCT_BLUEPRINT.md` and `.project/TASKS.md` on 2026-10-05 and authorized the Autonomous Developer Loop. `.project/STATE.json` records `implementation_authorized: true`. Implementation proceeds task by task from the lowest eligible READY task whose dependencies are DONE. Any future scope change still requires owner acceptance before its tasks become READY.

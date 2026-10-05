@@ -20,7 +20,7 @@ Refine native shell/title/menu, keyboard shortcuts, find within current document
 ## Phase 5 — Reliability and Performance — DONE (4 / 4 tasks verified: P05-T001..P05-T004)
 Hardened failure paths; performance measurements recorded; Core coverage and CI policy established; verification gate passed.
 
-## Phase 6 — MSIX Packaging — P06-T001 DONE, P06-T002 DONE (manual verification blocked by missing signing cert / no sideload env; gate P06-T003 READY)
+## Phase 6 — MSIX Packaging — P06-T001 DONE, P06-T002 DONE (manual verification blocked by missing signing cert / no sideload env; gate P06-T003 DONE); Phase 6 complete
 Build, sign through a non-committed development/distribution process, install/uninstall, and launch the MSIX package. No custom updater.
 
 ## Phase 7 — Microsoft Store Readiness — PLANNED

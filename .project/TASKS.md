@@ -28,7 +28,7 @@ PLANNED
 PLANNED
 
 ### Phase 6:
-PLANNED
+DONE (3 / 3 tasks; P06-T001..P06-T003 verified)
 
 ### Phase 7:
 PLANNED
@@ -482,7 +482,7 @@ The `FILES_SCOPE` on each original P01 task is the allowlist. Dependencies are d
 - **VERIFICATION:** Record OS/package/signing context and results.
 
 ### P06-T003 — Phase 6 verification gate
-**FEATURE:** Packaging · **PRIORITY:** P0 · **DEPENDS_ON:** P06-T002 · **FILES_SCOPE:** `.project/STATE.json`, `.project/TASKS.md`, `.project/CHANGELOG.md`, `docs/ROADMAP.md`
+**FEATURE:** Packaging · **PRIORITY:** P0 · **DEPENDS_ON:** P06-T002 · **STATUS:** DONE · **FILES_SCOPE:** `.project/STATE.json`, `.project/TASKS.md`, `.project/CHANGELOG.md`, `docs/ROADMAP.md`
 - **SUBTASKS:** Review package evidence and update state.
 - **ACCEPTANCE CRITERIA:** Package/build/install/uninstall evidence complete; signing constraints documented; no claim of Store approval.
 - **TEST:** Rebuild package and repeat launch/uninstall check.

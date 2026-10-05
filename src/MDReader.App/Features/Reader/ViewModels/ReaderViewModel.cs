@@ -17,6 +17,7 @@ public sealed partial class ReaderViewModel : ObservableObject
     private string? _documentContent;
     private string? _errorMessage;
     private MarkdownDocumentElement? _elements;
+    private bool _isLoading;
 
     /// <summary>Gets or sets the file path of the currently loaded document.</summary>
     public string? CurrentDocumentPath
@@ -67,13 +68,28 @@ public sealed partial class ReaderViewModel : ObservableObject
     }
 
     /// <summary>True when no document is loaded and no error is shown.</summary>
-    public bool IsEmpty => _errorMessage is null && string.IsNullOrEmpty(_currentDocumentPath);
+    public bool IsEmpty => _errorMessage is null && !_isLoading && string.IsNullOrEmpty(_currentDocumentPath);
 
     /// <summary>True when a document is loaded and ready for rendering.</summary>
-    public bool HasDocument => _errorMessage is null && !string.IsNullOrEmpty(_currentDocumentPath);
+    public bool HasDocument => _errorMessage is null && !_isLoading && !string.IsNullOrEmpty(_currentDocumentPath);
 
     /// <summary>True when there is an active error to display.</summary>
     public bool HasError => _errorMessage is not null;
+
+    /// <summary>True while a document is being loaded (between Open and render).</summary>
+    public bool IsLoading
+    {
+        get => _isLoading;
+        private set
+        {
+            if (SetProperty(ref _isLoading, value))
+            {
+                OnPropertyChanged(nameof(IsEmpty));
+                OnPropertyChanged(nameof(HasDocument));
+                OnPropertyChanged(nameof(HasError));
+            }
+        }
+    }
 
     /// <summary>
     /// Loads a document into the reader, clearing any previous state.
@@ -82,16 +98,28 @@ public sealed partial class ReaderViewModel : ObservableObject
     /// <param name="content">The raw Markdown text content.</param>
     public void LoadDocument(DocumentInfo info, string content)
     {
-        CurrentDocumentPath = info.FilePath;
-        DocumentContent = content;
+        // Mark loading and release the previous document's tree up front so a
+        // replacement never keeps the old visual content alive.
+        IsLoading = true;
+        Elements = null;
 
-        // Parse the Markdown into the platform-neutral element tree. Parse
-        // failures (or size warnings) never throw: the document is still shown,
-        // degrading to whatever could be parsed.
-        var parsed = new MarkdownDocument { SourceText = content }.Parse();
-        Elements = parsed.Document.Elements;
+        try
+        {
+            CurrentDocumentPath = info.FilePath;
+            DocumentContent = content;
 
-        ErrorMessage = null;
+            // Parse the Markdown into the platform-neutral element tree. Parse
+            // failures (or size warnings) never throw: the document is still
+            // shown, degrading to whatever could be parsed.
+            var parsed = new MarkdownDocument { SourceText = content }.Parse();
+            Elements = parsed.Document.Elements;
+
+            ErrorMessage = null;
+        }
+        finally
+        {
+            IsLoading = false;
+        }
     }
 
     /// <summary>

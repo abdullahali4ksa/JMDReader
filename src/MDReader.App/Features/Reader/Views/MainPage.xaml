@@ -69,6 +69,21 @@
                 TextAlignment="Center" />
         </StackPanel>
 
+        <!-- Loading state (shown while a document is being parsed) -->
+        <StackPanel
+            x:Name="LoadingStatePanel"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Spacing="12"
+            Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibilityConverter}}"
+            AutomationProperties.Name="Loading document">
+            <ProgressRing IsActive="{Binding IsLoading}" Width="32" Height="32" />
+            <TextBlock
+                Text="Opening document…"
+                Style="{StaticResource AppSecondaryTextStyle}"
+                HorizontalAlignment="Center" />
+        </StackPanel>
+
         <!-- Error state -->
         <Border
             x:Name="ErrorState"

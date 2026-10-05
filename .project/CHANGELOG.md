@@ -115,3 +115,10 @@
 - Fixed the false BLOCKED: root cause was UWP namespace usings (Windows.UI.Text / Windows.UI.Xaml.Automation) instead of Microsoft.UI.Text / Microsoft.UI.Xaml.Automation(.Peers); resolved.
 - Build: PASS (0 warnings, 0 errors); Tests: PASS (41/41).
 - Runtime verified via accessibility tree: H1/H2 headings, bold/italic/inline-code paragraph, bullet + ordered lists, blockquote, code block, table (2x2), and clickable external hyperlink all render as real WinUI elements.
+
+## P02-T005 — Add scrollable reader and document replacement lifecycle
+- ReaderViewModel: added IsLoading state; LoadDocument marks loading, clears the previous element tree up front (releases old visual content on replace), then parses and sets Elements.
+- Empty/HasDocument/HasError/IsLoading are mutually distinct states.
+- MainPage.xaml: added a loading state (ProgressRing + message) alongside empty/error/content states.
+- Scrolling: content lives in a ScrollViewer (vertical + horizontal Auto); long code lines scroll horizontally.
+- Verification: build PASS (0 warnings), tests PASS (41/41). Runtime: loaded a 60-section document via CLI; AX tree showed all sections and a vertical ScrollBar; setting the scrollbar position moved the viewport (element count shifted 133->137), confirming scroll works. Pixel-level visual confirmation not possible (active model has no image input); structural evidence recorded.

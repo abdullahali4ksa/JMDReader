@@ -336,7 +336,7 @@ The `FILES_SCOPE` on each original P01 task is the allowlist. Dependencies are d
 - **VERIFICATION:** Build/test and manual render checklist.
 
 ### P02-T005 — Add scrollable reader and document replacement lifecycle
-**STATUS:** PLANNED · **PRIORITY:** P1 · **DEPENDS_ON:** P02-T004 · **FILES_SCOPE:** `src/MDReader.App/Features/Reader/`
+**STATUS:** DONE · **PRIORITY:** P1 · **DEPENDS_ON:** P02-T004 · **FILES_SCOPE:** `src/MDReader.App/Features/Reader/`
 
 - **SUBTASKS:** Add reader scrolling; release old visual tree on replacement; keep empty/error/loading states distinct.
 - **ACCEPTANCE CRITERIA:** Mouse-wheel and touch scrolling work; replace-current path releases prior content; empty, loading, error, and loaded states are understandable.

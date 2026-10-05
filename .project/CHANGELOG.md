@@ -242,3 +242,10 @@
 - `dotnet build`: PASS (0 errors, 2 pre-existing warnings). `dotnet test`: PASS (45/45).
 - Verified commit: 046b600 (no new code changes; metadata/state updates only).
 - STATE updated to READY / next = P07-T001; TASKS.md and ROADMAP.md updated.
+
+## P07-T001 — Complete Store policy, privacy, and capability review (VERIFIED 2026-10-05)
+- Reviewed Package.appxmanifest: `runFullTrust` only, identity pinned 1.0.0.0, no extra capabilities.
+- Created docs/STORE_POLICY.md: privacy (offline, no telemetry/account/cloud), EULA notes, certification checklist.
+- Confirmed no remote fetch, no edit/save/edit, no persistent storage; signing stays out-of-repo.
+- Build PASS (0 errors, 2 pre-existing warnings); Tests PASS 45/45.
+- Store submission remains separate owner authorization; not submitted.

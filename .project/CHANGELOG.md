@@ -191,3 +191,10 @@
 - MainWindow.xaml updated with MenuBarItem entries for File, View, Settings.
 - Build PASS (0 errors, 2 pre-existing warnings); Tests PASS 45/45.
 - 2026-10-05 P04-T002: keyboard shortcuts (Ctrl+O, Ctrl+R, Ctrl+F) and in-document find command; build PASS 45/45; commit dadf0d5
+
+## P04-T003 — Single-file drag-and-drop (VERIFIED 2026-10-05)
+- Added AllowDrop=True and DragOver/Drop handlers to MainWindow (RootGrid).
+- Drop accepts only `.md`/`.markdown` files via StorageItems filter; unsupported/folder/multiple drops ignore safely.
+- Open path routed through ShellViewModel.OpenDocument (same pipeline as picker/CLI).
+- Build: PASS (0 errors, 0 warnings); Tests: PASS (45/45); Verified commit: b809808.
+2026-10-05 P04-T004: RecentFilesService (in-memory, max 10, no disk); SettingsViewModel links ThemeService + RecentService + language labels; build PASS 45/45

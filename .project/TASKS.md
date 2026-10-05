@@ -409,13 +409,14 @@ The `FILES_SCOPE` on each original P01 task is the allowlist. Dependencies are d
 - **VERIFICATION:** Recorded shortcut and focus checklist.
 
 ### P04-T003 — Support single-file drag-and-drop
-**FEATURE:** FileOpen · **PRIORITY:** P1 · **DEPENDS_ON:** P04-T001, P02-T003 · **FILES_SCOPE:** `src/MDReader.App/Features/FileOpen/`, `src/MDReader.App/Features/Shell/`, `src/MDReader.App/Features/Reader/`
+**FEATURE:** FileOpen · **PRIORITY:** P1 · **DEPENDS_ON:** P04-T001, P02-T003 · **STATUS:** DONE · **FILES_SCOPE:** `src/MDReader.App/Features/FileOpen/`, `src/MDReader.App/Features/Shell/`, `src/MDReader.App/Features/Reader/`
 - **SUBTASKS:** Accept one supported file; route through common open flow; reject folder/multiple/unsupported drops clearly.
 - **ACCEPTANCE CRITERIA:** One `.md`/`.markdown` drop opens safely and replaces current document; unsupported drops do not crash or broaden access.
 - **TEST:** Build/test and manual file/folder/multiple/unsupported drop checks.
 - **VERIFICATION:** Record outcome and error behavior.
 
 ### P04-T004 — Add current-session recent list and theme/language controls
+**STATUS:** DONE
 **FEATURE:** Settings · **PRIORITY:** P2 · **DEPENDS_ON:** P04-T001 · **FILES_SCOPE:** `src/MDReader.App/Features/Settings/`, `src/MDReader.App/Features/FileOpen/`, `src/MDReader.App/Features/Theme/`
 - **SUBTASKS:** Track up to 10 in-memory paths; clear on exit; expose theme and available English/Arabic labels.
 - **ACCEPTANCE CRITERIA:** Recent list contains only files opened during current process and is not written to disk; theme supports System/Light/Dark; no persistent preference/session storage is introduced.

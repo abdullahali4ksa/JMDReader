@@ -163,3 +163,10 @@
 - MainPage.xaml.cs passes CurrentDocumentPath to _renderer.Render.
 - Build PASS (0 warnings, 0 errors); Tests PASS (45/45).
 
+
+## P03-T003 — Resolve local images safely (VERIFIED 2026-10-05)
+- MarkdownRenderer: safe local image resolution with document-tree boundary (Path.GetFullPath), symlink/reparse-point rejection via FileAttributes.ReparsePoint, alt-text fallback.
+- No remote image fetch; traversal blocked; missing/malformed images degrade to muted placeholder.
+- Build PASS (0 warnings, 0 errors); Tests PASS (45/45).
+- Verified commit: 836ffac
+

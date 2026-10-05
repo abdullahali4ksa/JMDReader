@@ -214,3 +214,10 @@
 - Fixed MarkdownFileReader to use fully qualified FileNotFoundException.
 - Parser recoverable-error path preserved; renderer null/empty guard maintained.
 - `dotnet build`: PASS (0 errors, 2 pre-existing warnings). `dotnet test`: 45/45 PASS.
+
+## P05-T002 — Measure large document and rapid switching behavior
+- Fixtures: 1MB, 5MB, 10MB markdown prepared under tests/fixtures/large/
+- Build PASS (0 errors, 2 pre-existing warnings); Tests PASS (45/45)
+- Measurements recorded in docs/PERFORMANCE_MEASUREMENTS.md
+- No optimization added; evidence does not require virtualized rendering per ARCHITECTURE.md
+- Status: DONE; no persistent storage added; no code architecture change

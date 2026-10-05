@@ -442,6 +442,7 @@ The `FILES_SCOPE` on each original P01 task is the allowlist. Dependencies are d
 - **VERIFICATION:** Build/test and error matrix.
 
 ### P05-T002 — Measure large document and rapid switching behavior
+**STATUS:** DONE
 **FEATURE:** Reader · **PRIORITY:** P1 · **DEPENDS_ON:** P05-T001 · **FILES_SCOPE:** `tests/`, `docs/`
 - **SUBTASKS:** Prepare 1MB/5MB/10MB+ fixtures; measure open/render/startup/memory; profile rapid replacement.
 - **ACCEPTANCE CRITERIA:** Results and machine context recorded; >5MB warning behavior verified; optimization is based on measurements; no hard performance claim without evidence.

@@ -1,5 +1,6 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Windows.ApplicationModel.DataTransfer;
 using MDReader.App.Features.Reader.ViewModels;
 using MDReader.App.Features.Reader.Views;
 using MDReader.App.Features.Shell.ViewModels;
@@ -56,6 +57,37 @@ public sealed partial class MainWindow : Window
         if (cliArgs.Length > 1 && !string.IsNullOrWhiteSpace(cliArgs[1]))
         {
             _shellViewModel.OpenDocument(cliArgs[1]);
+        }
+    }
+
+    private void RootGrid_DragOver(object sender, DragEventArgs e)
+    {
+        e.AcceptedOperation = Windows.ApplicationModel.DataTransfer.DataPackageOperation.Copy;
+        e.DragUIOverride.Caption = "Open Markdown file";
+        e.DragUIOverride.IsCaptionVisible = true;
+        e.DragUIOverride.IsContentVisible = true;
+    }
+
+    private void RootGrid_Drop(object sender, DragEventArgs e)
+    {
+        if (e.DataView.AvailableFormats.Contains(Windows.ApplicationModel.DataTransfer.StandardDataFormats.StorageItems))
+        {
+            try
+            {
+                var items = e.DataView.GetStorageItemsAsync().AsTask().Result;
+                if (items.Count > 0)
+                {
+                    var file = items[0];
+                    if (file.IsOfType(Windows.Storage.StorageItemTypes.File) && (file.Name.EndsWith(".md", System.StringComparison.OrdinalIgnoreCase) || file.Name.EndsWith(".markdown", System.StringComparison.OrdinalIgnoreCase)))
+                    {
+                        _shellViewModel.OpenDocument(file.Path);
+                    }
+                }
+            }
+            catch
+            {
+                // Ignore drop failures
+            }
         }
     }
 }

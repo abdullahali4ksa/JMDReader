@@ -190,3 +190,4 @@
 - Added View (Refresh) and Settings (Theme) menu items with named RelayCommands (RefreshDocumentAsync, ThemeSettingsAsync) in ShellViewModel.
 - MainWindow.xaml updated with MenuBarItem entries for File, View, Settings.
 - Build PASS (0 errors, 2 pre-existing warnings); Tests PASS 45/45.
+- 2026-10-05 P04-T002: keyboard shortcuts (Ctrl+O, Ctrl+R, Ctrl+F) and in-document find command; build PASS 45/45; commit dadf0d5

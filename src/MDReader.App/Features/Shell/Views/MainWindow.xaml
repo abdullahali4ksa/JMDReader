@@ -13,7 +13,7 @@
         <MicaBackdrop />
     </Window.SystemBackdrop>
 
-    <Grid x:Name="RootGrid" TabFocusNavigation="Cycle" AutomationProperties.Name="MDReader application">
+    <Grid x:Name="RootGrid" TabFocusNavigation="Cycle" AutomationProperties.Name="MDReader application" AllowDrop="True" DragOver="RootGrid_DragOver" Drop="RootGrid_Drop">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />

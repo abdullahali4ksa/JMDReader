@@ -156,3 +156,10 @@
 - Font fallback chain: Segoe UI Variable → Cairo → Amiri.
 - LTR preserved for code blocks (`FlowDirection.LeftToRight`, `CodeFontFamily`), headings, table cells.
 - Mixed-direction safe; no HTML/script execution; build 0 errors; tests 45/45 PASS.
+
+## 2026-10-05 — P03-T003 — Resolve local images safely (IN_PROGRESS)
+- MarkdownRenderer: added safe local image resolution (document-tree boundary via Path.GetFullPath, symlink/reparse-point rejection, alt text fallback).
+- RenderImageInline uses InlineUIContainer for image load; degrades to muted placeholder text on any failure.
+- MainPage.xaml.cs passes CurrentDocumentPath to _renderer.Render.
+- Build PASS (0 warnings, 0 errors); Tests PASS (45/45).
+

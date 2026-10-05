@@ -71,7 +71,8 @@ public sealed partial class MainPage : Page
         if (elements is null)
             return;
 
-        foreach (var element in _renderer.Render(elements))
+        var basePath = _viewModel?.CurrentDocumentPath;
+        foreach (var element in _renderer.Render(elements, basePath))
             RenderedDocumentPanel.Children.Add(element);
     }
 }

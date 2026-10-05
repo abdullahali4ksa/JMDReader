@@ -12,6 +12,7 @@ using Microsoft.UI.Text;
 using Microsoft.UI.Xaml.Automation;
 using Microsoft.UI.Xaml.Automation.Peers;
 using Microsoft.UI.Xaml.Media;
+using System.IO;
 using MDReader.Core.Markdown;
 
 namespace MDReader.App.Features.Reader;
@@ -31,8 +32,11 @@ public sealed class MarkdownRenderer
     /// Renders a parsed document into an ordered list of block elements suitable
     /// for addition to a XAML panel (e.g. a <see cref="StackPanel"/>).
     /// </summary>
-    public IReadOnlyList<FrameworkElement> Render(MarkdownDocumentElement document)
+    private string? _documentBasePath;
+
+    public IReadOnlyList<FrameworkElement> Render(MarkdownDocumentElement document, string? documentBasePath = null)
     {
+        _documentBasePath = documentBasePath;
         var elements = new List<FrameworkElement>();
         foreach (var block in document.Blocks)
         {
@@ -313,13 +317,7 @@ public sealed class MarkdownRenderer
                 };
 
             case MarkdownImageInline i:
-                // Images are a Phase 3 concern (local image resolution). For the
-                // MVP the renderer degrades safely to a muted placeholder run.
-                return new Run
-                {
-                    Text = "[image: " + (string.IsNullOrEmpty(i.AltText) ? "image" : i.AltText) + "]",
-                    Foreground = GetBrush("AppSecondaryTextBrush"),
-                };
+                return RenderImageInline(i);
 
             default:
                 return new Run { Text = inline.ToString() ?? string.Empty };
@@ -409,6 +407,68 @@ public sealed class MarkdownRenderer
             _ => AutomationHeadingLevel.Level9,
         };
         AutomationProperties.SetHeadingLevel(target, headingLevel);
+    }
+
+    private Inline RenderImageInline(MarkdownImageInline image)
+    {
+        // Safe local image resolution: enforce document-tree boundary (no traversal, no symlink escape)
+        string altText = string.IsNullOrEmpty(image.AltText) ? "image" : image.AltText;
+        string? resolvedPath = null;
+        try
+        {
+            if (!string.IsNullOrEmpty(_documentBasePath) && !string.IsNullOrEmpty(image.Url))
+            {
+                var baseDir = Path.GetDirectoryName(_documentBasePath) ?? _documentBasePath;
+                var targetPath = Path.GetFullPath(Path.Combine(baseDir, image.Url));
+                var baseFull = Path.GetFullPath(baseDir);
+                // Ensure resolved path is under base directory
+                if (targetPath.StartsWith(baseFull, StringComparison.OrdinalIgnoreCase) || targetPath == baseFull)
+                {
+                    if (File.Exists(targetPath))
+                    {
+                        // Symlink check: reject reparse points
+                        var attr = File.GetAttributes(targetPath);
+                        if ((attr & FileAttributes.ReparsePoint) == 0)
+                        {
+                            resolvedPath = targetPath;
+                        }
+                    }
+                }
+            }
+        }
+        catch
+        {
+            // Any path failure degrades safely to alt text
+        }
+
+        if (!string.IsNullOrEmpty(resolvedPath))
+        {
+            try
+            {
+                var bitmap = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage { UriSource = new Uri(resolvedPath) };
+                var img = new Microsoft.UI.Xaml.Controls.Image
+                {
+                    Source = bitmap,
+                    Stretch = Microsoft.UI.Xaml.Media.Stretch.Uniform,
+                    MaxHeight = 400,
+                    Margin = new Thickness(0, 8, 0, 8),
+                };
+                AutomationProperties.SetName(img, altText);
+                return new InlineUIContainer { Child = img };
+            }
+            catch
+            {
+                // If loading fails, degrade
+            }
+        }
+
+        // Degrade safely: muted placeholder with alt text
+        return new Run
+        {
+            Text = "[image: " + altText + "]",
+            Foreground = GetBrush("AppSecondaryTextBrush"),
+            FontStyle = Windows.UI.Text.FontStyle.Italic,
+        };
     }
 
     private static bool ContainsRtlText(string text) =>

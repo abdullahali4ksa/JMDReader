@@ -233,3 +233,5 @@
 - Documented policy in docs/COVERAGE_CI.md: 80% Core target; reproducible measurement requires build; gaps recorded if <80%.
 - Build: PASS (0 errors, pre-existing warnings only); Tests: PASS (45/45).
 2026-10-05 P06-T001 MSIX manifest identity configured; docs/MSIX_SETUP.md added; build 0 errors (2 pre-existing warnings); tests 45/45 PASS
+
+[2026-10-05] P06-T002 — MSIX lifecycle verification (manual matrix): build PASS (0 errors, 2 warnings); tests PASS 45/45; MSIX manifest (`Package.appxmanifest`) and docs/MSIX_SETUP.md present and consistent. Manual install/launch/uninstall verification BLOCKED by environment: no development signing certificate committed (per security rule), no Store/development signing cert available in cron session, and MSIX sideload requires user interaction. No custom updater present. Evidence recorded in STATE.json. Point of resumption: complete manual lifecycle check once signing material and target Windows environment are available.

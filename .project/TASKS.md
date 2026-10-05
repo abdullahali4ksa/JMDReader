@@ -475,7 +475,7 @@ The `FILES_SCOPE` on each original P01 task is the allowlist. Dependencies are d
 - **VERIFICATION:** Capture package build result and configuration instructions.
 
 ### P06-T002 — Verify install, launch, and uninstall
-**FEATURE:** Packaging · **PRIORITY:** P1 · **DEPENDS_ON:** P06-T001 · **FILES_SCOPE:** `docs/`, packaging config only if needed
+**FEATURE:** Packaging · **PRIORITY:** P1 · **DEPENDS_ON:** P06-T001 · **STATUS:** DONE · **FILES_SCOPE:** `docs/`, packaging config only if needed
 - **SUBTASKS:** Install test package; launch/open sample; verify uninstall and user-file preservation.
 - **ACCEPTANCE CRITERIA:** Installed app launches and reads selected local file; uninstall is clean; no custom updater added.
 - **TEST:** Manual packaged lifecycle matrix on supported Windows environment.

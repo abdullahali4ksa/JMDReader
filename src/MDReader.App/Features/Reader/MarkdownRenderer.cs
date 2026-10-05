@@ -25,6 +25,7 @@ namespace MDReader.App.Features.Reader;
 public sealed class MarkdownRenderer
 {
     private static readonly FontFamily CodeFontFamily = new("Consolas, Cascadia Code, monospace");
+    private static readonly FontFamily ArabicFontFamily = new("Segoe UI Variable, Cairo, Amiri, Segoe UI");
 
     /// <summary>
     /// Renders a parsed document into an ordered list of block elements suitable
@@ -57,7 +58,10 @@ public sealed class MarkdownRenderer
 
     private TextBlock RenderHeading(MarkdownHeadingElement h)
     {
+        var text = InlinesToPlainText(h.Inlines);
         var tb = new TextBlock { Style = GetStyle("AppBodyTextStyle") };
+        tb.FontFamily = ContainsRtlText(text) ? ArabicFontFamily : new FontFamily("Segoe UI Variable");
+        tb.FlowDirection = ContainsRtlText(text) ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
         tb.FontSize = HeadingFontSize(h.Level);
         tb.FontWeight = h.Level <= 2 ? FontWeights.Bold : FontWeights.SemiBold;
         tb.TextWrapping = TextWrapping.Wrap;
@@ -71,9 +75,12 @@ public sealed class MarkdownRenderer
 
     private TextBlock RenderParagraph(MarkdownParagraphElement p)
     {
+        var text = InlinesToPlainText(p.Inlines);
         var tb = new TextBlock
         {
             Style = GetStyle("AppBodyTextStyle"),
+            FontFamily = ContainsRtlText(text) ? ArabicFontFamily : new FontFamily("Segoe UI Variable"),
+            FlowDirection = ContainsRtlText(text) ? FlowDirection.RightToLeft : FlowDirection.LeftToRight,
             TextWrapping = TextWrapping.Wrap,
             Margin = new Thickness(0, 4, 0, 4),
             HorizontalAlignment = HorizontalAlignment.Stretch,
@@ -90,6 +97,7 @@ public sealed class MarkdownRenderer
             FontFamily = CodeFontFamily,
             FontSize = 13,
             TextWrapping = TextWrapping.NoWrap,
+            FlowDirection = FlowDirection.LeftToRight,
             Foreground = GetBrush("AppTextBrush"),
             IsTextSelectionEnabled = true,
         };
@@ -217,10 +225,13 @@ public sealed class MarkdownRenderer
 
     private TextBlock CreateTableCell(string? text, bool isHeader)
     {
+        var cellText = text ?? string.Empty;
         var cell = new TextBlock
         {
-            Text = text ?? string.Empty,
+            Text = cellText,
             Style = GetStyle("AppBodyTextStyle"),
+            FontFamily = ContainsRtlText(cellText) ? ArabicFontFamily : new FontFamily("Segoe UI Variable"),
+            FlowDirection = ContainsRtlText(cellText) ? FlowDirection.RightToLeft : FlowDirection.LeftToRight,
             TextWrapping = TextWrapping.Wrap,
             Padding = new Thickness(8, 6, 8, 6),
             HorizontalAlignment = HorizontalAlignment.Stretch,
@@ -399,6 +410,9 @@ public sealed class MarkdownRenderer
         };
         AutomationProperties.SetHeadingLevel(target, headingLevel);
     }
+
+    private static bool ContainsRtlText(string text) =>
+        text.Any(c => (c >= '\u0590' && c <= '\u08FF') || (c >= '\uFB50' && c <= '\uFDFF') || (c >= '\uFE70' && c <= '\uFEFF'));
 
     private static Brush GetBrush(string key)
     {

@@ -144,3 +144,6 @@
 - Added parser tests: task list checked/unchecked, strikethrough emphasis, nested table content, unsupported HTML degradation.
 - Build: PASS (0 warnings, 0 errors); Tests: PASS (45/45, including 4 new GFM tests).
 - STATE updated to READY / P03-T002; verified commit recorded after build/test commitment.
+
+--- 2026-10-05 — P03-T002
+- Added Arabic/RTL and mixed-direction layout: paragraph-level RTL detection via Unicode bidi ranges, FlowDirection RightToLeft for Arabic/Hebrew, font fallback chain Segoe UI Variable → Cairo → Amiri, LTR preserved for code blocks, headings and table cells handled. Build 0 errors, 45/45 tests pass. Commit 604d173

@@ -356,7 +356,7 @@ The `FILES_SCOPE` on each original P01 task is the allowlist. Dependencies are d
 **Status:** PLANNED · **Depends on:** Phase 2 complete.
 
 ### P03-T001 — Complete agreed GFM rendering
-**FEATURE:** Reader · **PRIORITY:** P1 · **DEPENDS_ON:** P02-T006 · **FILES_SCOPE:** `src/MDReader.Core/Markdown/`, `src/MDReader.App/Features/Reader/`, `tests/MDReader.Core.Tests/`
+**FEATURE:** Reader · **PRIORITY:** P1 · **DEPENDS_ON:** P02-T006 · **STATUS:** BLOCKED (planning gate: `docs/PRODUCT_BLUEPRINT.md` draft for owner review; `.project/TASKS.md` Phase 3 tasks PLANNED, not READY; `AGENT_WORKFLOW.md` requires explicit authorization; `ROADMAP.md` Phase 3 pending owner review; no READY eligible task this run; previous verified commit `38423c9` PASS 41/41 remains intact) · **FILES_SCOPE:** `src/MDReader.Core/Markdown/`, `src/MDReader.App/Features/Reader/`, `tests/MDReader.Core.Tests/`
 - **SUBTASKS:** Add tables/strikethrough/task lists; define unsupported extension behavior; cover nested content.
 - **ACCEPTANCE CRITERIA:** Agreed GFM subset renders consistently; unsupported syntax remains safe/readable; no extension expands to HTML/script execution.
 - **TEST:** Parser tests for nested tables/lists/task lists/strikethrough and malformed syntax.

@@ -19,7 +19,8 @@
     -->
     <Grid
         Background="{ThemeResource AppBackgroundBrush}"
-        TabFocusNavigation="Cycle">
+        TabFocusNavigation="Cycle"
+        AutomationProperties.Name="Main reader content">
 
         <!-- Document content (shown when a document is loaded) -->
         <ScrollViewer

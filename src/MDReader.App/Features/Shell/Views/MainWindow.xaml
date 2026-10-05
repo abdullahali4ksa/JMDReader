@@ -27,7 +27,7 @@
         </TitleBar>
 
         <!-- Menu bar: File -> Open -->
-        <MenuBar Grid.Row="1" Background="{ThemeResource AppBackgroundBrush}">
+        <MenuBar Grid.Row="1" Background="{ThemeResource AppBackgroundBrush}" AutomationProperties.Name="Application menu bar">
             <MenuBarItem Title="File">
                 <MenuFlyoutItem Text="Open...  (Ctrl+O)" Command="{Binding OpenDocumentCommand}" />
             </MenuBarItem>

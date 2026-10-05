@@ -198,3 +198,14 @@
 - Open path routed through ShellViewModel.OpenDocument (same pipeline as picker/CLI).
 - Build: PASS (0 errors, 0 warnings); Tests: PASS (45/45); Verified commit: b809808.
 2026-10-05 P04-T004: RecentFilesService (in-memory, max 10, no disk); SettingsViewModel links ThemeService + RecentService + language labels; build PASS 45/45
+
+---
+
+## 2026-10-05 — P04-T005 completed
+
+- P04-T005: Accessibility and DPI verification gate
+- Added AutomationProperties.Name to MainWindow Grid, MenuBar, and MainPage Grid
+- Removed unsupported Window-level XAML properties (UseLayoutRounding / TextFormattingMode)
+- `dotnet build`: PASS (0 errors, 0 warnings)
+- `dotnet test`: PASS (45/45)
+- Commit: (awaiting)

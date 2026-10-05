@@ -423,8 +423,8 @@ The `FILES_SCOPE` on each original P01 task is the allowlist. Dependencies are d
 - **TEST:** Unit tests for list bound/order and manual exit/relaunch/theme checks.
 - **VERIFICATION:** Inspect storage behavior; build/test and UI checks.
 
-### P04-T005 — Accessibility and DPI verification gate
-**FEATURE:** Shell/Reader · **PRIORITY:** P1 · **DEPENDS_ON:** P04-T002, P04-T003, P04-T004 · **FILES_SCOPE:** `src/MDReader.App/`, `docs/UI_DESIGN.md`, `.project/`
+### **P04-T005 — Accessibility and DPI verification gate**
+**FEATURE:** Shell/Reader · **PRIORITY:** P1 · **DEPENDS_ON:** P04-T002, P04-T003, P04-T004 · **FILES_SCOPE:** `src/MDReader.App/`, `docs/UI_DESIGN.md`, `.project/` · **STATUS:** DONE
 - **SUBTASKS:** Verify keyboard order/focus, Narrator names, contrast and 100/150/200/250% scaling; fix scoped issues.
 - **ACCEPTANCE CRITERIA:** Core actions keyboard-accessible; images/controls named; layout usable at target scale factors; issues recorded and resolved or blocked transparently.
 - **TEST:** Build/test, manual Narrator/keyboard/high-contrast/multi-DPI matrix.

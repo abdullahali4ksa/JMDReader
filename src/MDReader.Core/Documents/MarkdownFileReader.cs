@@ -16,7 +16,7 @@ public static class MarkdownFileReader
     public static DocumentInfo ReadFile(string filePath)
     {
         if (string.IsNullOrWhiteSpace(filePath))
-            throw new FileNotFoundException("File path is empty.");
+            throw new System.IO.FileNotFoundException("File path is empty.");
 
         var extension = System.IO.Path.GetExtension(filePath).ToLowerInvariant();
         if (extension != ".md" && extension != ".markdown")

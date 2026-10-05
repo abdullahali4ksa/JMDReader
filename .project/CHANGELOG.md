@@ -209,3 +209,8 @@
 - `dotnet build`: PASS (0 errors, 0 warnings)
 - `dotnet test`: PASS (45/45)
 - Commit: (awaiting)
+
+## 2026-10-05 — P05-T001: Harden failure paths
+- Fixed MarkdownFileReader to use fully qualified FileNotFoundException.
+- Parser recoverable-error path preserved; renderer null/empty guard maintained.
+- `dotnet build`: PASS (0 errors, 2 pre-existing warnings). `dotnet test`: 45/45 PASS.

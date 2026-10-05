@@ -435,7 +435,7 @@ The `FILES_SCOPE` on each original P01 task is the allowlist. Dependencies are d
 **Status:** PLANNED · **Depends on:** Phase 4 complete.
 
 ### P05-T001 — Harden file, parser, and rendering failure paths
-**FEATURE:** Core/Reader · **PRIORITY:** P0 · **DEPENDS_ON:** P04-T005 · **FILES_SCOPE:** `src/MDReader.Core/`, `src/MDReader.App/Features/Reader/`, `tests/`
+**FEATURE:** Core/Reader · **PRIORITY:** P0 · **DEPENDS_ON:** P04-T005 · **STATUS:** DONE · **FILES_SCOPE:** `src/MDReader.Core/`, `src/MDReader.App/Features/Reader/`, `tests/`
 - **SUBTASKS:** Audit exception boundaries; validate malformed/removed/locked files; ensure retry/reload state recovers.
 - **ACCEPTANCE CRITERIA:** Expected failures produce actionable UI and no crash; prior document state is not corrupted by a failed open.
 - **TEST:** Fault-path unit tests and manual remove/lock/reload scenarios.

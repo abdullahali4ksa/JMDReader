@@ -163,6 +163,7 @@ MDReader.Core.Tests  ───depends on───>  MDReader.Core
 - File access is explicit (picker/CLI/drop); no directory crawl.
 - File reading uses `System.IO` with UTF-8; size warnings apply; access errors become recoverable typed errors.
 - Parser errors (invalid byte sequences, malformed input) are surfaced without crashing; error model lives in `MDReader.Core`.
+- **Unsupported GFM/extensions:** Any syntax not explicitly converted in `MarkdownAstBuilder` (e.g., unknown block/inlines, non-standard extensions) degrades safely — skipped or converted to literal text; no exception, no live markup execution.
 **File scope:** `src/MDReader.Core/Markdown/` (parser/model), `docs/ARCHITECTURE.md` (this entry), `.project/TASKS.md` (P02-T001 dependency entry).
 
 **Options evaluated:**

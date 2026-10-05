@@ -117,8 +117,15 @@ public sealed class MarkdownListItemElement : MarkdownBlockElement
     /// <summary>Gets the blocks contained in this list item.</summary>
     public IReadOnlyList<MarkdownBlockElement> Blocks { get; }
 
+    /// <summary>Gets whether this list item is a checked task item (GFM task list).</summary>
+    public bool IsChecked { get; }
+
     /// <summary>Creates a list-item element.</summary>
-    public MarkdownListItemElement(IReadOnlyList<MarkdownBlockElement> blocks) => Blocks = blocks;
+    public MarkdownListItemElement(IReadOnlyList<MarkdownBlockElement> blocks, bool isChecked = false)
+    {
+        Blocks = blocks;
+        IsChecked = isChecked;
+    }
 }
 
 /// <summary>

@@ -125,7 +125,7 @@ public sealed class MarkdownRenderer
             var row = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 2, 0, 2) };
             var glyph = new TextBlock
             {
-                Text = l.IsOrdered ? (number + ".") : "\u2022",
+                Text = item.IsChecked ? (l.IsOrdered ? (number + ".") : "\u2611") : (l.IsOrdered ? (number + ".") : "\u2610"),
                 FontWeight = FontWeights.Bold,
                 Margin = new Thickness(0, 0, 8, 0),
                 VerticalAlignment = VerticalAlignment.Top,
@@ -294,6 +294,13 @@ public sealed class MarkdownRenderer
             case MarkdownLinkInline l:
                 return CreateLink(l);
 
+            case MarkdownTaskInline t:
+                return new Run
+                {
+                    Text = t.IsChecked ? "\u2610 " : "\u2611 ",
+                    FontFamily = CodeFontFamily,
+                };
+
             case MarkdownImageInline i:
                 // Images are a Phase 3 concern (local image resolution). For the
                 // MVP the renderer degrades safely to a muted placeholder run.
@@ -366,6 +373,9 @@ public sealed class MarkdownRenderer
                     break;
                 case MarkdownImageInline i:
                     sb.Append(i.AltText);
+                    break;
+                case MarkdownTaskInline t:
+                    sb.Append(t.IsChecked ? "[x]" : "[ ]");
                     break;
             }
         }

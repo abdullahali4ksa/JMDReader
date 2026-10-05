@@ -70,7 +70,17 @@ public sealed class MarkdownLinkInline : MarkdownInlineElement
 }
 
 /// <summary>
-/// An inline image (e.g. <c>![alt](src)</c>). Local image resolution and rendering
+/// <summary>A GFM task list checkbox (<c>[x]</c> or <c>[ ]</c>).</summary>
+public sealed class MarkdownTaskInline : MarkdownInlineElement
+{
+    /// <summary>Gets whether the task is checked.</summary>
+    public bool IsChecked { get; }
+
+    /// <summary>Creates a task list checkbox inline.</summary>
+    public MarkdownTaskInline(bool isChecked) => IsChecked = isChecked;
+}
+
+/// <summary>An inline image (e.g. <c>![alt](src)</c>). Local image resolution and rendering</summary>
 /// is handled in Phase 3; for MVP the renderer degrades safely to a placeholder.
 /// </summary>
 public sealed class MarkdownImageInline : MarkdownInlineElement

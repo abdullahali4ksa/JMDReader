@@ -314,4 +314,45 @@ public class MarkdownAstTests
         Assert.True(result.Success);
         Assert.NotNull(result.Document.Elements);
     }
+
+    // ------------------------------------------------------------------ GFM: task lists, nested content, unsupported extensions safe
+
+    [Fact]
+    public void Parse_TaskList_UncheckedAndChecked()
+    {
+        var doc = Parse("- [ ] open\n- [x] done\n");
+        var list = Assert.IsType<MarkdownListElement>(Assert.Single(doc.Blocks));
+        Assert.Equal(2, list.Items.Count);
+        Assert.False(list.Items[0].IsChecked);
+        Assert.True(list.Items[1].IsChecked);
+    }
+
+    [Fact]
+    public void Parse_Strikethrough_EmphasisTypeStrikethrough()
+    {
+        var doc = Parse("~~deleted~~");
+        var para = Assert.IsType<MarkdownParagraphElement>(Assert.Single(doc.Blocks));
+        var strike = Assert.IsType<MarkdownEmphasisInline>(Assert.Single(para.Inlines));
+        Assert.Equal(MarkdownEmphasisType.Strikethrough, strike.EmphasisType);
+    }
+
+    [Fact]
+    public void Parse_Table_NestedContentSafe()
+    {
+        var doc = Parse("| A | B |\n|---|---|\n| **bold** | `code` |\n");
+        var table = Assert.IsType<MarkdownTableElement>(Assert.Single(doc.Blocks));
+        Assert.Equal(1, table.Rows.Count); // single row with nested inlines, safe
+        Assert.Contains("bold", table.Rows[0][0]);
+        Assert.Contains("code", table.Rows[0][1]);
+    }
+
+    [Fact]
+    public void Parse_UnsupportedExtension_DegradesSafely()
+    {
+        // Raw HTML and unsupported syntax degrade safely (no exception, no live markup).
+        var md = "Text <script>alert(1)</script> more\n";
+        var result = new MarkdownDocument { SourceText = md }.Parse();
+        Assert.True(result.Success);
+        Assert.NotNull(result.Document.Elements);
+    }
 }

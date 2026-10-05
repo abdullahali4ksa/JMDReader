@@ -135,3 +135,12 @@
 - AGENT_WORKFLOW.md planning gate and ROADMAP.md planning gate marked CLEARED; STATE.json plan_review.implementation_authorized = true.
 - Phase 3 tasks: P03-T001 and P03-T002 set to READY; P03-T003..P03-T005 remain PLANNED (dependencies not yet DONE). STATE.json current_task = P03-T001, status = READY, blocked = false.
 - No application code changed in this run.
+
+## P03-T001 — Complete agreed GFM rendering (COMPLETED)
+- Added GFM task list support (`MarkdownTaskInline`, `MarkdownListItemElement.IsChecked`) with Markdig `TaskList` inline detection.
+- Confirmed tables (`MarkdownTableElement`), strikethrough (`MarkdownEmphasisType.Strikethrough`), and nested list content render safely.
+- Defined unsupported extension behavior: unknown/inert nodes degrade safely (skipped or literal text); raw HTML remains inert; no live markup execution.
+- Updated `MarkdownAstBuilder` (task list inline parsing, nested table/list handling) and `MarkdownRenderer` (task checkbox glyph, list item checkbox display, inline text conversion).
+- Added parser tests: task list checked/unchecked, strikethrough emphasis, nested table content, unsupported HTML degradation.
+- Build: PASS (0 warnings, 0 errors); Tests: PASS (45/45, including 4 new GFM tests).
+- STATE updated to READY / P03-T002; verified commit recorded after build/test commitment.

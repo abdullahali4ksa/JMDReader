@@ -123,7 +123,22 @@ internal sealed class MarkdownAstBuilder
         {
             if (descendant is ListItemBlock lib && lib.Parent == lb)
             {
-                items.Add(new MarkdownListItemElement(ConvertChildBlocks(lib)));
+                bool isChecked = false;
+                // GFM task list: check for a TaskList inline in the item's first paragraph.
+                foreach (var child in lib)
+                {
+                    if (child is ParagraphBlock p)
+                    {
+                        foreach (var inline in p.Inline)
+                        {
+                            var prop = inline.GetType().GetProperty("Checked", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+                            if (prop != null && prop.PropertyType == typeof(bool))
+                                isChecked = (bool)(prop.GetValue(inline) ?? false);
+                        }
+                        break; // check first paragraph only
+                    }
+                }
+                items.Add(new MarkdownListItemElement(ConvertChildBlocks(lib), isChecked));
             }
         }
 
@@ -251,6 +266,15 @@ internal sealed class MarkdownAstBuilder
                 break;
 
             default:
+                // GFM task list checkbox inline (Markdig.Extensions.TaskLists.TaskList)
+                var taskType = inline.GetType();
+                if (taskType.FullName == "Markdig.Extensions.TaskLists.TaskList")
+                {
+                    var checkedProp = taskType.GetProperty("Checked", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+                    bool checkedVal = checkedProp != null && (bool)(checkedProp.GetValue(inline) ?? false);
+                    result.Add(new MarkdownTaskInline(checkedVal));
+                    break;
+                }
                 // Unknown inline — degrade to a literal run of its text.
                 result.Add(new MarkdownLiteralInline(inline.ToString() ?? string.Empty));
                 break;

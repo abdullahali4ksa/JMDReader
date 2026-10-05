@@ -221,3 +221,9 @@
 - Measurements recorded in docs/PERFORMANCE_MEASUREMENTS.md
 - No optimization added; evidence does not require virtualized rendering per ARCHITECTURE.md
 - Status: DONE; no persistent storage added; no code architecture change
+
+## P05-T003 — Establish Core coverage and CI policy
+- Added coverlet.collector 6.0.0 to MDReader.Core.Tests.
+- Created .github/workflows/ci.yml (Windows-latest, .NET 10, build + test with coverage collection, no secrets).
+- Documented policy in docs/COVERAGE_CI.md: 80% Core target; reproducible measurement requires build; gaps recorded if <80%.
+- Build: PASS (0 errors, pre-existing warnings only); Tests: PASS (45/45).

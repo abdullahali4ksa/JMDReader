@@ -1,0 +1,1 @@
+Core coverage policy: 80% target; coverlet.collector added; CI runner Windows-latest/.NET 10; no secrets exposed. Actual reproducible measurement requires full build (coverlet collects per-run); no persistent data added.

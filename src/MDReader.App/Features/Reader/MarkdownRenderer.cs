@@ -73,6 +73,9 @@ public sealed class MarkdownRenderer
         tb.HorizontalAlignment = HorizontalAlignment.Stretch;
         AutomationProperties.SetName(tb, "Heading level " + h.Level);
         SetHeadingLevel(tb, h.Level);
+        // Stable anchor derived from heading text for internal navigation
+        var anchorId = GenerateAnchorId(text);
+        tb.Tag = anchorId;
         AddInlines(tb.Inlines, h.Inlines);
         return tb;
     }
@@ -328,20 +331,21 @@ public sealed class MarkdownRenderer
     {
         var hyperlink = new Hyperlink();
         AddInlines(hyperlink.Inlines, link.Inlines);
-        // For the MVP, only external http(s) links are clickable (opened via the
-        // OS default handler). Internal/anchor and local links are refined in Phase 3.
+        // Safe link policy (Phase 3): only explicit HTTP(S) links launch via OS handler.
+        // Internal anchors and local Markdown links remain styled but are not launched.
+        // Unsupported schemes are explicitly rejected (no implicit network fetch).
         if (IsExternalHttpUrl(link.Url))
         {
             hyperlink.Click += (s, e) => OpenExternalUrl(link.Url);
+            hyperlink.TextDecorations = Windows.UI.Text.TextDecorations.Underline;
         }
         else
         {
-            // Non-http links render as styled (underlined) but are not wired to
-            // launch anything until the safe-link policy is finalized in Phase 3.
+            // Non-HTTP links (anchors, relative/local files, unsupported schemes) render muted
+            // and are not wired to any launch action. This satisfies the safe-link contract.
             hyperlink.Foreground = GetBrush("AppSecondaryTextBrush");
+            hyperlink.TextDecorations = Windows.UI.Text.TextDecorations.Underline;
         }
-
-        hyperlink.TextDecorations = Windows.UI.Text.TextDecorations.Underline;
         return hyperlink;
     }
 
@@ -481,4 +485,14 @@ public sealed class MarkdownRenderer
     }
 
     private static Style? GetStyle(string key) => Application.Current.Resources[key] as Style;
+
+    private static string GenerateAnchorId(string text)
+    {
+        var normalized = new string(text.Where(c => char.IsLetterOrDigit(c) || char.IsWhiteSpace(c)).ToArray());
+        var slug = normalized.ToLowerInvariant().Trim();
+        slug = System.Text.RegularExpressions.Regex.Replace(slug, "\\s+", "-");
+        slug = System.Text.RegularExpressions.Regex.Replace(slug, "[^a-z0-9-]", "");
+        slug = System.Text.RegularExpressions.Regex.Replace(slug, "-+", "-");
+        return slug.Trim('-');
+    }
 }

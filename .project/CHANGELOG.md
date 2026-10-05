@@ -175,3 +175,14 @@
 - Build PASS (0 warnings, 0 errors); Tests PASS (45/45).
 - Verified commit: 836ffac
 
+
+--- 2026-10-05 — P03-T004 — Safe links and heading anchors (VERIFIED)
+- MarkdownRenderer: heading anchors generated via GenerateAnchorId (stable slug); link policy enforced — only HTTP(S) links launched via OS handler; local/anchor links styled muted and not launched; unsupported schemes rejected.
+- Build PASS (0 errors, pre-existing warnings only); Tests PASS 45/45.
+- Verified commit: 243e949
+
+## P03-T005 — Phase 3 verification gate (2026-10-05)
+- All Phase 3 tasks verified: P03-T001 (GFM rendering), P03-T002 (Arabic/RTL), P03-T003 (safe local images), P03-T004 (safe links/anchors) — all DONE.
+- Build: PASS (0 errors, 2 pre-existing warnings); Tests: PASS (45/45).
+- Phase 3 complete; Phase 4 remains PLANNED (depends P03-T005 verified, which is now complete).
+- Updated STATE.json (current_task = P03-T005, then next = P04-T001; status = READY; blocked = false); TASKS.md (P03-T005 DONE, Phase 3 DONE 5/5); ROADMAP.md (Phase 3 DONE); commit `243e949` verified.

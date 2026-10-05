@@ -19,7 +19,7 @@ COMPLETED
 COMPLETED (6 / 6 tasks DONE)
 
 ### Phase 3:
-READY (3 / 5 tasks DONE; P03-T001 DONE, P03-T002 DONE, P03-T003 DONE; P03-T004 READY; P03-T005 PLANNED)
+DONE (5 / 5 tasks; P03-T001..P03-T005 DONE)
 
 ### Phase 4:
 PLANNED
@@ -377,7 +377,7 @@ The `FILES_SCOPE` on each original P01 task is the allowlist. Dependencies are d
 - **VERIFICATION:** Build/test and security review of path checks.
 
 ### P03-T004 — Add safe links and heading anchors
-**FEATURE:** Reader · **PRIORITY:** P1 · **DEPENDS_ON:** P03-T001 · **STATUS:** READY · **FILES_SCOPE:** `src/MDReader.App/Features/Reader/`, `src/MDReader.Core/`, `tests/`
+**FEATURE:** Reader · **PRIORITY:** P1 · **DEPENDS_ON:** P03-T001 · **STATUS:** DONE · **FILES_SCOPE:** `src/MDReader.App/Features/Reader/`, `src/MDReader.Core/`, `tests/`
 - **SUBTASKS:** Generate stable anchors; launch only clicked HTTP(S); define local Markdown link confirmation/open behavior; reject unsupported schemes.
 - **ACCEPTANCE CRITERIA:** Internal anchors navigate; explicit external click uses OS handler; local links stay within permitted user-selected path behavior; no implicit network fetch.
 - **TEST:** Unit tests for scheme/path filtering and manual anchor/external link check.

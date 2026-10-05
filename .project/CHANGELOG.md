@@ -222,6 +222,11 @@
 - No optimization added; evidence does not require virtualized rendering per ARCHITECTURE.md
 - Status: DONE; no persistent storage added; no code architecture change
 
+## P05-T004 — Phase 5 verification gate (VERIFIED 2026-10-05)
+- Phase 5 gate: P05-T001 (hardening), P05-T002 (performance measurements), P05-T003 (coverage/CI) all DONE; P05-T004 verified.
+- Build PASS (0 errors, pre-existing warnings); Tests PASS (45/45); verified commit `f00d063e7f852012ef32738c060ec61f6f61d548`.
+- Phase 5 complete; Phase 6 (MSIX packaging) next.
+
 ## P05-T003 — Establish Core coverage and CI policy
 - Added coverlet.collector 6.0.0 to MDReader.Core.Tests.
 - Created .github/workflows/ci.yml (Windows-latest, .NET 10, build + test with coverage collection, no secrets).

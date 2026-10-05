@@ -17,8 +17,8 @@ Complete agreed Markdown subset, Arabic/RTL behavior, safe in-tree local images,
 ## Phase 4 — Windows UX and Accessibility — PLANNED
 Refine native shell/title/menu, keyboard shortcuts, find within current document, single-file drag/drop, in-memory recent list, theme/language UI behavior, accessibility and high-DPI checks. Print remains deferred unless the owner approves it in the Blueprint.
 
-## Phase 5 — Reliability and Performance — PLANNED
-Malformed/unreadable and rapid-switch scenarios, large document measurements (including >=10 MB), startup measurement, memory review, Core coverage target, and CI decision. Only add complexity such as virtualization when evidence requires it.
+## Phase 5 — Reliability and Performance — DONE (4 / 4 tasks verified: P05-T001..P05-T004)
+Hardened failure paths; performance measurements recorded; Core coverage and CI policy established; verification gate passed.
 
 ## Phase 6 — MSIX Packaging — PLANNED
 Build, sign through a non-committed development/distribution process, install/uninstall, and launch the MSIX package. No custom updater.

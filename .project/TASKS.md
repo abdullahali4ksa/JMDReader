@@ -457,7 +457,7 @@ The `FILES_SCOPE` on each original P01 task is the allowlist. Dependencies are d
 - **VERIFICATION:** Report actual coverage/runner outcome.
 
 ### P05-T004 — Phase 5 verification gate
-**FEATURE:** Reliability · **PRIORITY:** P0 · **DEPENDS_ON:** P05-T001, P05-T002, P05-T003 · **FILES_SCOPE:** `.project/STATE.json`, `.project/TASKS.md`, `.project/CHANGELOG.md`, `docs/ROADMAP.md`
+**FEATURE:** Reliability · **PRIORITY:** P0 · **DEPENDS_ON:** P05-T001, P05-T002, P05-T003 · **STATUS:** DONE · **FILES_SCOPE:** `.project/STATE.json`, `.project/TASKS.md`, `.project/CHANGELOG.md`, `docs/ROADMAP.md`
 - **SUBTASKS:** Review failures/performance/coverage evidence; update plan/state.
 - **ACCEPTANCE CRITERIA:** All reliability criteria have evidence or remain explicitly blocked; no metric is inferred from an unrun test.
 - **TEST:** Build/test plus recorded reliability matrix.

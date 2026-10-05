@@ -11,7 +11,7 @@ Shell, MVVM, window size/position, theme service, empty reader state, keyboard a
 ## Phase 2 — File Open and Basic Reader — DONE (6/6 tasks: P02-T001..P02-T006 verified; build PASS 0 warnings, tests PASS 41/41, runtime verified via AX tree)
 Open one `.md`/`.markdown` file via picker and CLI; read safely; parse with documented Markdig dependency; render MVP Markdown nodes in a scrollable view; handle failures. Verified: CLI valid path renders headings/paragraphs/emphasis/code/lists/quotes/rules/tables/links; invalid path shows a recoverable error (no crash); scroll works; loading/empty/error/content states distinct. No folder crawling or editing.
 
-## Phase 3 — Rendering Quality and Safe References — READY (5 tasks: P03-T001 DONE, P03-T002 READY, P03-T003 DONE; P03-T004, P03-T005 PLANNED)
+## Phase 3 — Rendering Quality and Safe References — READY (3 / 5 tasks verified: P03-T001 DONE, P03-T002 DONE, P03-T003 DONE; P03-T004 READY; P03-T005 PLANNED)
 Complete agreed Markdown subset, Arabic/RTL behavior, safe in-tree local images, internal anchors, user-clicked external URLs and defined file-relative Markdown navigation. Add GFM cases. HTML stays inert; no remote content retrieval.
 
 ## Phase 4 — Windows UX and Accessibility — PLANNED

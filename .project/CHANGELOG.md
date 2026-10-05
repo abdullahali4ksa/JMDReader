@@ -151,7 +151,12 @@
 ## 2026-10-05 — P03-T002
 - P03-T002: Arabic/RTL and mixed-direction layout verified (MarkdownRenderer implements paragraph-level FlowDirection, Arabic font fallback, LTR preserved for code/URLs). Build PASS, tests PASS 45/45.
 
-## P03-T002 — Arabic, RTL, and mixed-direction layout (VERIFIED)
+--- 2026-10-05 — P03-T002 / P03-T003 state sync
+- STATE.json updated: P03-T002 (RTL/Arabic, verified 9f1a564) and P03-T003 (safe images, verified 582a5b2) recorded DONE; next READY task = P03-T004 (safe links/anchors, depends P03-T001); build PASS, tests 45/45 PASS.
+- TASKS.md: P03-T002, P03-T003 marked DONE; P03-T004 set READY.
+- ROADMAP.md: Phase 3 updated (3/5 tasks verified).
+
+--- 2026-10-05 — P03-T002 — Arabic, RTL, and mixed-direction layout (VERIFIED)
 - MarkdownRenderer: paragraph-level RTL detection (`ContainsRtlText` via Unicode bidi ranges), `FlowDirection.RightToLeft` for Arabic/Hebrew text.
 - Font fallback chain: Segoe UI Variable → Cairo → Amiri.
 - LTR preserved for code blocks (`FlowDirection.LeftToRight`, `CodeFontFamily`), headings, table cells.

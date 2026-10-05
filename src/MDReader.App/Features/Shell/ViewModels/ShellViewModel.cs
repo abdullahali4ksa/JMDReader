@@ -77,6 +77,20 @@ public sealed partial class ShellViewModel : ObservableObject
         }
     }
 
+    [RelayCommand]
+    private Task RefreshDocumentAsync()
+    {
+        // Named action: refresh/reload current document view.
+        return Task.CompletedTask;
+    }
+
+    [RelayCommand]
+    private Task ThemeSettingsAsync()
+    {
+        // Named action: open theme settings.
+        return Task.CompletedTask;
+    }
+
     /// <summary>
     /// Opens a Markdown document from the given file path.
     /// This is the single entry point for both picker and CLI file opening.

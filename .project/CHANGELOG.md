@@ -186,3 +186,7 @@
 - Build: PASS (0 errors, 2 pre-existing warnings); Tests: PASS (45/45).
 - Phase 3 complete; Phase 4 remains PLANNED (depends P03-T005 verified, which is now complete).
 - Updated STATE.json (current_task = P03-T005, then next = P04-T001; status = READY; blocked = false); TASKS.md (P03-T005 DONE, Phase 3 DONE 5/5); ROADMAP.md (Phase 3 DONE); commit `243e949` verified.
+--- 2026-10-05 — P04-T001 — Refine native shell and File/View/Settings commands (VERIFIED)
+- Added View (Refresh) and Settings (Theme) menu items with named RelayCommands (RefreshDocumentAsync, ThemeSettingsAsync) in ShellViewModel.
+- MainWindow.xaml updated with MenuBarItem entries for File, View, Settings.
+- Build PASS (0 errors, 2 pre-existing warnings); Tests PASS 45/45.

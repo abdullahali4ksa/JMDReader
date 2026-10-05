@@ -31,6 +31,12 @@
             <MenuBarItem Title="File">
                 <MenuFlyoutItem Text="Open..." Command="{Binding OpenDocumentCommand}" />
             </MenuBarItem>
+            <MenuBarItem Title="View">
+                <MenuFlyoutItem Text="Refresh" Command="{Binding RefreshDocumentCommand}" />
+            </MenuBarItem>
+            <MenuBarItem Title="Settings">
+                <MenuFlyoutItem Text="Theme" Command="{Binding ThemeSettingsCommand}" />
+            </MenuBarItem>
         </MenuBar>
 
         <!-- Main content area -->

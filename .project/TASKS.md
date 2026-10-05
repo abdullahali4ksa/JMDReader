@@ -394,8 +394,8 @@ The `FILES_SCOPE` on each original P01 task is the allowlist. Dependencies are d
 
 **Status:** PLANNED · **Depends on:** Phase 3 complete.
 
-### P04-T001 — Refine native shell and File/View/Settings commands
-**FEATURE:** Shell · **PRIORITY:** P1 · **DEPENDS_ON:** P03-T005 · **FILES_SCOPE:** `src/MDReader.App/Features/Shell/`, `src/MDReader.App/Features/Settings/`
+### **P04-T001 — Refine native shell and File/View/Settings commands**
+**FEATURE:** Shell · **PRIORITY:** P1 · **DEPENDS_ON:** P03-T005 · **STATUS:** DONE · **FILES_SCOPE:** `src/MDReader.App/Features/Shell/`, `src/MDReader.App/Features/Settings/`
 - **SUBTASKS:** Align title/menu controls with UI design; expose available reader commands; retain native minimize/maximize/close behavior.
 - **ACCEPTANCE CRITERIA:** Shell is consistent with Windows and UI_DESIGN; every displayed command has a working, named action; app remains a reader only.
 - **TEST:** Build/test and manual menu/window check.

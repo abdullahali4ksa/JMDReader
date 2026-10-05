@@ -36,10 +36,9 @@
                 CornerRadius="8"
                 BorderBrush="{ThemeResource AppBorderBrush}"
                 BorderThickness="1">
-                <TextBlock
-                    Text="{Binding DocumentContent}"
-                    Style="{StaticResource AppBodyTextStyle}"
-                    TextWrapping="Wrap" />
+                <StackPanel
+                    x:Name="RenderedDocumentPanel"
+                    Spacing="2" />
             </Border>
         </ScrollViewer>
 

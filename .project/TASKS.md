@@ -328,7 +328,7 @@ The `FILES_SCOPE` on each original P01 task is the allowlist. Dependencies are d
 - **VERIFICATION:** Build/test plus recorded launch checks.
 
 ### P02-T004 — Parse and render basic Markdown
-**STATUS:** READY · **PRIORITY:** P0 · **DEPENDS_ON:** P02-T001, P02-T003 · **FILES_SCOPE:** `src/MDReader.Core/Markdown/`, `src/MDReader.App/Features/Reader/`, `tests/MDReader.Core.Tests/`
+**STATUS:** DONE · **PRIORITY:** P0 · **DEPENDS_ON:** P02-T001, P02-T003 · **FILES_SCOPE:** `src/MDReader.Core/Markdown/`, `src/MDReader.App/Features/Reader/`, `tests/MDReader.Core.Tests/`
 
 - **SUBTASKS:** Parse headings/paragraphs/emphasis/lists/code/quotes/rules/tables; render AST nodes as WinUI controls; inert handling for HTML.
 - **ACCEPTANCE CRITERIA:** MVP elements are readable and styled; long code lines scroll horizontally; unsupported nodes degrade safely; no WebView, edit, or save path.

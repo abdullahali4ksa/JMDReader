@@ -102,3 +102,16 @@
 |- Updated MainWindow.xaml.cs to handle `mdreader.exe <path>` CLI arguments and pass ReaderViewModel through navigation.
 |- Added WindowHandleService helper (Shared/Helpers) using IWindowNative COM interop for HWND retrieval (Win32Interop unavailable in current App SDK configuration).
 |- Build: PASS (0 warnings, 0 errors); Tests: PASS (16/16); App launches and accepts CLI file argument without crash.
+
+## 2026-10-05 — Blocked (P02-T004)
+- Status: BLOCKED (SDK namespace errors: AutomationHeadingLevel / AutomationProperties unresolved; XamlCompiler WMC9999)
+- No code change performed. WinUI 3 + C# preserved; MSIX/store publication deferred per blueprint.
+- Environment fix required before P02-T004 (parse/render) can proceed.
+
+## P02-T004 — Parse and render basic Markdown (COMPLETED)
+- Core: MarkdownAstBuilder converts Markdig AST → platform-neutral element model (MarkdownElement/MarkdownElements/MarkdownInlines); MarkdownDocument.Parse() populates Elements.
+- App: MarkdownRenderer renders the element tree to WinUI controls (headings, paragraphs, emphasis, inline code, lists, blockquotes, thematic breaks, tables, links). Raw HTML nodes are inert (skipped). Long code lines scroll horizontally.
+- ReaderViewModel exposes Elements; MainPage renders the tree and refreshes on document replace.
+- Fixed the false BLOCKED: root cause was UWP namespace usings (Windows.UI.Text / Windows.UI.Xaml.Automation) instead of Microsoft.UI.Text / Microsoft.UI.Xaml.Automation(.Peers); resolved.
+- Build: PASS (0 warnings, 0 errors); Tests: PASS (41/41).
+- Runtime verified via accessibility tree: H1/H2 headings, bold/italic/inline-code paragraph, bullet + ordered lists, blockquote, code block, table (2x2), and clickable external hyperlink all render as real WinUI elements.

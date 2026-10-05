@@ -2,6 +2,7 @@
 
 using CommunityToolkit.Mvvm.ComponentModel;
 using MDReader.Core.Documents;
+using MDReader.Core.Markdown;
 
 namespace MDReader.App.Features.Reader.ViewModels;
 
@@ -15,6 +16,7 @@ public sealed partial class ReaderViewModel : ObservableObject
     private string? _currentDocumentPath;
     private string? _documentContent;
     private string? _errorMessage;
+    private MarkdownDocumentElement? _elements;
 
     /// <summary>Gets or sets the file path of the currently loaded document.</summary>
     public string? CurrentDocumentPath
@@ -36,6 +38,17 @@ public sealed partial class ReaderViewModel : ObservableObject
     {
         get => _documentContent;
         set => SetProperty(ref _documentContent, value);
+    }
+
+    /// <summary>
+    /// Gets the parsed, platform-neutral element tree for the loaded document,
+    /// or null when no document is loaded. The View renders this tree using
+    /// <c>MarkdownRenderer</c>.
+    /// </summary>
+    public MarkdownDocumentElement? Elements
+    {
+        get => _elements;
+        private set => SetProperty(ref _elements, value);
     }
 
     /// <summary>Gets or sets the error message to display, or null when no error.</summary>
@@ -71,6 +84,13 @@ public sealed partial class ReaderViewModel : ObservableObject
     {
         CurrentDocumentPath = info.FilePath;
         DocumentContent = content;
+
+        // Parse the Markdown into the platform-neutral element tree. Parse
+        // failures (or size warnings) never throw: the document is still shown,
+        // degrading to whatever could be parsed.
+        var parsed = new MarkdownDocument { SourceText = content }.Parse();
+        Elements = parsed.Document.Elements;
+
         ErrorMessage = null;
     }
 
@@ -82,6 +102,7 @@ public sealed partial class ReaderViewModel : ObservableObject
     {
         CurrentDocumentPath = null;
         DocumentContent = null;
+        Elements = null;
         ErrorMessage = message;
     }
 
@@ -92,6 +113,7 @@ public sealed partial class ReaderViewModel : ObservableObject
     {
         CurrentDocumentPath = null;
         DocumentContent = null;
+        Elements = null;
         ErrorMessage = null;
     }
 }

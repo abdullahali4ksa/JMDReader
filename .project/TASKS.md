@@ -507,7 +507,7 @@ The `FILES_SCOPE` on each original P01 task is the allowlist. Dependencies are d
 - **VERIFICATION:** Owner review of listing material; publication remains a separate authorized action.
 
 ### P07-T003 — Final product readiness gate
-**FEATURE:** Distribution · **PRIORITY:** P0 · **DEPENDS_ON:** P07-T002 · **FILES_SCOPE:** `.project/STATE.json`, `.project/TASKS.md`, `.project/CHANGELOG.md`, `docs/ROADMAP.md`
+**FEATURE:** Distribution · **PRIORITY:** P0 · **DEPENDS_ON:** P07-T002 · **STATUS:** DONE · **FILES_SCOPE:** `.project/STATE.json`, `.project/TASKS.md`, `.project/CHANGELOG.md`, `docs/ROADMAP.md`
 - **SUBTASKS:** Confirm all MVP gates and evidence; summarize known limitations; set project release-readiness state.
 - **ACCEPTANCE CRITERIA:** Every required task is DONE or explicitly waived by owner; build/test/package and readiness evidence are current; no publication implied.
 - **TEST:** Final build/test/package smoke check and checklist review.

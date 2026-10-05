@@ -78,6 +78,13 @@ public sealed partial class ShellViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private Task FindDocumentAsync()
+    {
+        // Named action: open find for current document.
+        return Task.CompletedTask;
+    }
+
+    [RelayCommand]
     private Task RefreshDocumentAsync()
     {
         // Named action: refresh/reload current document view.

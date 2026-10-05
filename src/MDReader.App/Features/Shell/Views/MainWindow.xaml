@@ -29,10 +29,11 @@
         <!-- Menu bar: File -> Open -->
         <MenuBar Grid.Row="1" Background="{ThemeResource AppBackgroundBrush}">
             <MenuBarItem Title="File">
-                <MenuFlyoutItem Text="Open..." Command="{Binding OpenDocumentCommand}" />
+                <MenuFlyoutItem Text="Open...  (Ctrl+O)" Command="{Binding OpenDocumentCommand}" />
             </MenuBarItem>
             <MenuBarItem Title="View">
-                <MenuFlyoutItem Text="Refresh" Command="{Binding RefreshDocumentCommand}" />
+                <MenuFlyoutItem Text="Refresh  (Ctrl+R)" Command="{Binding RefreshDocumentCommand}" />
+                <MenuFlyoutItem Text="Find  (Ctrl+F)" Command="{Binding FindDocumentCommand}" />
             </MenuBarItem>
             <MenuBarItem Title="Settings">
                 <MenuFlyoutItem Text="Theme" Command="{Binding ThemeSettingsCommand}" />

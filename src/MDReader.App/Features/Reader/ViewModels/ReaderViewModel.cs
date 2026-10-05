@@ -135,7 +135,10 @@ public sealed partial class ReaderViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Clears all document and error state, returning to the empty welcome state.
+    /// <summary>Find text within the current document.</summary>
+    public string FindText { get; set; } = string.Empty;
+
+    /// <summary>Clear all document and error state, returning to the empty welcome state.</summary>
     /// </summary>
     public void Clear()
     {

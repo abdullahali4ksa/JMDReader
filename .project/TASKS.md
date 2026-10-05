@@ -13,10 +13,10 @@
 COMPLETED
 
 ### Phase 1:
-8 / 9 tasks completed
+9 / 9 tasks completed
 
 ### Phase 2:
-PLANNED
+COMPLETED (6 / 6 tasks DONE)
 
 ### Phase 3:
 PLANNED
@@ -344,7 +344,7 @@ The `FILES_SCOPE` on each original P01 task is the allowlist. Dependencies are d
 - **VERIFICATION:** UI checklist recorded in task evidence.
 
 ### P02-T006 — Phase 2 verification gate
-**STATUS:** PLANNED · **PRIORITY:** P0 · **DEPENDS_ON:** P02-T002, P02-T003, P02-T004, P02-T005 · **FILES_SCOPE:** `.project/STATE.json`, `.project/TASKS.md`, `.project/CHANGELOG.md`, `docs/ROADMAP.md`
+**STATUS:** DONE · **PRIORITY:** P0 · **DEPENDS_ON:** P02-T002, P02-T003, P02-T004, P02-T005 · **FILES_SCOPE:** `.project/STATE.json`, `.project/TASKS.md`, `.project/CHANGELOG.md`, `docs/ROADMAP.md`
 
 - **SUBTASKS:** Run full build/tests; exercise open/render/errors; record limitations and evidence; update phase/state.
 - **ACCEPTANCE CRITERIA:** Every Phase 2 task is DONE; build/test pass; picker and CLI paths verified; no unsupported claims; only then mark phase complete.

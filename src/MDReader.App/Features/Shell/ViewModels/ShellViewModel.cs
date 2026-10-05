@@ -97,11 +97,12 @@ public sealed partial class ShellViewModel : ObservableObject
         }
         catch (System.ArgumentException ex)
         {
-            _readerViewModel.ShowError($"Cannot open file: {ex.Message}");
+            // Reader messages are already user-facing (e.g. unsupported extension).
+            _readerViewModel.ShowError(ex.Message);
         }
         catch (FileNotFoundException ex)
         {
-            _readerViewModel.ShowError($"File not found: {ex.Message}");
+            _readerViewModel.ShowError(ex.Message);
         }
         catch (UnauthorizedAccessException ex)
         {

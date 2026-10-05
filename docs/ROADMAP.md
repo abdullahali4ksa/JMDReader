@@ -5,11 +5,11 @@
 ## Phase 0 — Environment and Architecture — DONE
 Baseline environment, solution, feature-based structure, architecture and documentation established. Reported verification: build PASS (0 warnings/errors); tests PASS (2/2); baseline `5f81c9e`.
 
-## Phase 1 — Application Shell — IN PROGRESS (6/9 tasks completed: T001–T006 verified; build PASS 0 warnings, tests PASS 8/8, launch verified, Developer Mode available)
-Shell, MVVM, window size/position, theme service, empty reader state, keyboard accessibility, shared styles completed. Gate P01-T009 remains; Phase 2 (P02 tasks) follows after gate verification. Launch test: `MDReader.App.exe` launched successfully; no runtime errors.
+## Phase 1 — Application Shell — DONE (9/9 tasks: P01-T001..P01-T009 verified; build PASS 0 warnings, launch verified, Developer Mode available)
+Shell, MVVM, window size/position, theme service, empty reader state, keyboard accessibility, shared styles, and Core initialization tests completed. Gate P01-T009 passed. Launch test: `MDReader.App.exe` launched successfully; no runtime errors.
 
-## Phase 2 — File Open and Basic Reader — PLANNED
-Open one `.md`/`.markdown` file via picker and CLI; read safely; parse with documented Markdig dependency; render MVP Markdown nodes in a scrollable view; handle failures. Test Core parsing and file behavior. No folder crawling or editing.
+## Phase 2 — File Open and Basic Reader — DONE (6/6 tasks: P02-T001..P02-T006 verified; build PASS 0 warnings, tests PASS 41/41, runtime verified via AX tree)
+Open one `.md`/`.markdown` file via picker and CLI; read safely; parse with documented Markdig dependency; render MVP Markdown nodes in a scrollable view; handle failures. Verified: CLI valid path renders headings/paragraphs/emphasis/code/lists/quotes/rules/tables/links; invalid path shows a recoverable error (no crash); scroll works; loading/empty/error/content states distinct. No folder crawling or editing.
 
 ## Phase 3 — Rendering Quality and Safe References — PLANNED
 Complete agreed Markdown subset, Arabic/RTL behavior, safe in-tree local images, internal anchors, user-clicked external URLs and defined file-relative Markdown navigation. Add GFM cases. HTML stays inert; no remote content retrieval.

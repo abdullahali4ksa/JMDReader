@@ -122,3 +122,9 @@
 - MainPage.xaml: added a loading state (ProgressRing + message) alongside empty/error/content states.
 - Scrolling: content lives in a ScrollViewer (vertical + horizontal Auto); long code lines scroll horizontally.
 - Verification: build PASS (0 warnings), tests PASS (41/41). Runtime: loaded a 60-section document via CLI; AX tree showed all sections and a vertical ScrollBar; setting the scrollbar position moved the viewport (element count shifted 133->137), confirming scroll works. Pixel-level visual confirmation not possible (active model has no image input); structural evidence recorded.
+
+## P02-T006 — Phase 2 verification gate (COMPLETED)
+- All Phase 2 tasks (P02-T001..P02-T005) DONE. Full build PASS (0 warnings, 0 errors); full tests PASS (41/41).
+- Runtime acceptance: CLI valid path renders full Markdown (headings, paragraphs, emphasis, inline code, bullet+ordered lists, blockquote, code block, table, hyperlink); CLI invalid path shows a recoverable "File not found" error with no crash; long document scrolls (vertical ScrollBar active).
+- Fixed a duplicate error prefix in ShellViewModel ("File not found: File not found: ...") — reader messages are now used directly.
+- ROADMAP updated: Phase 1 DONE (9/9), Phase 2 DONE (6/6). STATE advanced to PHASE-03 / P03-T001.

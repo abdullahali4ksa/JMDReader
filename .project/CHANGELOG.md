@@ -249,3 +249,8 @@
 - Confirmed no remote fetch, no edit/save/edit, no persistent storage; signing stays out-of-repo.
 - Build PASS (0 errors, 2 pre-existing warnings); Tests PASS 45/45.
 - Store submission remains separate owner authorization; not submitted.
+
+## P07-T002 — Store listing assets and submission package (READY → DONE)
+- Created docs/store-listing/listing-assets.md (description, assets checklist, build steps).
+- Confirmed submission remains separate authorized action; no submission performed.
+- Build PASS (0 errors, 2 warnings pre-existing); Tests PASS 45/45.

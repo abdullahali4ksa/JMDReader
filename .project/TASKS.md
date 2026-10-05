@@ -1,4 +1,4 @@
-# MDReader — Task Backlog
+﻿# MDReader — Task Backlog
 
 > This is the detailed execution backlog for the MDReader project.
 > Tasks are organized by Phase. Each task has a permanent ID that is NEVER reused.
@@ -467,7 +467,7 @@ The `FILES_SCOPE` on each original P01 task is the allowlist. Dependencies are d
 
 **Status:** PLANNED · **Depends on:** Phase 5 complete.
 
-### P06-T001 — Configure reproducible MSIX package identity and manifest
+**FEATURE:** Packaging · **PRIORITY:** P1 · **DEPENDS_ON:** P05-T004 · **STATUS:** DONE · **FILES_SCOPE:** `src/MDReader.App/Package.appxmanifest`, `docs/MSIX_SETUP.md`
 **FEATURE:** Packaging · **PRIORITY:** P1 · **DEPENDS_ON:** P05-T004 · **FILES_SCOPE:** `src/MDReader.App/Package.appxmanifest`, packaging project/configuration, `docs/`
 - **SUBTASKS:** Review identity/version/capabilities; configure release build; keep signing material outside repository.
 - **ACCEPTANCE CRITERIA:** Least-privilege manifest is valid; package build reproducible on documented Windows SDK tooling; no secret/certificate private key committed.

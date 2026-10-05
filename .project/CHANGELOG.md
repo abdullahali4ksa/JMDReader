@@ -232,3 +232,4 @@
 - Created .github/workflows/ci.yml (Windows-latest, .NET 10, build + test with coverage collection, no secrets).
 - Documented policy in docs/COVERAGE_CI.md: 80% Core target; reproducible measurement requires build; gaps recorded if <80%.
 - Build: PASS (0 errors, pre-existing warnings only); Tests: PASS (45/45).
+2026-10-05 P06-T001 MSIX manifest identity configured; docs/MSIX_SETUP.md added; build 0 errors (2 pre-existing warnings); tests 45/45 PASS

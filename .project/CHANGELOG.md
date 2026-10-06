@@ -280,3 +280,16 @@
 2026-10-06: P08-T001 DONE (commit 361f8dc). Intermittent startup crash fixed; build PASS (0 errors); tests PASS 60/60; statistical verification 12/12 alive (180s). Backlog complete; no remaining READY tasks.
 - 2026-10-06: P08-T001 finalized at commit `f54fd25` (dispatcher deferral + MarkdownLinkPolicy fix verified). STATE.json: READY, backlog_complete=true, last_verified_commit=f54fd25, current_task=null.
 - 2026-10-06 — P08-T001 finalized DONE at commit 6c6375b. Intermittent startup crash fixed (MarkdownLinkPolicy + dispatcher deferral). Build PASS (0 errors, 2 pre-existing warnings). Tests PASS 60/60. Statistical verification 12/12 ALIVE (180s). Backlog complete — no remaining READY tasks.
+
+## 2026-10-06 — MSIX Package Build and Signing (P08-T001 follow-up)
+- Built MSIX package: `artifacts/release/MDReader-x64.msix` (31.7 MB, x64, Release)
+- Created self-signed development certificate for `CN=AppPublisher` (matches Package.appxmanifest Publisher)
+- Certificate thumbprint: `AF45AD5F5F15F3894DA5FAD18A44A80A8A289EC1`
+- Certificate has Code Signing EKU (1.3.6.1.5.5.7.3.3)
+- Package signed successfully (signature status: UnknownError — expected for self-signed cert not yet trusted)
+- Public certificate exported: `artifacts/release/AppPublisher.cer` (safe to distribute)
+- Private key (.pfx) kept OUTSIDE repo at `C:\Users\ZAACO\AppData\Local\Temp\MDReader_DevCert.pfx`
+- ZIP bundle created: `artifacts/release/MDReader-x64.zip` (MSIX + .cer + INSTALL_AR.md)
+- Verification report created: `artifacts/reports/MDReader-Verification-Report.html` (Arabic, RTL)
+- Build: PASS (0 errors, 0 warnings); Tests: PASS (60/60)
+- Note: Certificate is for LOCAL TESTING ONLY. Not a production certificate.

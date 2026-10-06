@@ -534,3 +534,15 @@ The `FILES_SCOPE` on each original P01 task is the allowlist. Dependencies are d
 4. Confirm print remains deferred and current-session recent list is useful.
 5. Review task file scopes and acceptance criteria before enabling execution.
 
+
+## Phase 8 — Verified Runtime Defect Remediation
+
+**Status:** IN_PROGRESS · **Depends on:** Phase 7 complete · **Triggered by:** intermittent startup crash when opening a Markdown file (`0xc000027b` / `0x80131509` `System.InvalidOperationException` on `Uri.get_Scheme()` for relative URIs).
+
+### P08-T001 — Fix intermittent startup crash on file open (verified regression fix)
+**ID:** P08-T001 · **FEATURE:** Reader / Runtime Stability · **PRIORITY:** P0 · **DEPENDS_ON:** P07-T003 · **STATUS:** IN_PROGRESS (fix applied `82eb61d`; verification pending) · **FILES_SCOPE:** `src/MDReader.App/Features/Reader/MarkdownRenderer.cs`, `src/MDReader.App/Features/Shell/Views/MainWindow.xaml.cs`, `src/MDReader.Core/Markdown/MarkdownLinkPolicy.cs`, `tests/MDReader.Core.Tests/MarkdownLinkPolicyTests.cs`
+- **SUBTASKS:** (a) Reproduce crash statistically; (b) Capture first-chance exception confirming `InvalidOperationException` on relative URI `.Scheme`; (c) Introduce `MarkdownLinkPolicy.IsExternalHttpUrl` in Core using `UriKind.Absolute`; (d) Update renderer to delegate; (e) Defer CLI file open to dispatcher after activation; (f) Add regression test.
+- **ACCEPTANCE CRITERIA:** Statistical launch with `demo-arabic.md` achieves 0 crashes in 10 consecutive 180s runs; build 0 errors; all 60 tests pass; no remote push; no Store publish.
+- **VERIFICATION:** `dotnet build` PASS (0 errors); `dotnet test` PASS (60/60); statistical launch 12/12 ALIVE (180s each); git diff shows only fix scope.
+- **NOTES:** Defect missed by short-launch verification (7-10s); requires 180s monitoring (`scripts/monitor.sh`) to confirm absence of intermittent failure.
+- **BLOCK_REASON:** None. Fix applied; final verification recorded.

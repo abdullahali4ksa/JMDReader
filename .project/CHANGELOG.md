@@ -269,3 +269,11 @@
 - **Fix:** introduced `MDReader.Core.Markdown.MarkdownLinkPolicy.IsExternalHttpUrl` (pure, testable) using `UriKind.Absolute`, so relative targets return false instead of throwing; renderer now delegates to it. Also deferred the CLI file open in `MainWindow` to the dispatcher queue (after activation) instead of running it inside the constructor.
 - **Verification:** `dotnet build` PASS (0 errors, 2 pre-existing warnings); `dotnet test` PASS (60/60, +15 link-policy tests including the exact anchor regression). Statistical launch test after fix: **12/12 alive with a file argument, 0 crashes**.
 - Note: this defect was missed by prior "launch verification" because that check only confirmed the `✅ launched` line and did not confirm the window stayed alive.
+
+## P08-T001 — Fix intermittent startup crash on file open (IN_PROGRESS -> VERIFICATION)
+- Root cause confirmed via AppDomain.FirstChanceException: `System.InvalidOperationException: This operation is not supported for a relative URI.` at `System.Uri.get_Scheme()` for relative links (anchors `#section`, file-relative `./other.md`, unsupported schemes). This stowed exception (`0xc000027b`) intermittently crashed `MDReader.App.exe` when the CLI/file-open path delivered a document containing relative links during startup (~25% reproduction rate; 0/8 crashes without file, 2/8 with file before fix; 0/12 after fix).
+- Fix applied: moved link classification to `MDReader.Core.MarkdownLinkPolicy.IsExternalHttpUrl` (pure, `UriKind.Absolute`); renderer delegates; CLI file open deferred via `DispatcherQueue.TryEnqueue` to after window activation.
+- Regression test added: `MarkdownLinkPolicyTests.cs` (absolute HTTP = external; relative anchor, file-relative, empty, unsupported schemes = not external; no throw).
+- Build PASS (0 errors); Tests PASS (60/60, including 15 new link-policy tests).
+- Statistical verification (180s runs): without file 8/8 ALIVE; with `demo-arabic.md` 12/12 ALIVE after fix (before fix 6/8 ALIVE / 2 crashes).
+- Note: previous "launch verification" (P02-T006, P03-T006) relied on short 7-10s observations that missed this intermittent failure window (~10-16s after startup); long-run monitoring (`scripts/monitor.sh`) now required.

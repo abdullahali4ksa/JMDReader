@@ -52,11 +52,16 @@ public sealed partial class MainWindow : Window
         // Navigate the root frame to the main page, passing the ReaderViewModel
         RootFrame.Navigate(typeof(MainPage), readerViewModel);
 
-        // Handle command-line file argument (mdreader.exe <path>)
+        // Handle command-line file argument (mdreader.exe <path>).
+        // Deferred until the window is activated: building the rendered visual
+        // tree inside the constructor (before Activate) races with WinUI
+        // activation and can intermittently crash the process. Enqueuing the
+        // open on the dispatcher runs it after activation, on the UI thread.
         var cliArgs = System.Environment.GetCommandLineArgs();
         if (cliArgs.Length > 1 && !string.IsNullOrWhiteSpace(cliArgs[1]))
         {
-            _shellViewModel.OpenDocument(cliArgs[1]);
+            var cliPath = cliArgs[1];
+            DispatcherQueue.TryEnqueue(() => _shellViewModel.OpenDocument(cliPath));
         }
     }
 

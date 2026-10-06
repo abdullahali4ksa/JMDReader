@@ -260,3 +260,12 @@
 - All phases (0-6) complete; backlog fully executed.
 - STATE.json updated; ROADMAP.md reflects Phase 7 planned; no remaining READY tasks.
 - Backlog complete. No Store submission performed (separate owner authorization required per blueprint).
+
+## 2026-10-06 — Hotfix: intermittent startup crash when opening a file (regression)
+
+- **Symptom:** launching the app with a Markdown file argument (or via picker) crashed intermittently (~25% of launches) with an unhandled WinRT exception (`0xc000027b` in `Microsoft.UI.Xaml.dll`, inner `0x80131509` = `COR_E_INVALIDOPERATION`).
+- **Root cause:** `MarkdownRenderer.IsExternalHttpUrl` created the URI with `UriKind.RelativeOrAbsolute` and then read `uri.Scheme`. For a relative target (internal anchor `#section`, file-relative `./other.md`) `Uri.Scheme` throws `InvalidOperationException` ("This operation is not supported for a relative URI"). Because rendering happens during startup, the throw escaped as a stowed XAML exception and killed the process.
+- **Evidence:** captured via `AppDomain.FirstChanceException` — `System.InvalidOperationException: This operation is not supported for a relative URI. at System.Uri.get_Scheme()`. Statistical launch test before fix: 6/8 alive with a file vs 8/8 alive without; bisect was inconclusive because the failure is timing-dependent.
+- **Fix:** introduced `MDReader.Core.Markdown.MarkdownLinkPolicy.IsExternalHttpUrl` (pure, testable) using `UriKind.Absolute`, so relative targets return false instead of throwing; renderer now delegates to it. Also deferred the CLI file open in `MainWindow` to the dispatcher queue (after activation) instead of running it inside the constructor.
+- **Verification:** `dotnet build` PASS (0 errors, 2 pre-existing warnings); `dotnet test` PASS (60/60, +15 link-policy tests including the exact anchor regression). Statistical launch test after fix: **12/12 alive with a file argument, 0 crashes**.
+- Note: this defect was missed by prior "launch verification" because that check only confirmed the `✅ launched` line and did not confirm the window stayed alive.

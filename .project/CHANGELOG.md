@@ -279,3 +279,4 @@
 - Note: previous "launch verification" (P02-T006, P03-T006) relied on short 7-10s observations that missed this intermittent failure window (~10-16s after startup); long-run monitoring (`scripts/monitor.sh`) now required.
 2026-10-06: P08-T001 DONE (commit 361f8dc). Intermittent startup crash fixed; build PASS (0 errors); tests PASS 60/60; statistical verification 12/12 alive (180s). Backlog complete; no remaining READY tasks.
 - 2026-10-06: P08-T001 finalized at commit `f54fd25` (dispatcher deferral + MarkdownLinkPolicy fix verified). STATE.json: READY, backlog_complete=true, last_verified_commit=f54fd25, current_task=null.
+- 2026-10-06 — P08-T001 finalized DONE at commit 6c6375b. Intermittent startup crash fixed (MarkdownLinkPolicy + dispatcher deferral). Build PASS (0 errors, 2 pre-existing warnings). Tests PASS 60/60. Statistical verification 12/12 ALIVE (180s). Backlog complete — no remaining READY tasks.

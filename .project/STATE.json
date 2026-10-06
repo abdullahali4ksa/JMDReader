@@ -3,10 +3,10 @@
   "project": "MDReader",
   "project_root": "D:\\AI_PROJECTS\\MDReader",
   "current_phase": "PHASE-08",
-  "current_task": null,
-  "status": "READY",
+  "current_task": "P08-T001",
+  "status": "VERIFYING",
   "last_completed_phase": "PHASE-08",
-  "last_verified_commit": "f54fd25",
+  "last_verified_commit": "82eb61d",
   "build_status": "PASS",
   "test_status": "PASS",
   "test_summary": "60/60 passed",
@@ -19,6 +19,6 @@
     "implementation_authorized": true
   },
   "start_date": "2026-10-05",
-  "backlog_complete": true,
-  "note": "P08-T001 completed (commit f54fd25). Regression fix verified: MarkdownLinkPolicy.IsExternalHttpUrl + dispatcher deferral for CLI open. Build PASS, 60/60 tests PASS, statistical 12/12 ALIVE. Backlog complete — no remaining READY tasks."
+  "backlog_complete": false,
+  "note": "P08-T001 fix applied (82eb61d): MarkdownLinkPolicy (UriKind.Absolute) + dispatcher deferral. Build PASS (0 errors), 60/60 tests PASS. First-chance exception capture confirmed zero InvalidOperationException on relative URI after fix. Statistical 180s test interrupted before final batch confirmation; requires user/test confirmation before declaring P08-T001 DONE. Backlog NOT fully complete until P08-T001 verified."
 }

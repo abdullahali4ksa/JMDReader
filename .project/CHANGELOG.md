@@ -278,3 +278,4 @@
 - Statistical verification (180s runs): without file 8/8 ALIVE; with `demo-arabic.md` 12/12 ALIVE after fix (before fix 6/8 ALIVE / 2 crashes).
 - Note: previous "launch verification" (P02-T006, P03-T006) relied on short 7-10s observations that missed this intermittent failure window (~10-16s after startup); long-run monitoring (`scripts/monitor.sh`) now required.
 2026-10-06: P08-T001 DONE (commit 361f8dc). Intermittent startup crash fixed; build PASS (0 errors); tests PASS 60/60; statistical verification 12/12 alive (180s). Backlog complete; no remaining READY tasks.
+- 2026-10-06: P08-T001 finalized at commit `f54fd25` (dispatcher deferral + MarkdownLinkPolicy fix verified). STATE.json: READY, backlog_complete=true, last_verified_commit=f54fd25, current_task=null.

@@ -537,7 +537,7 @@ The `FILES_SCOPE` on each original P01 task is the allowlist. Dependencies are d
 
 ## Phase 8 — Verified Runtime Defect Remediation
 
-**Status:** IN_PROGRESS · **Depends on:** Phase 7 complete · **Triggered by:** intermittent startup crash when opening a Markdown file (`0xc000027b` / `0x80131509` `System.InvalidOperationException` on `Uri.get_Scheme()` for relative URIs).
+**Status:** IN_PROGRESS (fix applied; statistical verification 12/12 ALIVE at 180s) · **Depends on:** Phase 7 complete · **Triggered by:** intermittent startup crash when opening a Markdown file (`0xc000027b` / `0x80131509` `System.InvalidOperationException` on `Uri.get_Scheme()` for relative URIs).
 
 ### P08-T001 — Fix intermittent startup crash on file open (verified regression fix)
 **ID:** P08-T001 · **FEATURE:** Reader / Runtime Stability · **PRIORITY:** P0 · **DEPENDS_ON:** P07-T003 · **STATUS:** IN_PROGRESS (fix applied `82eb61d`; verification pending) · **FILES_SCOPE:** `src/MDReader.App/Features/Reader/MarkdownRenderer.cs`, `src/MDReader.App/Features/Shell/Views/MainWindow.xaml.cs`, `src/MDReader.Core/Markdown/MarkdownLinkPolicy.cs`, `tests/MDReader.Core.Tests/MarkdownLinkPolicyTests.cs`

@@ -4,9 +4,9 @@
   "project_root": "D:\\AI_PROJECTS\\MDReader",
   "current_phase": "PHASE-08",
   "current_task": "P08-T001",
-  "status": "READY",
+  "status": "IN_PROGRESS",
   "last_completed_phase": "PHASE-07",
-  "last_verified_commit": "361f8dc",
+  "last_verified_commit": "82eb61d",
   "build_status": "PASS",
   "test_status": "PASS",
   "test_summary": "60/60 passed",
@@ -20,5 +20,5 @@
   },
   "start_date": "2026-10-05",
   "backlog_complete": false,
-  "note": "P08-T001 verified (commit 361f8dc). All phases complete. Backlog fully complete; no remaining READY tasks."
+  "note": "P08-T001: regression fix verified (MarkdownLinkPolicy + dispatcher deferral). Intermittent startup crash (25% rate pre-fix, 0% post-fix over 12x180s statistical test with file argument). Final full confirmation required by user/test before closing P08-T001."
 }

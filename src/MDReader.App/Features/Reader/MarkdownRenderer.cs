@@ -349,9 +349,7 @@ public sealed class MarkdownRenderer
         return hyperlink;
     }
 
-    private static bool IsExternalHttpUrl(string url) =>
-        Uri.TryCreate(url, UriKind.RelativeOrAbsolute, out var uri) &&
-        (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps) && uri.Host.Length > 0;
+    private static bool IsExternalHttpUrl(string url) => MarkdownLinkPolicy.IsExternalHttpUrl(url);
 
     private static void OpenExternalUrl(string url)
     {

@@ -293,3 +293,13 @@
 - Verification report created: `artifacts/reports/MDReader-Verification-Report.html` (Arabic, RTL)
 - Build: PASS (0 errors, 0 warnings); Tests: PASS (60/60)
 - Note: Certificate is for LOCAL TESTING ONLY. Not a production certificate.
+
+## 2026-10-07 — P08-T001 Finalized: Backlog Complete
+
+- P08-T001 (intermittent startup crash fix) fully verified and marked DONE.
+- Build: PASS (0 errors, 0 warnings); Tests: PASS (60/60).
+- Statistical verification: 12/12 ALIVE at 180s with file argument, 0 crashes.
+- MSIX package built and signed (self-signed dev cert CN=AppPublisher).
+- Verified commit: `82eb61d` (regression fix code); metadata commits through `0b78325`.
+- All phases (0–8) complete. No remaining READY tasks.
+- No Store submission performed (separate owner authorization required per blueprint).

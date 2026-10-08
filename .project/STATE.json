@@ -3,9 +3,9 @@
   "project": "MDReader",
   "project_root": "D:\\AI_PROJECTS\\MDReader",
   "current_phase": "PHASE-08",
-  "current_task": null,
-  "status": "READY",
-  "last_completed_phase": "PHASE-08",
+  "current_task": "P08-T001",
+  "status": "VERIFYING",
+  "last_completed_phase": "PHASE-07",
   "last_verified_commit": "82eb61d",
   "build_status": "PASS",
   "test_status": "PASS",
@@ -19,6 +19,6 @@
     "implementation_authorized": true
   },
   "start_date": "2026-10-05",
-  "backlog_complete": true,
-  "note": "P08-T001 DONE: intermittent startup crash fixed (MarkdownLinkPolicy + dispatcher deferral). Build PASS (0 errors, 0 warnings); tests PASS (60/60); statistical verification 12/12 ALIVE at 180s with file arg, 0 crashes. MSIX package built and signed (self-signed dev cert CN=AppPublisher). Backlog complete — no remaining READY tasks."
+  "backlog_complete": false,
+  "note": "P08-T001: regression fix verified (MarkdownLinkPolicy + dispatcher deferral; 12/12 ALIVE at 180s with file arg; 0 crashes post-fix; 3/3 ALIVE at 30s; 8/8 ALIVE without file). MSIX package built and signed with self-signed cert CN=AppPublisher (thumbprint AF45AD5F5F15F3894DA5FAD18A44A80A8A289EC1). P09-T001 and P09-T002 (Auto/RTL/LTR zoom) added to backlog as READY. Build PASS (0 errors, 0 warnings); tests PASS (60/60). Backlog NOT complete until P08-T001 confirmed and P09 tasks verified."
 }

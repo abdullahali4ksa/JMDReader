@@ -45,6 +45,8 @@ Windows 10 20H2 or later is the minimum product target as stated in `PRODUCT_SPE
 - Phase 3 quality scope: GFM tables, strikethrough, task lists, relative local images, external links, internal heading anchors, file-relative Markdown links, and common-language code highlighting if an acceptable dependency is approved and recorded.
 - Raw HTML nodes are displayed as inert text or omitted consistently; never execute HTML or scripts and do not use WebView for document rendering.
 - Internal anchors navigate within the current document. External `http`/`https` links open in the system browser after a user click. Unsupported schemes are not launched.
+- Per-paragraph RTL detection: Arabic/Hebrew paragraphs use `FlowDirection.RightToLeft`; English/code paragraphs use `FlowDirection.LeftToRight`. LTR preserved for code blocks, headings, table cells, URLs, and inline code.
+- Visible zoom ratio indicator (e.g., 100%) displayed in the application. Keyboard zoom actions (`Ctrl++` for +10%, `Ctrl+-` for -10%, `Ctrl+0` for reset) are discoverable. No persistent preference stored (current-run only, per Blueprint §3.7).
 - Rendering is read-only. No source editing, export, print-to-PDF, or clipboard enhancement is committed for MVP.
 
 ### 3.3 Navigation, search, and multiple items

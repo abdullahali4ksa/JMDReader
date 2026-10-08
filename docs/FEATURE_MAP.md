@@ -21,7 +21,9 @@ clear owner directory under `src/MDReader/App/Features/` or `src/MDReader/App/AI
 | Reader | `Features/Reader/` | Markdown rendering, scrolling, links | MDReader.App |
 | FileOpen | `Features/FileOpen/` | File dialog, path validation, open command | MDReader.App |
 | Settings | `Features/Settings/` | Theme, language, preferences | MDReader.App |
-| Theme | `Features/Theme/` | Light/dark/system theme management | MDReader.App |
+|| Theme | `Features/Theme/` | Light/dark/system theme management | MDReader.App |
+|| Auto RTL/LTR Direction | `Features/Reader/MarkdownRenderer.cs`, `Shared/Styles/App.xaml` | Per-paragraph RTL detection, LTR preservation for code/URLs | MDReader.App |
+|| Zoom and Ratio | `Features/Reader/MarkdownRenderer.cs`, `Shared/Styles/App.xaml` | Visible zoom ratio (100%), zoom in (+10%), zoom out (-10%), reset (Ctrl+0) | MDReader.App |
 
 ## AI Control Surface (`src/MDReader.App/AI/`)
 

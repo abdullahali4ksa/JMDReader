@@ -546,3 +546,23 @@ The `FILES_SCOPE` on each original P01 task is the allowlist. Dependencies are d
 - **STATUS:** DONE (fix applied; statistical 12/12 ALIVE at 180s; MSIX package built and signed; build PASS 0 errors; tests PASS 60/60) · **VERIFICATION:** `dotnet build` PASS (0 errors); `dotnet test` PASS (60/60); statistical verification 12/12 ALIVE; commit `82eb61d`; MSIX package `MDReader-x64.msix` (31.7 MB) signed with self-signed cert `CN=AppPublisher` (thumbprint `AF45AD5F5F15F3894DA5FAD18A44A80A8A289EC1`); artifacts in `artifacts/release/`
 - **NOTES:** Defect missed by short-launch verification (7-10s); requires 180s monitoring (`scripts/monitor.sh`) to confirm absence of intermittent failure.
 - **BLOCK_REASON:** None. Fix applied; final verification recorded.
+
+---
+
+## Phase 9 — Auto/RTL/LTR Zoom and Reset (New Feature)
+
+**Status:** PLANNED · **Depends on:** Phase 8 verified · **Triggered by:** User request for visible zoom ratio display, Auto/RTL detection per paragraph, LTR preservation for code/URLs, and reset mechanism.
+
+### P09-T001 — Auto/RTL/LTR direction per paragraph with visible zoom ratio
+**ID:** P09-T001 · **FEATURE:** Reader / Accessibility · **PRIORITY:** P1 · **DEPENDS_ON:** P08-T001 · **STATUS:** READY · **FILES_SCOPE:** `src/MDReader.App/Features/Reader/MarkdownRenderer.cs`, `src/MDReader.App/Features/Shared/Styles/App.xaml`, `tests/MDReader.Core.Tests/`
+- **SUBTASKS:** (a) Detect paragraph direction (RTL for Arabic/Hebrew, LTR for English/code); (b) Apply `FlowDirection.RightToLeft` for RTL paragraphs; (c) Preserve LTR (`FlowDirection.LeftToLeft`) for code blocks and URLs; (d) Add visible zoom ratio indicator (e.g., 100%) in UI; (e) Add zoom in (+10%) / zoom out (-10%) keyboard actions (`Ctrl++` / `Ctrl+-`); (f) Add reset (`Ctrl+0`) to restore 100%.
+- **ACCEPTANCE CRITERIA:** Arabic paragraphs show RTL; English/code show LTR; zoom ratio is visible; zoom actions work; reset returns to 100%; no architecture change.
+- **TEST:** Build/test + manual visual verification of Arabic/English/mixed content with zoom.
+- **VERIFICATION:** Record actual zoom ratios observed; confirm no persistent preference stored (per Blueprint §3.7).
+
+### P09-T002 — LTR preservation for code/URLs and zoom reset with ratio display
+**ID:** P09-T002 · **FEATURE:** Reader / Accessibility · **PRIORITY:** P1 · **DEPENDS_ON:** P09-T001 · **STATUS:** READY · **FILES_SCOPE:** `src/MDReader.App/Features/Reader/MarkdownRenderer.cs`, `docs/UI_DESIGN.md`, `.project/`
+- **SUBTASKS:** (a) Confirm `CodeFontFamily` and URL links use `FlowDirection.LeftToRight`; (b) Confirm heading anchors and table cells retain LTR; (c) Confirm zoom reset (`Ctrl+0`) restores both content scale and direction state; (d) Document zoom behavior in `docs/ARCHITECTURE.md`.
+- **ACCEPTANCE CRITERIA:** Code and URLs never mirror; reset works; zoom state is visible; documentation updated; no persistent storage added.
+- **TEST:** Build/test + manual interaction checklist (zoom in, zoom out, reset, verify ratio display, verify direction preservation).
+- **VERIFICATION:** Confirm ratio value visible in UI; confirm reset action executes without crash; confirm direction preserved for code/url elements.

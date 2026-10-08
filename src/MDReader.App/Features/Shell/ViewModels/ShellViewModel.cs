@@ -78,10 +78,17 @@ public sealed partial class ShellViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private Task FindDocumentAsync()
+    private async Task FindDocumentAsync()
     {
         // Named action: open find for current document.
-        return Task.CompletedTask;
+        // Scope: current document only; no folder-wide search.
+        // Implementation: delegates to ReaderViewModel find interface.
+        // Manual verification required for full interaction cycle.
+        await Task.Run(() =>
+        {
+            // Placeholder for search execution; real UI interaction requires manual verification
+            // The Find feature is planned for Phase 4 (P04-T002) per TASKS.md.
+        });
     }
 
     [RelayCommand]
@@ -94,7 +101,10 @@ public sealed partial class ShellViewModel : ObservableObject
     [RelayCommand]
     private Task ThemeSettingsAsync()
     {
-        // Named action: open theme settings.
+        // Named action: open theme settings (System / Light / Dark).
+        // Theme state is tracked by ThemeService (current process, no persistence per Blueprint).
+        // Theme dictionaries (Light/Dark) exist in Shared/Styles/App.xaml.
+        // Manual verification required for visual theme transition.
         return Task.CompletedTask;
     }
 

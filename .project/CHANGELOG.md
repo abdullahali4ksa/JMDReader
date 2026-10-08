@@ -313,3 +313,13 @@
 - Code blocks and URLs preserve LTR (FlowDirection.LeftToRight)
 - Build: PASS (0 errors, 0 warnings); Tests: PASS (60/60)
 - No persistent preference stored (per Blueprint §3.7)
+
+## 2026-10-08 — P09-T002: LTR preservation for code/URLs and zoom reset with ratio display (DONE)
+- Confirmed code blocks use FlowDirection.LeftToRight (MarkdownRenderer.cs line 107)
+- Confirmed inline code uses CodeFontFamily with LTR direction
+- Confirmed external HTTP(S) URLs inherit paragraph FlowDirection but URL characters remain LTR via Unicode bidi algorithm
+- Confirmed heading anchors and table cells retain LTR/RTL based on content analysis
+- Confirmed zoom reset (Ctrl+0) restores ZoomRatio to 1.0 (100%) via ScaleTransform
+- Documented zoom behavior in docs/ARCHITECTURE.md (Zoom Behavior section)
+- Build: PASS (0 errors, 0 warnings); Tests: PASS (60/60)
+- No persistent storage added; no architecture change

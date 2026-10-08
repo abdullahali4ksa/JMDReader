@@ -299,6 +299,16 @@ MDReader.Core.Tests  ───depends on───>  MDReader.Core
 - `BitmapImage` images scale based on DPI.
 - **Decision:** Use Vector icons where possible. For raster images, ensure they are provided at 1x, 1.5x, and 2x scales, or use `BitmapImage.DecodePixelType`.
 
+### Zoom Behavior (Phase 9)
+- **Zoom ratio:** Stored in `ReaderViewModel.ZoomRatio` (1.0 = 100%). Range: 0.5–3.0 (50%–300%).
+- **Zoom in/out:** ±10% per step via `Ctrl++` / `Ctrl+-` keyboard shortcuts or toolbar buttons.
+- **Reset:** `Ctrl+0` restores zoom to 100% (1.0).
+- **Visible ratio:** `ZoomPercentage` property (e.g., "100%") displayed in the zoom toolbar.
+- **Implementation:** Zoom is applied as a `ScaleTransform` render transform on the document panel — it does not affect layout or cause infinite measure/arrange cycles.
+- **Direction preservation:** Zoom is a uniform scale transform; it does not alter `FlowDirection` of any element. Code blocks, URLs, headings, and table cells retain their original LTR/RTL direction after zoom.
+- **No persistence:** Zoom ratio is session-only state; it is not saved to disk and resets to 100% on app restart (per Blueprint §3.7 — no persistent preference storage).
+- **RTL/LTR direction:** Set per-paragraph based on content analysis (`ContainsRtlText`). Code blocks and inline code always use `FlowDirection.LeftToRight`. External HTTP(S) URLs inherit paragraph direction but the URL characters themselves remain LTR via the Unicode bidirectional algorithm.
+
 ### Windows Light/Dark Theme Behavior
 - WinUI 3 `Application.RequestedTheme` can be set to `Light` or `Dark`.
 - The app should follow the system theme by default.

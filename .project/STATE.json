@@ -3,10 +3,10 @@
   "project": "MDReader",
   "project_root": "D:\\AI_PROJECTS\\MDReader",
   "current_phase": "PHASE-09",
-  "current_task": "P09-T001",
-  "status": "IN_PROGRESS",
-  "last_completed_phase": "PHASE-07",
-  "last_verified_commit": "82eb61d",
+  "current_task": null,
+  "status": "READY",
+  "last_completed_phase": "PHASE-08",
+  "last_verified_commit": "41c182a",
   "build_status": "PASS",
   "test_status": "PASS",
   "test_summary": "60/60 passed",
@@ -20,5 +20,5 @@
   },
   "start_date": "2026-10-08",
   "backlog_complete": false,
-  "note": "P09-T001: Auto/RTL/LTR direction per paragraph with visible zoom ratio. Implementing zoom toolbar, keyboard shortcuts (Ctrl++/Ctrl+-/Ctrl+0), and RTL/LTR direction detection. P08-T001 confirmed DONE (12/12 ALIVE at 180s; build PASS; tests 60/60)."
+  "note": "P09-T002 DONE: LTR preservation for code/URLs confirmed; zoom reset with ratio display documented in ARCHITECTURE.md. Phase 9 complete (2/2 tasks). No remaining READY tasks in backlog."
 }

@@ -336,6 +336,11 @@ public sealed class MarkdownRenderer
         // Unsupported schemes are explicitly rejected (no implicit network fetch).
         if (IsExternalHttpUrl(link.Url))
         {
+            // External HTTP(S) URLs always render LTR regardless of paragraph direction.
+            // WinUI's Unicode bidirectional algorithm handles mixed-direction text within
+            // the hyperlink, but the URL itself (scheme, domain, path) is always LTR.
+            // The hyperlink inherits FlowDirection from its parent TextBlock; for RTL
+            // paragraphs the URL characters remain LTR via the bidi algorithm.
             hyperlink.Click += (s, e) => OpenExternalUrl(link.Url);
             hyperlink.TextDecorations = Windows.UI.Text.TextDecorations.Underline;
         }

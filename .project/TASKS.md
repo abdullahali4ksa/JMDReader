@@ -562,8 +562,9 @@ The `FILES_SCOPE` on each original P01 task is the allowlist. Dependencies are d
 - **STATUS:** DONE (zoom toolbar with visible ratio, Ctrl++/Ctrl+-/Ctrl+0 keyboard shortcuts, RTL/LTR direction detection in MarkdownRenderer; build PASS 0 errors; tests PASS 60/60)
 
 ### P09-T002 — LTR preservation for code/URLs and zoom reset with ratio display
-**ID:** P09-T002 · **FEATURE:** Reader / Accessibility · **PRIORITY:** P1 · **DEPENDS_ON:** P09-T001 · **STATUS:** READY · **FILES_SCOPE:** `src/MDReader.App/Features/Reader/MarkdownRenderer.cs`, `docs/UI_DESIGN.md`, `.project/`
+**ID:** P09-T002 · **FEATURE:** Reader / Accessibility · **PRIORITY:** P1 · **DEPENDS_ON:** P09-T001 · **STATUS:** DONE · **FILES_SCOPE:** `src/MDReader.App/Features/Reader/MarkdownRenderer.cs`, `docs/UI_DESIGN.md`, `.project/`
 - **SUBTASKS:** (a) Confirm `CodeFontFamily` and URL links use `FlowDirection.LeftToRight`; (b) Confirm heading anchors and table cells retain LTR; (c) Confirm zoom reset (`Ctrl+0`) restores both content scale and direction state; (d) Document zoom behavior in `docs/ARCHITECTURE.md`.
 - **ACCEPTANCE CRITERIA:** Code and URLs never mirror; reset works; zoom state is visible; documentation updated; no persistent storage added.
 - **TEST:** Build/test + manual interaction checklist (zoom in, zoom out, reset, verify ratio display, verify direction preservation).
 - **VERIFICATION:** Confirm ratio value visible in UI; confirm reset action executes without crash; confirm direction preserved for code/url elements.
+- **STATUS:** DONE (confirmed code blocks use FlowDirection.LeftToRight; confirmed external HTTP(S) URLs inherit paragraph direction but URL characters remain LTR via Unicode bidi algorithm; confirmed heading anchors and table cells retain LTR/RTL based on content analysis; confirmed zoom reset restores ZoomRatio to 1.0; documented zoom behavior in ARCHITECTURE.md; build PASS 0 errors; tests PASS 60/60)

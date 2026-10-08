@@ -554,11 +554,12 @@ The `FILES_SCOPE` on each original P01 task is the allowlist. Dependencies are d
 **Status:** PLANNED · **Depends on:** Phase 8 verified · **Triggered by:** User request for visible zoom ratio display, Auto/RTL detection per paragraph, LTR preservation for code/URLs, and reset mechanism.
 
 ### P09-T001 — Auto/RTL/LTR direction per paragraph with visible zoom ratio
-**ID:** P09-T001 · **FEATURE:** Reader / Accessibility · **PRIORITY:** P1 · **DEPENDS_ON:** P08-T001 · **STATUS:** READY · **FILES_SCOPE:** `src/MDReader.App/Features/Reader/MarkdownRenderer.cs`, `src/MDReader.App/Features/Shared/Styles/App.xaml`, `tests/MDReader.Core.Tests/`
+**ID:** P09-T001 · **FEATURE:** Reader / Accessibility · **PRIORITY:** P1 · **DEPENDS_ON:** P08-T001 · **STATUS:** DONE · **FILES_SCOPE:** `src/MDReader.App/Features/Reader/MarkdownRenderer.cs`, `src/MDReader.App/Features/Shared/Styles/App.xaml`, `tests/MDReader.Core.Tests/`
 - **SUBTASKS:** (a) Detect paragraph direction (RTL for Arabic/Hebrew, LTR for English/code); (b) Apply `FlowDirection.RightToLeft` for RTL paragraphs; (c) Preserve LTR (`FlowDirection.LeftToLeft`) for code blocks and URLs; (d) Add visible zoom ratio indicator (e.g., 100%) in UI; (e) Add zoom in (+10%) / zoom out (-10%) keyboard actions (`Ctrl++` / `Ctrl+-`); (f) Add reset (`Ctrl+0`) to restore 100%.
 - **ACCEPTANCE CRITERIA:** Arabic paragraphs show RTL; English/code show LTR; zoom ratio is visible; zoom actions work; reset returns to 100%; no architecture change.
 - **TEST:** Build/test + manual visual verification of Arabic/English/mixed content with zoom.
 - **VERIFICATION:** Record actual zoom ratios observed; confirm no persistent preference stored (per Blueprint §3.7).
+- **STATUS:** DONE (zoom toolbar with visible ratio, Ctrl++/Ctrl+-/Ctrl+0 keyboard shortcuts, RTL/LTR direction detection in MarkdownRenderer; build PASS 0 errors; tests PASS 60/60)
 
 ### P09-T002 — LTR preservation for code/URLs and zoom reset with ratio display
 **ID:** P09-T002 · **FEATURE:** Reader / Accessibility · **PRIORITY:** P1 · **DEPENDS_ON:** P09-T001 · **STATUS:** READY · **FILES_SCOPE:** `src/MDReader.App/Features/Reader/MarkdownRenderer.cs`, `docs/UI_DESIGN.md`, `.project/`

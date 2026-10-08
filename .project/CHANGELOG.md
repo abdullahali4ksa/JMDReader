@@ -303,3 +303,13 @@
 - Verified commit: `82eb61d` (regression fix code); metadata commits through `0b78325`.
 - All phases (0–8) complete. No remaining READY tasks.
 - No Store submission performed (separate owner authorization required per blueprint).
+
+## 2026-10-08 — P09-T001: Auto/RTL/LTR direction per paragraph with visible zoom ratio (DONE)
+- Zoom toolbar added to MainPage.xaml with visible ratio display (e.g., "100%"), zoom in/out/reset buttons
+- Keyboard shortcuts: Ctrl++ (zoom in +10%), Ctrl+- (zoom out -10%), Ctrl+0 (reset to 100%)
+- ZoomRatio property in ReaderViewModel with ZoomPercentage string for binding
+- ScaleTransform applied to RenderedDocumentPanel for zoom (render transform, no layout cycle)
+- RTL/LTR direction detection already present in MarkdownRenderer (ContainsRtlText via Unicode bidi ranges)
+- Code blocks and URLs preserve LTR (FlowDirection.LeftToRight)
+- Build: PASS (0 errors, 0 warnings); Tests: PASS (60/60)
+- No persistent preference stored (per Blueprint §3.7)

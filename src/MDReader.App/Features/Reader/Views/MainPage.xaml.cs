@@ -1,10 +1,16 @@
 using System.ComponentModel;
+using Microsoft.UI.Input;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using MDReader.App.Features.Reader.ViewModels;
+using Windows.UI.Core;
+using Windows.System;
 
 // To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
+// and more about our app templates, see: http://aka.ms/winui-project-info.
 
 namespace MDReader.App.Features.Reader.Views;
 
@@ -22,6 +28,7 @@ public sealed partial class MainPage : Page
     public MainPage()
     {
         InitializeComponent();
+        KeyDown += OnKeyDown;
     }
 
     /// <summary>
@@ -49,12 +56,44 @@ public sealed partial class MainPage : Page
             _viewModel.PropertyChanged -= OnViewModelPropertyChanged;
     }
 
+    private void OnKeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        if (_viewModel is null)
+            return;
+
+        var ctrl = InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Control)
+            .HasFlag(VirtualKeyStates.Down);
+
+        if (!ctrl)
+            return;
+
+        switch (e.Key)
+        {
+            case VirtualKey.Add:
+                _viewModel.ZoomInCommand.Execute(null);
+                e.Handled = true;
+                break;
+            case VirtualKey.Subtract:
+                _viewModel.ZoomOutCommand.Execute(null);
+                e.Handled = true;
+                break;
+            case VirtualKey.Number0:
+                _viewModel.ResetZoomCommand.Execute(null);
+                e.Handled = true;
+                break;
+        }
+    }
+
     private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(ReaderViewModel.Elements) ||
             e.PropertyName == nameof(ReaderViewModel.HasDocument))
         {
             RenderDocument();
+        }
+        else if (e.PropertyName == nameof(ReaderViewModel.ZoomRatio))
+        {
+            ApplyZoom();
         }
     }
 
@@ -74,5 +113,25 @@ public sealed partial class MainPage : Page
         var basePath = _viewModel?.CurrentDocumentPath;
         foreach (var element in _renderer.Render(elements, basePath))
             RenderedDocumentPanel.Children.Add(element);
+
+        ApplyZoom();
+    }
+
+    /// <summary>
+    /// Applies the current zoom ratio to the rendered document panel via a
+    /// ScaleTransform. The zoom is applied as a render transform so it does
+    /// not affect layout or cause infinite measure/arrange cycles.
+    /// </summary>
+    private void ApplyZoom()
+    {
+        if (_viewModel is null)
+            return;
+
+        var scale = _viewModel.ZoomRatio;
+        RenderedDocumentPanel.RenderTransform = new ScaleTransform
+        {
+            ScaleX = scale,
+            ScaleY = scale,
+        };
     }
 }

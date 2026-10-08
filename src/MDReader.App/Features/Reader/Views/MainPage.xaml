@@ -22,10 +22,66 @@
         TabFocusNavigation="Cycle"
         AutomationProperties.Name="Main reader content">
 
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Zoom toolbar (visible when document is loaded) -->
+        <Border
+            x:Name="ZoomToolbar"
+            Grid.Row="0"
+            Background="{ThemeResource AppBackgroundBrush}"
+            BorderBrush="{ThemeResource AppBorderBrush}"
+            BorderThickness="0,0,0,1"
+            Padding="12,6"
+            Visibility="{Binding HasDocument, Converter={StaticResource BoolToVisibilityConverter}}"
+            AutomationProperties.Name="Zoom controls">
+            <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+                <Button
+                    x:Name="ZoomOutButton"
+                    Content="−"
+                    FontSize="18"
+                    FontWeight="SemiBold"
+                    Width="36"
+                    Height="36"
+                    Command="{Binding ZoomOutCommand}"
+                    AutomationProperties.Name="Zoom out"
+                    ToolTipService.ToolTip="Zoom out (Ctrl+-)" />
+                <TextBlock
+                    x:Name="ZoomPercentageText"
+                    Text="{Binding ZoomPercentage}"
+                    VerticalAlignment="Center"
+                    MinWidth="48"
+                    TextAlignment="Center"
+                    Style="{StaticResource AppSecondaryTextStyle}"
+                    AutomationProperties.Name="Zoom level" />
+                <Button
+                    x:Name="ZoomInButton"
+                    Content="+"
+                    FontSize="18"
+                    FontWeight="SemiBold"
+                    Width="36"
+                    Height="36"
+                    Command="{Binding ZoomInCommand}"
+                    AutomationProperties.Name="Zoom in"
+                    ToolTipService.ToolTip="Zoom in (Ctrl++)" />
+                <Button
+                    x:Name="ZoomResetButton"
+                    Content="⟲"
+                    FontSize="16"
+                    Width="36"
+                    Height="36"
+                    Command="{Binding ResetZoomCommand}"
+                    AutomationProperties.Name="Reset zoom"
+                    ToolTipService.ToolTip="Reset zoom (Ctrl+0)" />
+            </StackPanel>
+        </Border>
+
         <!-- Document content (shown when a document is loaded) -->
         <ScrollViewer
             x:Name="DocumentContentViewer"
-            Grid.Row="0"
+            Grid.Row="1"
             HorizontalScrollMode="Auto"
             VerticalScrollMode="Auto"
             Visibility="{Binding HasDocument, Converter={StaticResource BoolToVisibilityConverter}}"

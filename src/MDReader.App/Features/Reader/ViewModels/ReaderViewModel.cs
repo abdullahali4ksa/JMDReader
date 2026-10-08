@@ -1,6 +1,7 @@
 // MIT License - see LICENSE file in the repository root.
 
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using MDReader.Core.Documents;
 using MDReader.Core.Markdown;
 
@@ -18,6 +19,7 @@ public sealed partial class ReaderViewModel : ObservableObject
     private string? _errorMessage;
     private MarkdownDocumentElement? _elements;
     private bool _isLoading;
+    private double _zoomRatio = 1.0;
 
     /// <summary>Gets or sets the file path of the currently loaded document.</summary>
     public string? CurrentDocumentPath
@@ -89,6 +91,41 @@ public sealed partial class ReaderViewModel : ObservableObject
                 OnPropertyChanged(nameof(HasError));
             }
         }
+    }
+
+    /// <summary>Gets the current zoom ratio (1.0 = 100%).</summary>
+    public double ZoomRatio
+    {
+        get => _zoomRatio;
+        private set
+        {
+            if (SetProperty(ref _zoomRatio, value))
+                OnPropertyChanged(nameof(ZoomPercentage));
+        }
+    }
+
+    /// <summary>Gets the zoom percentage string for display (e.g., "100%").</summary>
+    public string ZoomPercentage => $"{(int)(_zoomRatio * 100)}%";
+
+    /// <summary>Zoom in by 10% (Ctrl++).</summary>
+    [RelayCommand]
+    private void ZoomIn()
+    {
+        ZoomRatio = Math.Min(_zoomRatio + 0.1, 3.0);
+    }
+
+    /// <summary>Zoom out by 10% (Ctrl+-).</summary>
+    [RelayCommand]
+    private void ZoomOut()
+    {
+        ZoomRatio = Math.Max(_zoomRatio - 0.1, 0.5);
+    }
+
+    /// <summary>Reset zoom to 100% (Ctrl+0).</summary>
+    [RelayCommand]
+    private void ResetZoom()
+    {
+        ZoomRatio = 1.0;
     }
 
     /// <summary>

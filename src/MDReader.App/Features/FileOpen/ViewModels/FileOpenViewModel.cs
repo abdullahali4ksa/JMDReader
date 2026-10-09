@@ -13,7 +13,7 @@ namespace MDReader.App.Features.FileOpen.ViewModels;
 /// in unpackaged WinUI 3 desktop applications.
 /// </summary>
 [ComImport]
-[Guid("781deb8d-0efc-4b60-a7ee-0c4d7d4b7d50")]
+[Guid("3E68D4BD-7135-4D10-8018-9FB6D9F33FA1")]
 [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 internal interface IInitializeWithWindow
 {
@@ -44,37 +44,20 @@ public sealed partial class FileOpenViewModel : ObservableObject
     /// <returns>The selected file path, or null if the user cancels or an error occurs.</returns>
     public async Task<string?> PickMarkdownFileAsync(IntPtr hwnd)
     {
-        try
-        {
-            var picker = new FileOpenPicker();
-            picker.FileTypeFilter.Add(".md");
-            picker.FileTypeFilter.Add(".markdown");
-            picker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
+        if (hwnd == IntPtr.Zero)
+            throw new InvalidOperationException("The MDReader window handle is unavailable; the file picker cannot be attached to the app window.");
 
-            // Attach the window handle — required for unpackaged WinUI 3 apps.
-            // Uses COM interop (Marshal + QueryInterface) because the Windows App
-            // SDK configuration in this project does not expose `.As<T>()` on
-            // the FileOpenPicker projection.
-            AttachWindowHandle(picker, hwnd);
-
-            var file = await picker.PickSingleFileAsync();
-            if (file is null)
-                return null; // user cancelled
-
-            // For files selected from the local file system, Path is available
-            SelectedFilePath = file.Path;
-            return SelectedFilePath;
-        }
-        catch (System.UnauthorizedAccessException)
-        {
-            // File in a protected location — return null, caller shows error
+        var picker = new FileOpenPicker();
+        picker.FileTypeFilter.Add(".md");
+        picker.FileTypeFilter.Add(".markdown");
+        picker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
+        AttachWindowHandle(picker, hwnd);
+        var file = await picker.PickSingleFileAsync();
+        if (file is null)
             return null;
-        }
-        catch (System.Exception)
-        {
-            // Any other picker error — return null, caller shows error
-            return null;
-        }
+
+        SelectedFilePath = file.Path;
+        return SelectedFilePath;
     }
 
     /// <summary>

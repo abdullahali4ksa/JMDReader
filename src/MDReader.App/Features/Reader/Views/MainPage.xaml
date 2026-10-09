@@ -24,6 +24,7 @@
 
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -78,10 +79,34 @@
             </StackPanel>
         </Border>
 
+        <Border
+            x:Name="FindBar"
+            Grid.Row="1"
+            Padding="12,8"
+            Background="{ThemeResource AppBackgroundBrush}"
+            BorderBrush="{ThemeResource AppBorderBrush}"
+            BorderThickness="0,0,0,1"
+            Visibility="Collapsed"
+            AutomationProperties.Name="Find in document">
+            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <TextBlock Text="Find" VerticalAlignment="Center" />
+                <TextBox x:Name="FindTextBox" Width="260"
+                    PlaceholderText="Search this Markdown document"
+                    TextChanged="FindTextBox_TextChanged"
+                    KeyDown="FindTextBox_KeyDown"
+                    AutomationProperties.Name="Search text" />
+                <Button Content="Previous" Click="FindPrevious_Click" />
+                <Button Content="Next" Click="FindNext_Click" />
+                <TextBlock x:Name="FindStatusText" VerticalAlignment="Center" MinWidth="90" />
+                <TextBlock x:Name="FindPreviewText" VerticalAlignment="Center" MaxWidth="360" TextTrimming="CharacterEllipsis" />
+                <Button Content="Close" Click="CloseFind_Click" />
+            </StackPanel>
+        </Border>
+
         <!-- Document content (shown when a document is loaded) -->
         <ScrollViewer
             x:Name="DocumentContentViewer"
-            Grid.Row="1"
+            Grid.Row="2"
             HorizontalScrollMode="Auto"
             VerticalScrollMode="Auto"
             Visibility="{Binding HasDocument, Converter={StaticResource BoolToVisibilityConverter}}"
@@ -102,6 +127,7 @@
         <!-- Empty / welcome state -->
         <StackPanel
             x:Name="EmptyStatePanel"
+            Grid.Row="2"
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
             Spacing="12"
@@ -129,6 +155,7 @@
         <!-- Loading state (shown while a document is being parsed) -->
         <StackPanel
             x:Name="LoadingStatePanel"
+            Grid.Row="2"
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
             Spacing="12"
@@ -144,6 +171,7 @@
         <!-- Error state -->
         <Border
             x:Name="ErrorState"
+            Grid.Row="2"
             Background="{ThemeResource AppBackgroundBrush}"
             Margin="24"
             Padding="20"

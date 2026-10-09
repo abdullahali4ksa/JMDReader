@@ -94,7 +94,11 @@ public sealed partial class ShellViewModel : ObservableObject
     [RelayCommand]
     private Task RefreshDocumentAsync()
     {
-        // Named action: refresh/reload current document view.
+        // Reload the currently open file from disk; no-op when the reader is empty.
+        var currentPath = _readerViewModel.CurrentDocumentPath;
+        if (!string.IsNullOrWhiteSpace(currentPath))
+            OpenDocument(currentPath);
+
         return Task.CompletedTask;
     }
 

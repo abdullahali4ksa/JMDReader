@@ -1,10 +1,12 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
 using Windows.ApplicationModel.DataTransfer;
 using MDReader.App.Features.Reader.ViewModels;
 using MDReader.App.Features.Reader.Views;
 using MDReader.App.Features.Shell.ViewModels;
 using MDReader.App.Shared.Helpers;
+using Windows.System;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -36,6 +38,8 @@ public sealed partial class MainWindow : Window
         // Set MVVM DataContext on root grid (ShellViewModel for menu/commands)
         RootGrid.DataContext = _shellViewModel;
 
+        RegisterKeyboardAccelerators(readerViewModel);
+
         ExtendsContentIntoTitleBar = true;
         SetTitleBar(AppTitleBar);
 
@@ -64,6 +68,37 @@ public sealed partial class MainWindow : Window
             DispatcherQueue.TryEnqueue(() => _shellViewModel.OpenDocument(cliPath));
         }
     }
+
+    private void RegisterKeyboardAccelerators(ReaderViewModel readerViewModel)
+    {
+        RegisterKeyboardAccelerator(VirtualKey.F, VirtualKeyModifiers.Control,
+            () => (RootFrame.Content as MainPage)?.ShowFind());
+        RegisterKeyboardAccelerator(VirtualKey.O, VirtualKeyModifiers.Control,
+            () => _shellViewModel.OpenDocumentCommand.Execute(null));        RegisterKeyboardAccelerator(VirtualKey.R, VirtualKeyModifiers.Control,
+            () => _shellViewModel.RefreshDocumentCommand.Execute(null));
+        RegisterKeyboardAccelerator(VirtualKey.Number0, VirtualKeyModifiers.Control,
+            () => readerViewModel.ResetZoomCommand.Execute(null));
+        RegisterKeyboardAccelerator((VirtualKey)0xBB, VirtualKeyModifiers.Control | VirtualKeyModifiers.Shift,
+            () => readerViewModel.ZoomInCommand.Execute(null));
+        RegisterKeyboardAccelerator(VirtualKey.Add, VirtualKeyModifiers.Control,
+            () => readerViewModel.ZoomInCommand.Execute(null));
+        RegisterKeyboardAccelerator((VirtualKey)0xBD, VirtualKeyModifiers.Control,
+            () => readerViewModel.ZoomOutCommand.Execute(null));
+        RegisterKeyboardAccelerator(VirtualKey.Subtract, VirtualKeyModifiers.Control,
+            () => readerViewModel.ZoomOutCommand.Execute(null));
+    }
+
+    private void RegisterKeyboardAccelerator(VirtualKey key, VirtualKeyModifiers modifiers, Action execute)
+    {
+        var accelerator = new KeyboardAccelerator { Key = key, Modifiers = modifiers };
+        accelerator.Invoked += (_, args) =>
+        {
+            execute();
+            args.Handled = true;
+        };
+        RootGrid.KeyboardAccelerators.Add(accelerator);
+    }
+    private void Find_Click(object sender, RoutedEventArgs e) => (RootFrame.Content as MainPage)?.ShowFind();
 
     private void RootGrid_DragOver(object sender, DragEventArgs e)
     {

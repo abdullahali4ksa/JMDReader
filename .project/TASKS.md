@@ -392,7 +392,7 @@ The `FILES_SCOPE` on each original P01 task is the allowlist. Dependencies are d
 
 ## Phase 4 — Windows UX and Accessibility
 
-**Status:** PLANNED · **Depends on:** Phase 3 complete.
+**Status:** DONE (5/5 tasks: P04-T001..P04-T005 verified) · **Depends on:** Phase 3 complete.
 
 ### **P04-T001 — Refine native shell and File/View/Settings commands**
 **FEATURE:** Shell · **PRIORITY:** P1 · **DEPENDS_ON:** P03-T005 · **STATUS:** DONE · **FILES_SCOPE:** `src/MDReader.App/Features/Shell/`, `src/MDReader.App/Features/Settings/`
@@ -402,7 +402,7 @@ The `FILES_SCOPE` on each original P01 task is the allowlist. Dependencies are d
 - **VERIFICATION:** Build/test plus interaction checklist.
 
 ### P04-T002 — Add keyboard shortcuts and in-document find
-**FEATURE:** Reader · **PRIORITY:** P1 · **DEPENDS_ON:** P04-T001 · **FILES_SCOPE:** `src/MDReader.App/Features/Reader/`, `src/MDReader.App/Features/Shell/`
+**FEATURE:** Reader · **PRIORITY:** P1 · **DEPENDS_ON:** P04-T001 · **STATUS:** DONE · **FILES_SCOPE:** `src/MDReader.App/Features/Reader/`, `src/MDReader.App/Features/Shell/`
 - **SUBTASKS:** Implement Ctrl+O, Ctrl+R, Ctrl+F; next/previous and clear; show shortcut labels.
 - **ACCEPTANCE CRITERIA:** Find searches only current document; shortcuts are discoverable; no folder-wide search or source editing.
 - **TEST:** Build/test plus manual keyboard-only search/reload/open checks.

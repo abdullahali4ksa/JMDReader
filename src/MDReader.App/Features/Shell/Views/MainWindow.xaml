@@ -33,7 +33,7 @@
             </MenuBarItem>
             <MenuBarItem Title="View">
                 <MenuFlyoutItem Text="Refresh  (Ctrl+R)" Command="{Binding RefreshDocumentCommand}" />
-                <MenuFlyoutItem Text="Find  (Ctrl+F)" Command="{Binding FindDocumentCommand}" />
+                <MenuFlyoutItem Text="Find  (Ctrl+F)" Click="Find_Click" />
             </MenuBarItem>
             <MenuBarItem Title="Settings">
                 <MenuFlyoutItem Text="Theme" Command="{Binding ThemeSettingsCommand}" />

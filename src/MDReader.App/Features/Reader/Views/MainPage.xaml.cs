@@ -24,11 +24,12 @@ public sealed partial class MainPage : Page
 {
     private readonly MarkdownRenderer _renderer = new();
     private ReaderViewModel? _viewModel;
+    private readonly List<int> _findMatches = new();
+    private int _currentFindIndex = -1;
 
     public MainPage()
     {
         InitializeComponent();
-        KeyDown += OnKeyDown;
     }
 
     /// <summary>
@@ -56,32 +57,88 @@ public sealed partial class MainPage : Page
             _viewModel.PropertyChanged -= OnViewModelPropertyChanged;
     }
 
-    private void OnKeyDown(object sender, KeyRoutedEventArgs e)
+    public void ShowFind()
     {
-        if (_viewModel is null)
-            return;
+        FindBar.Visibility = Visibility.Visible;
+        FindTextBox.Focus(FocusState.Programmatic);
+        FindTextBox.SelectAll();
+    }
 
-        var ctrl = InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Control)
-            .HasFlag(VirtualKeyStates.Down);
-
-        if (!ctrl)
-            return;
-
-        switch (e.Key)
+    private void FindTextBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        _findMatches.Clear();
+        _currentFindIndex = -1;
+        var query = FindTextBox.Text;
+        var content = _viewModel?.DocumentContent ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(query))
         {
-            case VirtualKey.Add:
-                _viewModel.ZoomInCommand.Execute(null);
-                e.Handled = true;
-                break;
-            case VirtualKey.Subtract:
-                _viewModel.ZoomOutCommand.Execute(null);
-                e.Handled = true;
-                break;
-            case VirtualKey.Number0:
-                _viewModel.ResetZoomCommand.Execute(null);
-                e.Handled = true;
-                break;
+            FindStatusText.Text = string.Empty;
+            FindPreviewText.Text = string.Empty;
+            return;
         }
+
+        var position = 0;
+        while ((position = content.IndexOf(query, position, StringComparison.CurrentCultureIgnoreCase)) >= 0)
+        {
+            _findMatches.Add(position);
+            position += query.Length;
+        }
+
+        if (_findMatches.Count == 0)
+        {
+            FindStatusText.Text = "No matches";
+            FindPreviewText.Text = string.Empty;
+            return;
+        }
+
+        _currentFindIndex = 0;
+        UpdateFindResult();
+    }
+
+    private void FindTextBox_KeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        if (e.Key == VirtualKey.Enter)
+        {
+            if (InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Shift).HasFlag(VirtualKeyStates.Down))
+                FindPrevious();
+            else
+                FindNext();
+            e.Handled = true;
+        }
+        else if (e.Key == VirtualKey.Escape)
+        {
+            FindBar.Visibility = Visibility.Collapsed;
+            e.Handled = true;
+        }
+    }
+
+    private void FindPrevious_Click(object sender, RoutedEventArgs e) => FindPrevious();
+    private void FindNext_Click(object sender, RoutedEventArgs e) => FindNext();
+    private void CloseFind_Click(object sender, RoutedEventArgs e) => FindBar.Visibility = Visibility.Collapsed;
+
+    private void FindPrevious()
+    {
+        if (_findMatches.Count == 0) return;
+        _currentFindIndex = (_currentFindIndex - 1 + _findMatches.Count) % _findMatches.Count;
+        UpdateFindResult();
+    }
+
+    private void FindNext()
+    {
+        if (_findMatches.Count == 0) return;
+        _currentFindIndex = (_currentFindIndex + 1) % _findMatches.Count;
+        UpdateFindResult();
+    }
+
+    private void UpdateFindResult()
+    {
+        var content = _viewModel?.DocumentContent ?? string.Empty;
+        var start = _findMatches[_currentFindIndex];
+        var queryLength = FindTextBox.Text.Length;
+        var previewStart = Math.Max(0, start - 32);
+        var previewLength = Math.Min(content.Length - previewStart, queryLength + 64);
+        FindStatusText.Text = $"{_currentFindIndex + 1} of {_findMatches.Count}";
+        FindPreviewText.Text = content.Substring(previewStart, previewLength).Replace('\r', ' ').Replace('\n', ' ');
     }
 
     private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)

@@ -323,3 +323,11 @@
 - Documented zoom behavior in docs/ARCHITECTURE.md (Zoom Behavior section)
 - Build: PASS (0 errors, 0 warnings); Tests: PASS (60/60)
 - No persistent storage added; no architecture change
+
+## 2026-10-10 — P04-T002: Keyboard shortcuts and in-document find (DONE)
+- Added KeyboardAccelerators to MainWindow: Ctrl+O (open), Ctrl+R (refresh), Ctrl+F (find), Ctrl++/Ctrl+0xBB+Shift (zoom in), Ctrl+-/Ctrl+0xBD (zoom out), Ctrl+0 (zoom reset)
+- Added Find bar UI to MainPage.xaml: search textbox, Previous/Next buttons, status text, preview text, close button
+- Implemented in-document find in MainPage.xaml.cs: FindTextBox_TextChanged (live search), FindTextBox_KeyDown (Enter=next, Shift+Enter=previous, Escape=close), FindPrevious/FindNext/UpdateFindResult
+- Fixed Find menu item: changed from Command binding to Click event (Find_Click) to call MainPage.ShowFind()
+- Fixed Refresh command: now reloads current document from disk (no-op when reader is empty)
+- Build: PASS (0 errors, 1 pre-existing warning); Tests: PASS (60/60)

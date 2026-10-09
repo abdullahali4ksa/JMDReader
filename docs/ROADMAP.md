@@ -14,8 +14,8 @@ Open one `.md`/`.markdown` file via picker and CLI; read safely; parse with docu
 ## Phase 3 — Rendering Quality and Safe References — DONE (5 / 5 tasks verified: P03-T001..P03-T005)
 Complete agreed Markdown subset, Arabic/RTL behavior, safe in-tree local images, internal anchors, user-clicked external URLs and defined file-relative Markdown navigation. Add GFM cases. HTML stays inert; no remote content retrieval.
 
-## Phase 4 — Windows UX and Accessibility — PLANNED
-Refine native shell/title/menu, keyboard shortcuts, find within current document, single-file drag/drop, in-memory recent list, theme/language UI behavior, accessibility and high-DPI checks. Print remains deferred unless the owner approves it in the Blueprint.
+## Phase 4 — Windows UX and Accessibility — DONE (5/5 tasks: P04-T001..P04-T005 verified)
+Refined native shell/title/menu, keyboard shortcuts (Ctrl+O/R/F, zoom), in-document find with Previous/Next, single-file drag/drop, in-memory recent list, theme/language UI behavior, accessibility and high-DPI checks. Print remains deferred unless the owner approves it in the Blueprint.
 
 ## Phase 5 — Reliability and Performance — DONE (4 / 4 tasks verified: P05-T001..P05-T004)
 Hardened failure paths; performance measurements recorded; Core coverage and CI policy established; verification gate passed.

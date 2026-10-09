@@ -23,8 +23,14 @@ Hardened failure paths; performance measurements recorded; Core coverage and CI 
 ## Phase 6 — MSIX Packaging — P06-T001 DONE, P06-T002 DONE (manual verification blocked by missing signing cert / no sideload env; gate P06-T003 DONE); Phase 6 complete
 Build, sign through a non-committed development/distribution process, install/uninstall, and launch the MSIX package. No custom updater.
 
-## Phase 7 — Microsoft Store Readiness — PLANNED
-Review capabilities and certification, privacy/legal disclosures, manifest and listing assets. Prepare a submission-ready package; actual publication requires a separate owner action.
+## Phase 7 — Microsoft Store Readiness — DONE (3/3 tasks: P07-T001..P07-T003 verified)
+Store policy, privacy/capability review, and listing assets completed. No Store submission performed (separate owner authorization required per blueprint).
+
+## Phase 8 — Verified Runtime Defect Remediation — DONE (P08-T001 verified)
+Intermittent startup crash on file open fixed (MarkdownLinkPolicy + dispatcher deferral). Build PASS (0 errors); tests PASS (60/60); statistical verification 12/12 ALIVE (180s).
+
+## Phase 9 — Auto/RTL/LTR Zoom and Reset — DONE (2/2 tasks: P09-T001, P09-T002 verified)
+Zoom toolbar with visible ratio, Ctrl++/Ctrl+-/Ctrl+0 keyboard shortcuts, RTL/LTR direction detection per paragraph, LTR preservation for code/URLs. Build PASS (0 errors); tests PASS (60/60).
 
 ## Global exclusions
 No editing, accounts/cloud sync, database, telemetry, plugin marketplace, collaboration, browser automation, embedded HTML/script execution, custom updater, or AI provider integration. Persistent recent/session/preferences remain deferred until the owner resolves the Blueprint storage conflict.

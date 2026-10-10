@@ -15,6 +15,9 @@ Built with **WinUI 3** and the **Windows App SDK** on **.NET 10**, using **Visua
 
 *See [docs/ROADMAP.md](docs/ROADMAP.md) for the complete phased feature plan.*
 
+- [دليل المنتج العربي (HTML)](docs/MDReader_PRODUCT_GUIDE_AR.html)
+- [دليل تثبيت وإصدار Windows (HTML)](docs/MDReader_RELEASE_AR.html)
+
 ## Prerequisites
 
 | Tool | Minimum Version | Install Command |

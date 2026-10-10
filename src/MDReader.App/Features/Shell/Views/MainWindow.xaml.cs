@@ -74,7 +74,8 @@ public sealed partial class MainWindow : Window
         RegisterKeyboardAccelerator(VirtualKey.F, VirtualKeyModifiers.Control,
             () => (RootFrame.Content as MainPage)?.ShowFind());
         RegisterKeyboardAccelerator(VirtualKey.O, VirtualKeyModifiers.Control,
-            () => _shellViewModel.OpenDocumentCommand.Execute(null));        RegisterKeyboardAccelerator(VirtualKey.R, VirtualKeyModifiers.Control,
+            () => _shellViewModel.OpenDocumentCommand.Execute(null));
+        RegisterKeyboardAccelerator(VirtualKey.R, VirtualKeyModifiers.Control,
             () => _shellViewModel.RefreshDocumentCommand.Execute(null));
         RegisterKeyboardAccelerator(VirtualKey.Number0, VirtualKeyModifiers.Control,
             () => readerViewModel.ResetZoomCommand.Execute(null));

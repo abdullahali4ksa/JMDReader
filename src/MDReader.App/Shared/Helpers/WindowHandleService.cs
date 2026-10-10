@@ -29,27 +29,6 @@ public static class WindowHandleService
     /// <returns>The HWND as an IntPtr, or IntPtr.Zero on failure.</returns>
     public static IntPtr GetWindowHandle(Window window)
     {
-        var iUnknown = Marshal.GetIUnknownForObject(window);
-        try
-        {
-            var iid = typeof(IWindowNative).GUID;
-            Marshal.QueryInterface(iUnknown, in iid, out var interfacePtr);
-            try
-            {
-                if (interfacePtr == IntPtr.Zero)
-                    return IntPtr.Zero;
-                var native = (IWindowNative)Marshal.GetObjectForIUnknown(interfacePtr);
-                return native.WindowHandle;
-            }
-            finally
-            {
-                if (interfacePtr != IntPtr.Zero)
-                    Marshal.Release(interfacePtr);
-            }
-        }
-        finally
-        {
-            Marshal.Release(iUnknown);
-        }
-    }
-}
+        ArgumentNullException.ThrowIfNull(window);
+        return WinRT.Interop.WindowNative.GetWindowHandle(window);
+    }}

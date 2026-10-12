@@ -31,7 +31,7 @@ PLANNED
 DONE (3 / 3 tasks; P06-T001..P06-T003 verified)
 
 ### Phase 7:
-PLANNED
+DONE (3 / 3 tasks; P07-T001..P07-T003 DONE)
 
 ---
 
@@ -384,7 +384,7 @@ The `FILES_SCOPE` on each original P01 task is the allowlist. Dependencies are d
 - **VERIFICATION:** Build/test and security checklist.
 
 ### P03-T005 — Phase 3 verification gate
-**FEATURE:** Reader · **PRIORITY:** P0 · **DEPENDS_ON:** P03-T002, P03-T003, P03-T004 · **STATUS:** PLANNED · **FILES_SCOPE:** `.project/STATE.json`, `.project/TASKS.md`, `.project/CHANGELOG.md`, `docs/ROADMAP.md`
+**FEATURE:** Reader · **PRIORITY:** P0 · **DEPENDS_ON:** P03-T002, P03-T003, P03-T004 · **STATUS:** DONE · **FILES_SCOPE:** `.project/STATE.json`, `.project/TASKS.md`, `.project/CHANGELOG.md`, `docs/ROADMAP.md`
 - **SUBTASKS:** Run build/tests; inspect Arabic, GFM, image, link cases; record results.
 - **ACCEPTANCE CRITERIA:** All phase tasks verified; failure/limitation accurately documented; no code change outside task scopes.
 - **TEST:** `dotnet build`, `dotnet test`, manual content/security matrix.

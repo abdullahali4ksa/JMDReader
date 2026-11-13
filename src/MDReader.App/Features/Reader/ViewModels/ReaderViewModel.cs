@@ -33,6 +33,7 @@ public sealed partial class ReaderViewModel : ObservableObject
     private string _newCommentText = string.Empty;
     private string _selectedQuoteText = string.Empty;
     private bool _isOutlinePaneOpen;
+    private bool _isPathBarVisible = true;
     private DocumentOutlineItem? _activeOutlineItem;
     private DocumentAnalytics _analytics;
     private bool _isZenMode;
@@ -241,6 +242,19 @@ public sealed partial class ReaderViewModel : ObservableObject
     public void ToggleCommentsPane()
     {
         IsCommentsPaneOpen = !IsCommentsPaneOpen;
+    }
+
+    /// <summary>Gets or sets whether the informational file path bar is visible.</summary>
+    public bool IsPathBarVisible
+    {
+        get => _isPathBarVisible;
+        set => SetProperty(ref _isPathBarVisible, value);
+    }
+
+    [RelayCommand]
+    public void TogglePathBarVisibility()
+    {
+        IsPathBarVisible = !IsPathBarVisible;
     }
 
     [RelayCommand]

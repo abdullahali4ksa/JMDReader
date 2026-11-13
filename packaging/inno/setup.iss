@@ -5,8 +5,8 @@
 
 #define MyAppName "MDReader"
 #define MyAppVersion "1.0.1"
-#define MyAppPublisher "MDReader"
-#define MyAppURL "https://github.com/MDReader/MDReader"
+#define MyAppPublisher "ABDULLAHALI4KSA"
+#define MyAppURL "https://github.com/ABDULLAHALI4KSA/MDReader"
 #define MyAppExeName "MDReader.App.exe"
 #define MyAppId "{{B9A5F148-36D2-475C-9A8E-2B60AC00D413}"
 

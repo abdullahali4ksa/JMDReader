@@ -71,10 +71,20 @@ public sealed partial class MainWindow : Window
 
     private void RegisterKeyboardAccelerators(ReaderViewModel readerViewModel)
     {
-        RegisterKeyboardAccelerator(VirtualKey.F, VirtualKeyModifiers.Control,
-            () => (RootFrame.Content as MainPage)?.ShowFind());
+        RegisterKeyboardAccelerator(VirtualKey.N, VirtualKeyModifiers.Control,
+            () => _shellViewModel.NewDocumentCommand.Execute(null));
         RegisterKeyboardAccelerator(VirtualKey.O, VirtualKeyModifiers.Control,
             () => _shellViewModel.OpenDocumentCommand.Execute(null));
+        RegisterKeyboardAccelerator(VirtualKey.O, VirtualKeyModifiers.Control | VirtualKeyModifiers.Shift,
+            () => _shellViewModel.OpenFolderCommand.Execute(null));
+        RegisterKeyboardAccelerator(VirtualKey.S, VirtualKeyModifiers.Control,
+            () => _shellViewModel.SaveDocumentCommand.Execute(null));
+        RegisterKeyboardAccelerator(VirtualKey.W, VirtualKeyModifiers.Control,
+            () => _shellViewModel.CloseCurrentTabCommand.Execute(null));
+        RegisterKeyboardAccelerator(VirtualKey.B, VirtualKeyModifiers.Control,
+            () => _shellViewModel.ToggleWorkspacePaneCommand.Execute(null));
+        RegisterKeyboardAccelerator(VirtualKey.F, VirtualKeyModifiers.Control,
+            () => (RootFrame.Content as MainPage)?.ShowFind());
         RegisterKeyboardAccelerator(VirtualKey.R, VirtualKeyModifiers.Control,
             () => _shellViewModel.RefreshDocumentCommand.Execute(null));
         RegisterKeyboardAccelerator(VirtualKey.Number0, VirtualKeyModifiers.Control,
@@ -87,6 +97,14 @@ public sealed partial class MainWindow : Window
             () => readerViewModel.ZoomOutCommand.Execute(null));
         RegisterKeyboardAccelerator(VirtualKey.Subtract, VirtualKeyModifiers.Control,
             () => readerViewModel.ZoomOutCommand.Execute(null));
+    }
+
+    private void WorkspaceTreeView_ItemInvoked(TreeView sender, TreeViewItemInvokedEventArgs args)
+    {
+        if (args.InvokedItem is MDReader.App.Features.Shell.ViewModels.FolderNodeViewModel node)
+        {
+            _shellViewModel.OnNodeSelected(node);
+        }
     }
 
     private void RegisterKeyboardAccelerator(VirtualKey key, VirtualKeyModifiers modifiers, Action execute)

@@ -1,5 +1,8 @@
 // MIT License - see LICENSE file in the repository root.
 
+using System;
+using System.Collections.ObjectModel;
+using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MDReader.Core.Documents;
@@ -8,10 +11,9 @@ using MDReader.Core.Markdown;
 namespace MDReader.App.Features.Reader.ViewModels;
 
 /// <summary>
-/// ViewModel for the document reader — manages document content display,
-/// error messaging, and empty-state logic. Acts as the data context for
-/// MainPage.xaml, exposing properties that drive the empty, content, and
-/// error visual states.</summary>
+/// ViewModel for the document reader — manages multi-tab document sessions,
+/// content display, error messaging, and zoom state.
+/// </summary>
 public sealed partial class ReaderViewModel : ObservableObject
 {
     private string? _currentDocumentPath;
@@ -20,8 +22,44 @@ public sealed partial class ReaderViewModel : ObservableObject
     private MarkdownDocumentElement? _elements;
     private bool _isLoading;
     private double _zoomRatio = 1.0;
+    private DocumentTabViewModel? _selectedTab;
 
-    /// <summary>Gets or sets the file path of the currently loaded document.</summary>
+    /// <summary>Collection of active document tabs.</summary>
+    public ObservableCollection<DocumentTabViewModel> Tabs { get; } = new();
+
+    /// <summary>Gets or sets the active document tab.</summary>
+    public DocumentTabViewModel? SelectedTab
+    {
+        get => _selectedTab;
+        set
+        {
+            if (SetProperty(ref _selectedTab, value))
+            {
+                if (_selectedTab != null)
+                {
+                    _currentDocumentPath = _selectedTab.FilePath;
+                    _documentContent = _selectedTab.Content;
+                    _elements = _selectedTab.Elements;
+                    _errorMessage = null;
+                }
+                else
+                {
+                    _currentDocumentPath = null;
+                    _documentContent = null;
+                    _elements = null;
+                }
+
+                OnPropertyChanged(nameof(CurrentDocumentPath));
+                OnPropertyChanged(nameof(DocumentContent));
+                OnPropertyChanged(nameof(Elements));
+                OnPropertyChanged(nameof(IsEmpty));
+                OnPropertyChanged(nameof(HasDocument));
+                OnPropertyChanged(nameof(HasError));
+            }
+        }
+    }
+
+    /// <summary>Gets or sets the file path of the currently active document.</summary>
     public string? CurrentDocumentPath
     {
         get => _currentDocumentPath;
@@ -36,17 +74,26 @@ public sealed partial class ReaderViewModel : ObservableObject
         }
     }
 
-    /// <summary>Gets or sets the raw Markdown text of the loaded document.</summary>
+    /// <summary>Gets or sets the raw Markdown text of the active document.</summary>
     public string? DocumentContent
     {
         get => _documentContent;
-        set => SetProperty(ref _documentContent, value);
+        set
+        {
+            if (SetProperty(ref _documentContent, value))
+            {
+                if (_selectedTab != null && _selectedTab.Content != value)
+                {
+                    _selectedTab.Content = value ?? string.Empty;
+                    _elements = _selectedTab.Elements;
+                    OnPropertyChanged(nameof(Elements));
+                }
+            }
+        }
     }
 
     /// <summary>
-    /// Gets the parsed, platform-neutral element tree for the loaded document,
-    /// or null when no document is loaded. The View renders this tree using
-    /// <c>MarkdownRenderer</c>.
+    /// Gets the parsed element tree for the active document.
     /// </summary>
     public MarkdownDocumentElement? Elements
     {
@@ -54,7 +101,7 @@ public sealed partial class ReaderViewModel : ObservableObject
         private set => SetProperty(ref _elements, value);
     }
 
-    /// <summary>Gets or sets the error message to display, or null when no error.</summary>
+    /// <summary>Gets or sets the error message to display.</summary>
     public string? ErrorMessage
     {
         get => _errorMessage;
@@ -69,16 +116,16 @@ public sealed partial class ReaderViewModel : ObservableObject
         }
     }
 
-    /// <summary>True when no document is loaded and no error is shown.</summary>
-    public bool IsEmpty => _errorMessage is null && !_isLoading && string.IsNullOrEmpty(_currentDocumentPath);
+    /// <summary>True when no document is loaded or active.</summary>
+    public bool IsEmpty => _errorMessage is null && !_isLoading && (Tabs.Count == 0 || (_selectedTab is null && string.IsNullOrEmpty(_currentDocumentPath)));
 
     /// <summary>True when a document is loaded and ready for rendering.</summary>
-    public bool HasDocument => _errorMessage is null && !_isLoading && !string.IsNullOrEmpty(_currentDocumentPath);
+    public bool HasDocument => _errorMessage is null && !_isLoading && (_selectedTab is not null || !string.IsNullOrEmpty(_currentDocumentPath));
 
     /// <summary>True when there is an active error to display.</summary>
     public bool HasError => _errorMessage is not null;
 
-    /// <summary>True while a document is being loaded (between Open and render).</summary>
+    /// <summary>True while a document is being loaded.</summary>
     public bool IsLoading
     {
         get => _isLoading;
@@ -129,28 +176,37 @@ public sealed partial class ReaderViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Loads a document into the reader, clearing any previous state.
+    /// Loads a document into a tab (opening a new tab or selecting the existing one).
     /// </summary>
-    /// <param name="info">Document metadata from the file reader.</param>
-    /// <param name="content">The raw Markdown text content.</param>
     public void LoadDocument(DocumentInfo info, string content)
     {
-        // Mark loading and release the previous document's tree up front so a
-        // replacement never keeps the old visual content alive.
         IsLoading = true;
-        Elements = null;
-
         try
         {
-            CurrentDocumentPath = info.FilePath;
-            DocumentContent = content;
+            // Check if already open in a tab
+            var existing = Tabs.FirstOrDefault(t => string.Equals(t.FilePath, info.FilePath, StringComparison.OrdinalIgnoreCase));
+            if (existing != null)
+            {
+                existing.Content = content;
+                SelectedTab = existing;
+                ErrorMessage = null;
+                return;
+            }
 
-            // Parse the Markdown into the platform-neutral element tree. Parse
-            // failures (or size warnings) never throw: the document is still
-            // shown, degrading to whatever could be parsed.
-            var parsed = new MarkdownDocument { SourceText = content }.Parse();
-            Elements = parsed.Document.Elements;
+            var session = DocumentSession.FromFile(info.FilePath, content);
+            var tab = new DocumentTabViewModel(session);
 
+            // If we currently have just one untitled empty tab, replace it
+            if (Tabs.Count == 1 && string.IsNullOrEmpty(Tabs[0].FilePath) && !Tabs[0].IsDirty && string.IsNullOrEmpty(Tabs[0].Content))
+            {
+                Tabs[0] = tab;
+            }
+            else
+            {
+                Tabs.Add(tab);
+            }
+
+            SelectedTab = tab;
             ErrorMessage = null;
         }
         finally
@@ -160,28 +216,89 @@ public sealed partial class ReaderViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Shows an error message, clearing any loaded document.
+    /// Creates a new draft untitled document in a new tab.
     /// </summary>
-    /// <param name="message">A human-readable error message.</param>
-    public void ShowError(string message)
+    [RelayCommand]
+    public void CreateNewDocument()
     {
-        CurrentDocumentPath = null;
-        DocumentContent = null;
-        Elements = null;
-        ErrorMessage = message;
+        var untitledNumber = Tabs.Count + 1;
+        var session = DocumentSession.CreateNew($"Untitled-{untitledNumber}.md");
+        var tab = new DocumentTabViewModel(session);
+        Tabs.Add(tab);
+        SelectedTab = tab;
+        ErrorMessage = null;
     }
 
     /// <summary>
+    /// Closes the specified tab.
+    /// </summary>
+    public void CloseTab(DocumentTabViewModel tab)
+    {
+        var index = Tabs.IndexOf(tab);
+        Tabs.Remove(tab);
+
+        if (SelectedTab == tab)
+        {
+            if (Tabs.Count > 0)
+            {
+                var nextIndex = Math.Min(index, Tabs.Count - 1);
+                SelectedTab = Tabs[nextIndex];
+            }
+            else
+            {
+                SelectedTab = null;
+                Clear();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Saves the currently active document.
+    /// </summary>
+    public bool SaveCurrentDocument(string? targetPath = null)
+    {
+        if (_selectedTab == null)
+            return false;
+
+        var savePath = targetPath ?? _selectedTab.FilePath;
+        if (string.IsNullOrWhiteSpace(savePath))
+            return false;
+
+        var result = MarkdownFileWriter.WriteFile(savePath, _selectedTab.Content);
+        if (result.IsSuccess)
+        {
+            _selectedTab.MarkSaved(savePath, result.SavedAt);
+            CurrentDocumentPath = savePath;
+            return true;
+        }
+
+        ShowError($"Failed to save file: {result.ErrorMessage}");
+        return false;
+    }
+
+    /// <summary>
+    /// Shows an error message.
+    /// </summary>
+    public void ShowError(string message)
+    {
+        ErrorMessage = message;
+    }
+
     /// <summary>Find text within the current document.</summary>
     public string FindText { get; set; } = string.Empty;
 
-    /// <summary>Clear all document and error state, returning to the empty welcome state.</summary>
-    /// </summary>
+    /// <summary>Clear all document and error state.</summary>
     public void Clear()
     {
-        CurrentDocumentPath = null;
-        DocumentContent = null;
-        Elements = null;
-        ErrorMessage = null;
+        _currentDocumentPath = null;
+        _documentContent = null;
+        _elements = null;
+        _errorMessage = null;
+        OnPropertyChanged(nameof(CurrentDocumentPath));
+        OnPropertyChanged(nameof(DocumentContent));
+        OnPropertyChanged(nameof(Elements));
+        OnPropertyChanged(nameof(IsEmpty));
+        OnPropertyChanged(nameof(HasDocument));
+        OnPropertyChanged(nameof(HasError));
     }
 }

@@ -64,6 +64,19 @@ public sealed partial class MainPage : Page
         FindTextBox.SelectAll();
     }
 
+    private void DocumentTabs_AddTabButtonClick(TabView sender, object args)
+    {
+        _viewModel?.CreateNewDocument();
+    }
+
+    private void DocumentTabs_TabCloseRequested(TabView sender, TabViewTabCloseRequestedEventArgs args)
+    {
+        if (args.Item is DocumentTabViewModel tab)
+        {
+            _viewModel?.CloseTab(tab);
+        }
+    }
+
     private void FindTextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
         _findMatches.Clear();
@@ -144,7 +157,8 @@ public sealed partial class MainPage : Page
     private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(ReaderViewModel.Elements) ||
-            e.PropertyName == nameof(ReaderViewModel.HasDocument))
+            e.PropertyName == nameof(ReaderViewModel.HasDocument) ||
+            e.PropertyName == nameof(ReaderViewModel.SelectedTab))
         {
             RenderDocument();
         }

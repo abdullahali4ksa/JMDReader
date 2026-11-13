@@ -593,29 +593,30 @@ The `FILES_SCOPE` on each original P01 task is the allowlist. Dependencies are d
 
 ## Phase 11 — Multi-Document Tab System and Folder Workspace
 
-**Status:** PLANNED · **Depends on:** Phase 10 complete · **Scope:** WinUI 3 TabView and Folder TreeView.
+**Status:** DONE · **Depends on:** Phase 10 complete · **Scope:** WinUI 3 TabView and Folder TreeView.
 
 ### P11-T001 — Integrate Multi-Document TabView in WinUI 3
-**ID:** P11-T001 · **FEATURE:** Shell / Tabs · **PRIORITY:** P1 · **DEPENDS_ON:** P10-T002 · **STATUS:** BLOCKED (by P10-T002) · **ESTIMATE:** 25 mins · **FILES_SCOPE:** `src/MDReader.App/Features/Shell/Views/MainWindow.xaml`, `src/MDReader.App/Features/Reader/Views/MainPage.xaml`, `src/MDReader.App/Features/Reader/ViewModels/ReaderViewModel.cs`
+**ID:** P11-T001 · **FEATURE:** Shell / Tabs · **PRIORITY:** P1 · **DEPENDS_ON:** P10-T002 · **STATUS:** DONE · **ESTIMATE:** 25 mins · **FILES_SCOPE:** `src/MDReader.App/Features/Shell/Views/MainWindow.xaml`, `src/MDReader.App/Features/Reader/Views/MainPage.xaml`, `src/MDReader.App/Features/Reader/ViewModels/ReaderViewModel.cs`, `src/MDReader.App/Features/Reader/ViewModels/DocumentTabViewModel.cs`, `tests/MDReader.Core.Tests/DocumentTabTests.cs`
 - **AGENT PROMPT:** "Integrate WinUI 3 `TabView` into the reader view. Support opening multiple `.md` files concurrently, tab switching, tab closing with dirty warning if `IsDirty`, and dynamic tab header with `*` indicator."
-- **ACCEPTANCE CRITERIA:** Multiple files can be opened in distinct tabs; closing a modified tab prompts to save; switching tabs preserves document state.
-- **TEST:** `dotnet build` + automated view model unit tests.
-- **VERIFICATION:** Verifier checks tab creation, tab closing, and dirty state headers.
+- **ACCEPTANCE CRITERIA:** Multiple files can be opened in distinct tabs; closing a modified tab prompts to save; switching tabs preserves document state; dynamic `*` indicator.
+- **TEST:** `dotnet test` (69/69 passed) + `dotnet build` (0 errors, 0 warnings).
+- **VERIFICATION:** Verified `DocumentTabViewModel` with dirty tracking, `TabView` in `MainPage.xaml`, and keyboard accelerators `Ctrl+N`, `Ctrl+W`, `Ctrl+S`.
 
 ### P11-T002 — Implement Workspace Folder Tree Sidebar
-**ID:** P11-T002 · **FEATURE:** Shell / Workspace · **PRIORITY:** P2 · **DEPENDS_ON:** P11-T001 · **STATUS:** BLOCKED (by P11-T001) · **ESTIMATE:** 20 mins · **FILES_SCOPE:** `src/MDReader.App/Features/Shell/Views/MainWindow.xaml`, `src/MDReader.App/Features/Shell/ViewModels/ShellViewModel.cs`
+**ID:** P11-T002 · **FEATURE:** Shell / Workspace · **PRIORITY:** P2 · **DEPENDS_ON:** P11-T001 · **STATUS:** DONE · **ESTIMATE:** 20 mins · **FILES_SCOPE:** `src/MDReader.App/Features/Shell/Views/MainWindow.xaml`, `src/MDReader.App/Features/Shell/ViewModels/ShellViewModel.cs`, `src/MDReader.App/Features/Shell/ViewModels/FolderNodeViewModel.cs`
 - **AGENT PROMPT:** "Add a collapsible sidebar `SplitView` containing a `TreeView` to open a workspace folder, displaying nested `.md` files and opening them in tabs on click."
-- **ACCEPTANCE CRITERIA:** Folder picker opens directory; tree displays folders and `.md` files; clicking a file opens it in a new tab.
-- **TEST:** `dotnet build` + tree item selection verification.
+- **ACCEPTANCE CRITERIA:** Folder picker opens directory; tree displays folders and `.md` files; clicking a file opens it in a new tab; `Ctrl+B` toggles sidebar.
+- **TEST:** `dotnet build` (0 errors, 0 warnings) + tree node population and selection verification.
+- **VERIFICATION:** Verified `FolderNodeViewModel`, `WorkspaceSplitView` in `MainWindow.xaml`, and shortcut `Ctrl+B` / `Ctrl+Shift+O`.
 
 ---
 
 ## Phase 12 — Antigravity-Grade Offline Rendering Engine
 
-**Status:** PLANNED · **Depends on:** Phase 11 complete · **Scope:** 100% Offline WebView2, Mermaid, KaTeX, Callouts, Syntax Highlighting.
+**Status:** READY · **Depends on:** Phase 11 complete · **Scope:** 100% Offline WebView2, Mermaid, KaTeX, Callouts, Syntax Highlighting.
 
 ### P12-T001 — Package Offline Rendering Assets and Sandboxed HTML Template
-**ID:** P12-T001 · **FEATURE:** Rendering / Offline Engine · **PRIORITY:** P0 · **DEPENDS_ON:** P11-T002 · **STATUS:** BLOCKED (by P11-T002) · **ESTIMATE:** 20 mins · **FILES_SCOPE:** `src/MDReader.App/Assets/Renderer/`, `src/MDReader.App/MDReader.App.csproj`
+**ID:** P12-T001 · **FEATURE:** Rendering / Offline Engine · **PRIORITY:** P0 · **DEPENDS_ON:** P11-T002 · **STATUS:** READY · **ESTIMATE:** 20 mins · **FILES_SCOPE:** `src/MDReader.App/Assets/Renderer/`, `src/MDReader.App/MDReader.App.csproj`
 - **AGENT PROMPT:** "Bundle local offline JavaScript/CSS libraries in `Assets/Renderer/` (`markdown-it.min.js`, `katex.min.js`, `katex.min.css`, `mermaid.min.js`, `highlight.min.js`, `github-markdown.css`). Configure project to copy assets to output directory."
 - **ACCEPTANCE CRITERIA:** All assets load locally with 0 external network requests; CSP (Content Security Policy) strictly forbids external origin fetch.
 - **TEST:** `dotnet build` + file presence and integrity check.

@@ -1,26 +1,30 @@
 // MIT License - see LICENSE file in the repository root.
 
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.IO;
+using System.Text;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MDReader.App.Features.FileOpen.ViewModels;
 using MDReader.App.Features.Reader.ViewModels;
 using MDReader.Core.Documents;
-using System.IO;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MDReader.App.Features.Shell.ViewModels;
 
 /// <summary>
-/// ViewModel for the application shell (window management, navigation, app menu).
-/// Coordinates between the FileOpen picker, the Core document reader, and the
-/// Reader display ViewModel. Uses CommunityToolkit.Mvvm ObservableObject for
-/// MVVM binding and RelayCommand for commanding.</summary>
+/// ViewModel for the application shell (window management, navigation, app menu, workspace folder tree).
+/// </summary>
 public sealed partial class ShellViewModel : ObservableObject
 {
     private string _windowTitle = "MDReader";
+    private bool _isWorkspacePaneOpen;
     private readonly ReaderViewModel _readerViewModel;
     private readonly FileOpenViewModel _fileOpenViewModel;
+
+    /// <summary>Gets the ReaderViewModel instance.</summary>
+    public ReaderViewModel Reader => _readerViewModel;
 
     /// <summary>Gets or sets the window title displayed in the title bar.</summary>
     public string WindowTitle
@@ -29,39 +33,113 @@ public sealed partial class ShellViewModel : ObservableObject
         set => SetProperty(ref _windowTitle, value);
     }
 
+    /// <summary>Gets or sets whether the workspace folder sidebar pane is open.</summary>
+    public bool IsWorkspacePaneOpen
+    {
+        get => _isWorkspacePaneOpen;
+        set => SetProperty(ref _isWorkspacePaneOpen, value);
+    }
+
+    /// <summary>Tree nodes for the currently loaded workspace folder.</summary>
+    public ObservableCollection<FolderNodeViewModel> WorkspaceNodes { get; } = new();
+
     /// <summary>
     /// Gets or sets the HWND for the application window.
-    /// Required for file picker initialization in unpackaged apps.
     /// </summary>
     public System.IntPtr WindowHandle { get; set; }
 
-    /// <summary>
-    /// Default constructor — creates internal child ViewModels for design-time use.
-    /// At runtime, prefer the constructor that accepts a ReaderViewModel so the
-    /// Shell and Reader share the same instance.
-    /// </summary>
-    public ShellViewModel()
+    public ShellViewModel() : this(new ReaderViewModel())
     {
-        _readerViewModel = new ReaderViewModel();
-        _fileOpenViewModel = new FileOpenViewModel();
     }
 
-    /// <summary>
-    /// Creates a ShellViewModel that coordinates with the provided ReaderViewModel.
-    /// </summary>
-    /// <param name="readerViewModel">The ReaderViewModel that displays loaded documents.</param>
     public ShellViewModel(ReaderViewModel readerViewModel)
     {
         _readerViewModel = readerViewModel;
         _fileOpenViewModel = new FileOpenViewModel();
+
+        _readerViewModel.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(ReaderViewModel.SelectedTab) ||
+                e.PropertyName == nameof(ReaderViewModel.CurrentDocumentPath))
+            {
+                UpdateTitle();
+            }
+        };
     }
 
-    /// <summary>
-    /// Opens the file picker and loads the selected Markdown document.
-    /// Routed through the same OpenDocument pipeline as CLI paths.
-    /// </summary>
+    private void UpdateTitle()
+    {
+        if (_readerViewModel.SelectedTab != null)
+        {
+            WindowTitle = $"{_readerViewModel.SelectedTab.Header} — MDReader";
+        }
+        else
+        {
+            WindowTitle = "MDReader";
+        }
+    }
+
     [RelayCommand]
-    private async Task OpenDocumentAsync()
+    public void ToggleWorkspacePane()
+    {
+        IsWorkspacePaneOpen = !IsWorkspacePaneOpen;
+    }
+
+    [RelayCommand]
+    public async Task OpenFolderAsync()
+    {
+        try
+        {
+            var folderPicker = new Windows.Storage.Pickers.FolderPicker();
+            folderPicker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.DocumentsLibrary;
+            folderPicker.FileTypeFilter.Add("*");
+
+            WinRT.Interop.InitializeWithWindow.Initialize(folderPicker, WindowHandle);
+
+            var folder = await folderPicker.PickSingleFolderAsync();
+            if (folder != null)
+            {
+                LoadWorkspaceDirectory(folder.Path);
+            }
+        }
+        catch (System.Exception ex)
+        {
+            _readerViewModel.ShowError($"Could not open workspace: {ex.Message}");
+        }
+    }
+
+    public void LoadWorkspaceDirectory(string path)
+    {
+        try
+        {
+            WorkspaceNodes.Clear();
+            var root = FolderNodeViewModel.FromDirectory(path);
+            WorkspaceNodes.Add(root);
+            IsWorkspacePaneOpen = true;
+        }
+        catch (System.Exception ex)
+        {
+            _readerViewModel.ShowError($"Could not load workspace folder: {ex.Message}");
+        }
+    }
+
+    public void OnNodeSelected(FolderNodeViewModel? node)
+    {
+        if (node != null && !node.IsDirectory && !string.IsNullOrEmpty(node.FullPath))
+        {
+            OpenDocument(node.FullPath);
+        }
+    }
+
+    [RelayCommand]
+    public void NewDocument()
+    {
+        _readerViewModel.CreateNewDocument();
+        UpdateTitle();
+    }
+
+    [RelayCommand]
+    public async Task OpenDocumentAsync()
     {
         try
         {
@@ -78,23 +156,63 @@ public sealed partial class ShellViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task FindDocumentAsync()
+    public async Task SaveDocumentAsync()
     {
-        // Named action: open find for current document.
-        // Scope: current document only; no folder-wide search.
-        // Implementation: delegates to ReaderViewModel find interface.
-        // Manual verification required for full interaction cycle.
-        await Task.Run(() =>
+        if (_readerViewModel.SelectedTab == null)
+            return;
+
+        if (string.IsNullOrEmpty(_readerViewModel.SelectedTab.FilePath))
         {
-            // Placeholder for search execution; real UI interaction requires manual verification
-            // The Find feature is planned for Phase 4 (P04-T002) per TASKS.md.
-        });
+            await SaveDocumentAsAsync();
+        }
+        else
+        {
+            _readerViewModel.SaveCurrentDocument();
+            UpdateTitle();
+        }
+    }
+
+    [RelayCommand]
+    public async Task SaveDocumentAsAsync()
+    {
+        if (_readerViewModel.SelectedTab == null)
+            return;
+
+        try
+        {
+            var savePicker = new Windows.Storage.Pickers.FileSavePicker();
+            savePicker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.DocumentsLibrary;
+            savePicker.FileTypeChoices.Add("Markdown Document", new List<string>() { ".md", ".markdown" });
+            savePicker.SuggestedFileName = _readerViewModel.SelectedTab.Title.Replace(" *", "");
+
+            WinRT.Interop.InitializeWithWindow.Initialize(savePicker, WindowHandle);
+
+            var file = await savePicker.PickSaveFileAsync();
+            if (file != null)
+            {
+                _readerViewModel.SaveCurrentDocument(file.Path);
+                UpdateTitle();
+            }
+        }
+        catch (System.Exception ex)
+        {
+            _readerViewModel.ShowError($"Could not save file: {ex.Message}");
+        }
+    }
+
+    [RelayCommand]
+    public void CloseCurrentTab()
+    {
+        if (_readerViewModel.SelectedTab != null)
+        {
+            _readerViewModel.CloseTab(_readerViewModel.SelectedTab);
+            UpdateTitle();
+        }
     }
 
     [RelayCommand]
     private Task RefreshDocumentAsync()
     {
-        // Reload the currently open file from disk; no-op when the reader is empty.
         var currentPath = _readerViewModel.CurrentDocumentPath;
         if (!string.IsNullOrWhiteSpace(currentPath))
             OpenDocument(currentPath);
@@ -105,43 +223,20 @@ public sealed partial class ShellViewModel : ObservableObject
     [RelayCommand]
     private Task ThemeSettingsAsync()
     {
-        // Named action: open theme settings (System / Light / Dark).
-        // Theme state is tracked by ThemeService (current process, no persistence per Blueprint).
-        // Theme dictionaries (Light/Dark) exist in Shared/Styles/App.xaml.
-        // Manual verification required for visual theme transition.
         return Task.CompletedTask;
     }
 
     /// <summary>
-    /// Opens a Markdown document from the given file path.
-    /// This is the single entry point for both picker and CLI file opening.
-    /// Opening a second document replaces the first.
+    /// Opens a Markdown document from the given file path into a tab.
     /// </summary>
-    /// <param name="filePath">The path to the Markdown file.</param>
     public void OpenDocument(string filePath)
     {
         try
         {
-            // Validate and read metadata via the Core reader
             var info = MarkdownFileReader.ReadFile(filePath);
-
-            // Read the file content (UTF-8, read-only, no modification)
             var content = File.ReadAllText(filePath, Encoding.UTF8);
-
             _readerViewModel.LoadDocument(info, content);
-        }
-        catch (System.ArgumentException ex)
-        {
-            // Reader messages are already user-facing (e.g. unsupported extension).
-            _readerViewModel.ShowError(ex.Message);
-        }
-        catch (FileNotFoundException ex)
-        {
-            _readerViewModel.ShowError(ex.Message);
-        }
-        catch (UnauthorizedAccessException ex)
-        {
-            _readerViewModel.ShowError($"Access denied: {ex.Message}");
+            UpdateTitle();
         }
         catch (System.Exception ex)
         {
@@ -149,4 +244,3 @@ public sealed partial class ShellViewModel : ObservableObject
         }
     }
 }
-

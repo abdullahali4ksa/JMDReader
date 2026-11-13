@@ -5,6 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:MDReader.App.Features.Shell.Views"
+    xmlns:shellVm="using:MDReader.App.Features.Shell.ViewModels"
     xmlns:mu="using:Microsoft.UI.Xaml.Controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="{Binding WindowTitle}"
@@ -26,12 +27,21 @@
             </TitleBar.IconSource>
         </TitleBar>
 
-        <!-- Menu bar: File -> Open -->
+        <!-- Menu bar: File, View, Settings -->
         <MenuBar Grid.Row="1" Background="{ThemeResource AppBackgroundBrush}" AutomationProperties.Name="Application menu bar">
             <MenuBarItem Title="File">
-                <MenuFlyoutItem Text="Open...  (Ctrl+O)" Command="{Binding OpenDocumentCommand}" />
+                <MenuFlyoutItem Text="New  (Ctrl+N)" Command="{Binding NewDocumentCommand}" />
+                <MenuFlyoutItem Text="Open File...  (Ctrl+O)" Command="{Binding OpenDocumentCommand}" />
+                <MenuFlyoutItem Text="Open Folder...  (Ctrl+Shift+O)" Command="{Binding OpenFolderCommand}" />
+                <MenuFlyoutSeparator />
+                <MenuFlyoutItem Text="Save  (Ctrl+S)" Command="{Binding SaveDocumentCommand}" />
+                <MenuFlyoutItem Text="Save As...  (Ctrl+Shift+S)" Command="{Binding SaveDocumentAsCommand}" />
+                <MenuFlyoutSeparator />
+                <MenuFlyoutItem Text="Close Tab  (Ctrl+W)" Command="{Binding CloseCurrentTabCommand}" />
             </MenuBarItem>
             <MenuBarItem Title="View">
+                <MenuFlyoutItem Text="Toggle Sidebar  (Ctrl+B)" Command="{Binding ToggleWorkspacePaneCommand}" />
+                <MenuFlyoutSeparator />
                 <MenuFlyoutItem Text="Refresh  (Ctrl+R)" Command="{Binding RefreshDocumentCommand}" />
                 <MenuFlyoutItem Text="Find  (Ctrl+F)" Click="Find_Click" />
             </MenuBarItem>
@@ -40,7 +50,48 @@
             </MenuBarItem>
         </MenuBar>
 
-        <!-- Main content area -->
-        <Frame x:Name="RootFrame" Grid.Row="2" />
+        <!-- Main content area with collapsible workspace sidebar -->
+        <SplitView
+            x:Name="WorkspaceSplitView"
+            Grid.Row="2"
+            IsPaneOpen="{Binding IsWorkspacePaneOpen, Mode=TwoWay}"
+            DisplayMode="Inline"
+            OpenPaneLength="260"
+            CompactPaneLength="0"
+            Background="{ThemeResource AppBackgroundBrush}"
+            PaneBackground="{ThemeResource AppBackgroundBrush}">
+            <SplitView.Pane>
+                <Grid BorderBrush="{ThemeResource AppBorderBrush}" BorderThickness="0,0,1,0" Padding="8,10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" Margin="4,0,4,8">
+                        <TextBlock Text="WORKSPACE" FontWeight="Bold" FontSize="11" Foreground="{ThemeResource AppSecondaryTextBrush}" VerticalAlignment="Center" />
+                        <Button Content="📁 Open" Margin="12,0,0,0" Padding="8,4" FontSize="11" Command="{Binding OpenFolderCommand}" ToolTipService.ToolTip="Open workspace folder" />
+                    </StackPanel>
+                    <TreeView
+                        x:Name="WorkspaceTreeView"
+                        Grid.Row="1"
+                        ItemsSource="{Binding WorkspaceNodes}"
+                        ItemInvoked="WorkspaceTreeView_ItemInvoked"
+                        AutomationProperties.Name="Workspace files">
+                        <TreeView.ItemTemplate>
+                            <DataTemplate x:DataType="shellVm:FolderNodeViewModel">
+                                <TreeViewItem ItemsSource="{Binding Children}">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <FontIcon Glyph="{Binding Glyph}" FontSize="14" Foreground="{ThemeResource AppSecondaryTextBrush}" />
+                                        <TextBlock Text="{Binding Name}" FontSize="13" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </TreeViewItem>
+                            </DataTemplate>
+                        </TreeView.ItemTemplate>
+                    </TreeView>
+                </Grid>
+            </SplitView.Pane>
+            <SplitView.Content>
+                <Frame x:Name="RootFrame" />
+            </SplitView.Content>
+        </SplitView>
     </Grid>
 </Window>

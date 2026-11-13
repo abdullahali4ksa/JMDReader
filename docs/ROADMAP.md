@@ -32,13 +32,13 @@ Intermittent startup crash on file open fixed (MarkdownLinkPolicy + dispatcher d
 ## Phase 9 — Auto/RTL/LTR Zoom and Reset — DONE (2/2 tasks: P09-T001, P09-T002 verified)
 Zoom toolbar with visible ratio, Ctrl++/Ctrl+-/Ctrl+0 keyboard shortcuts, RTL/LTR direction detection per paragraph, LTR preservation for code/URLs. Build PASS (0 errors); tests PASS (60/60).
 
-## Phase 10 — Core Mutation Foundation and Safe File I/O — IN_PROGRESS
+## Phase 10 — Core Mutation Foundation and Safe File I/O — DONE (2/2 tasks: P10-T001, P10-T002 verified; 66/66 tests pass)
 Lift read-only constraints in Core. Implement atomic file writing (`MarkdownFileWriter`), backup mechanics, document dirty tracking (`IsDirty`), and UTF-8 Arabic round-trip tests.
 
-## Phase 11 — Multi-Document Tab System and Folder Workspace — PLANNED
+## Phase 11 — Multi-Document Tab System and Folder Workspace — DONE (2/2 tasks: P11-T001, P11-T002 verified; 69/69 tests pass)
 Integrate WinUI 3 `TabView` for multi-tab document editing/viewing with dirty markers (`*`), and a workspace folder `TreeView` sidebar for quick file browsing.
 
-## Phase 12 — Antigravity-Grade Offline Rendering Engine — PLANNED
+## Phase 12 — Antigravity-Grade Offline Rendering Engine — IN_PROGRESS
 Embed 100% offline WebView2 component with bundled local scripts: GitHub Alerts (`[!NOTE]`, `[!TIP]`, `[!IMPORTANT]`, `[!WARNING]`, `[!CAUTION]`), Mermaid.js diagrams, KaTeX math expressions, and syntax-highlighted code blocks with copy-to-clipboard action.
 
 ## Phase 13 — Live Markdown Editor and Synchronized Split View — PLANNED

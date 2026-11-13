@@ -4,6 +4,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:converters="using:MDReader.App.Shared.Converters"
+    xmlns:viewModels="using:MDReader.App.Features.Reader.ViewModels"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
@@ -14,8 +15,8 @@
 
     <!--
         Main content area of the application.
-        Shows empty/welcome state, document content, or error state
-        based on ReaderViewModel properties.
+        Shows open document tabs at the top, then toolbars, followed by
+        rendered Markdown content or empty/error states.
     -->
     <Grid
         Background="{ThemeResource AppBackgroundBrush}"
@@ -25,13 +26,41 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
+
+        <!-- Document Tabs -->
+        <TabView
+            x:Name="DocumentTabs"
+            Grid.Row="0"
+            TabItemsSource="{Binding Tabs}"
+            SelectedItem="{Binding SelectedTab, Mode=TwoWay}"
+            AddTabButtonClick="DocumentTabs_AddTabButtonClick"
+            TabCloseRequested="DocumentTabs_TabCloseRequested"
+            IsAddTabButtonVisible="True"
+            Background="{ThemeResource AppBackgroundBrush}"
+            BorderBrush="{ThemeResource AppBorderBrush}"
+            BorderThickness="0,0,0,1"
+            AutomationProperties.Name="Open document tabs">
+            <TabView.TabItemTemplate>
+                <DataTemplate x:DataType="viewModels:DocumentTabViewModel">
+                    <TabViewItem
+                        Header="{Binding Header}"
+                        IsClosable="True"
+                        AutomationProperties.Name="{Binding Header}">
+                        <TabViewItem.IconSource>
+                            <FontIconSource Glyph="&#xE8A5;" />
+                        </TabViewItem.IconSource>
+                    </TabViewItem>
+                </DataTemplate>
+            </TabView.TabItemTemplate>
+        </TabView>
 
         <!-- Zoom toolbar (visible when document is loaded) -->
         <Border
             x:Name="ZoomToolbar"
-            Grid.Row="0"
+            Grid.Row="1"
             Background="{ThemeResource AppBackgroundBrush}"
             BorderBrush="{ThemeResource AppBorderBrush}"
             BorderThickness="0,0,0,1"
@@ -81,7 +110,7 @@
 
         <Border
             x:Name="FindBar"
-            Grid.Row="1"
+            Grid.Row="2"
             Padding="12,8"
             Background="{ThemeResource AppBackgroundBrush}"
             BorderBrush="{ThemeResource AppBorderBrush}"
@@ -106,7 +135,7 @@
         <!-- Document content (shown when a document is loaded) -->
         <ScrollViewer
             x:Name="DocumentContentViewer"
-            Grid.Row="2"
+            Grid.Row="3"
             HorizontalScrollMode="Auto"
             VerticalScrollMode="Auto"
             Visibility="{Binding HasDocument, Converter={StaticResource BoolToVisibilityConverter}}"
@@ -127,7 +156,7 @@
         <!-- Empty / welcome state -->
         <StackPanel
             x:Name="EmptyStatePanel"
-            Grid.Row="2"
+            Grid.Row="3"
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
             Spacing="12"
@@ -146,7 +175,7 @@
                 Style="{StaticResource AppBodyTextStyle}"
                 HorizontalAlignment="Center" />
             <TextBlock
-                Text="Select a Markdown file to read."
+                Text="Select a Markdown file to read or click + to create a new one."
                 Style="{StaticResource AppSecondaryTextStyle}"
                 HorizontalAlignment="Center"
                 TextAlignment="Center" />
@@ -155,7 +184,7 @@
         <!-- Loading state (shown while a document is being parsed) -->
         <StackPanel
             x:Name="LoadingStatePanel"
-            Grid.Row="2"
+            Grid.Row="3"
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
             Spacing="12"
@@ -171,7 +200,7 @@
         <!-- Error state -->
         <Border
             x:Name="ErrorState"
-            Grid.Row="2"
+            Grid.Row="3"
             Background="{ThemeResource AppBackgroundBrush}"
             Margin="24"
             Padding="20"

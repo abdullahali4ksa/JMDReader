@@ -23,7 +23,7 @@
 
         <TitleBar x:Name="AppTitleBar" Grid.Row="0" Title="{Binding WindowTitle}" AutomationProperties.Name="MDReader title bar">
             <TitleBar.IconSource>
-                <ImageIconSource ImageSource="Assets/AppIcon.ico" />
+                <ImageIconSource ImageSource="ms-appx:///Assets/AppIcon.ico" />
             </TitleBar.IconSource>
         </TitleBar>
 

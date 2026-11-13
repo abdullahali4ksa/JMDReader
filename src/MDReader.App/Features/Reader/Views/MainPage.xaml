@@ -296,9 +296,9 @@
                                         </Grid.RowDefinitions>
                                         <Grid Grid.Row="0">
                                             <TextBlock Text="{Binding CreatedAtDisplay}" FontSize="10" Foreground="{ThemeResource AppSecondaryTextBrush}" VerticalAlignment="Center" />
-                                            <Button Content="🗑️" HorizontalAlignment="Right" Padding="4,2" FontSize="10" Background="Transparent" BorderThickness="0" Command="{Binding DataContext.DeleteCommentCommand, ElementName=CommentsDrawer}" CommandParameter="{Binding}" ToolTipService.ToolTip="Delete Comment" />
+                                            <Button Content="🗑️" HorizontalAlignment="Right" Padding="4,2" FontSize="10" Background="Transparent" BorderThickness="0" Click="DeleteComment_Click" ToolTipService.ToolTip="Delete Comment" />
                                         </Grid>
-                                        <Border Grid.Row="1" Margin="0,4" Padding="6,4" Background="rgba(127,127,127,0.08)" CornerRadius="4" Visibility="{Binding SelectedText, Converter={StaticResource StringToVisibilityConverter}}">
+                                        <Border Grid.Row="1" Margin="0,4" Padding="6,4" Background="#14808080" CornerRadius="4" Visibility="{Binding SelectedText, Converter={StaticResource StringToVisibilityConverter}}">
                                             <TextBlock Text="{Binding SelectedText}" FontSize="11" FontStyle="Italic" TextWrapping="Wrap" />
                                         </Border>
                                         <TextBlock Grid.Row="2" Text="{Binding CommentText}" FontSize="12" TextWrapping="Wrap" Margin="0,4,0,0" />

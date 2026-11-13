@@ -1,3 +1,5 @@
+using System;
+using System.IO;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -43,7 +45,22 @@ public sealed partial class MainWindow : Window
         ExtendsContentIntoTitleBar = true;
         SetTitleBar(AppTitleBar);
 
-        AppWindow.SetIcon("Assets/AppIcon.ico");
+        // Load and set the application icon reliably for window and taskbar
+        try
+        {
+            var baseDir = AppContext.BaseDirectory;
+            var iconPath = Path.Combine(baseDir, "Assets", "AppIcon.ico");
+            if (!File.Exists(iconPath))
+            {
+                // Fallback for development / dotnet run unpackaged from project root
+                iconPath = Path.Combine(Directory.GetCurrentDirectory(), "src", "MDReader.App", "Assets", "AppIcon.ico");
+            }
+            if (File.Exists(iconPath))
+            {
+                AppWindow.SetIcon(Path.GetFullPath(iconPath));
+            }
+        }
+        catch { }
 
         // Set initial window size and center
         var displayArea = Microsoft.UI.Windowing.DisplayArea.GetFromWindowId(AppWindow.Id, Microsoft.UI.Windowing.DisplayAreaFallback.Primary);

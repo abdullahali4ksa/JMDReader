@@ -164,51 +164,62 @@ public sealed partial class MainPage : Page
         catch { }
     }
 
+    private void DeleteComment_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.DataContext is DocumentComment comment)
+        {
+            _viewModel?.DeleteComment(comment);
+        }
+    }
+
     private void OnWebMessageReceived(CoreWebView2 sender, CoreWebView2WebMessageReceivedEventArgs args)
     {
         try
         {
             using var doc = JsonDocument.Parse(args.WebMessageAsJson);
-            var root = doc.RootElement;
-            if (root.TryGetProperty("type", out var typeProp))
+            var root = doc.RootElement.Clone();
+            DispatcherQueue.TryEnqueue(() =>
             {
-                var type = typeProp.GetString();
-                if (type == "linkClick")
+                if (root.TryGetProperty("type", out var typeProp))
                 {
-                    var url = root.GetProperty("url").GetString();
-                    if (!string.IsNullOrEmpty(url))
+                    var type = typeProp.GetString();
+                    if (type == "linkClick")
                     {
-                        if (url.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
-                            url.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+                        var url = root.GetProperty("url").GetString();
+                        if (!string.IsNullOrEmpty(url))
                         {
-                            Process.Start(new ProcessStartInfo { FileName = url, UseShellExecute = true });
-                        }
-                        else if (url.EndsWith(".md", StringComparison.OrdinalIgnoreCase) ||
-                                 url.EndsWith(".markdown", StringComparison.OrdinalIgnoreCase))
-                        {
-                            var currentDir = Path.GetDirectoryName(_viewModel?.CurrentDocumentPath);
-                            var target = Path.GetFullPath(Path.Combine(currentDir ?? ".", url));
-                            if (File.Exists(target))
+                            if (url.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+                                url.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
                             {
-                                var info = MarkdownFileReader.ReadFile(target);
-                                var content = File.ReadAllText(target, Encoding.UTF8);
-                                _viewModel?.LoadDocument(info, content);
+                                Process.Start(new ProcessStartInfo { FileName = url, UseShellExecute = true });
+                            }
+                            else if (url.EndsWith(".md", StringComparison.OrdinalIgnoreCase) ||
+                                     url.EndsWith(".markdown", StringComparison.OrdinalIgnoreCase))
+                            {
+                                var currentDir = Path.GetDirectoryName(_viewModel?.CurrentDocumentPath);
+                                var target = Path.GetFullPath(Path.Combine(currentDir ?? ".", url));
+                                if (File.Exists(target))
+                                {
+                                    var info = MarkdownFileReader.ReadFile(target);
+                                    var content = File.ReadAllText(target, Encoding.UTF8);
+                                    _viewModel?.LoadDocument(info, content);
+                                }
                             }
                         }
                     }
-                }
-                else if (type == "autoScrollEnded")
-                {
-                    if (_viewModel != null) _viewModel.IsAutoScrolling = false;
-                }
-                else if (type == "textSelected")
-                {
-                    if (_viewModel != null && root.TryGetProperty("text", out var textProp))
+                    else if (type == "autoScrollEnded")
                     {
-                        _viewModel.SelectedQuoteText = textProp.GetString() ?? string.Empty;
+                        if (_viewModel != null) _viewModel.IsAutoScrolling = false;
+                    }
+                    else if (type == "textSelected")
+                    {
+                        if (_viewModel != null && root.TryGetProperty("text", out var textProp))
+                        {
+                            _viewModel.SelectedQuoteText = textProp.GetString() ?? string.Empty;
+                        }
                     }
                 }
-            }
+            });
         }
         catch { }
     }

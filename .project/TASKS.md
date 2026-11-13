@@ -781,28 +781,64 @@ The `FILES_SCOPE` on each original P01 task is the allowlist. Dependencies are d
 
 ## Phase 18 — Microsoft Store (Windows Store) Readiness & Submission (النشر على متجر مايكروسوفت)
 
-**Status:** PLANNED · **Depends on:** Phase 17 complete · **Triggered by:** User request to publish MDReader on the official Microsoft Store for Windows 10 & 11 users.
+**Status:** ON_HOLD (مؤجلة بناءً على طلب المستخدم لحين وقت لاحق) · **Depends on:** Phase 17 complete · **Triggered by:** User request to publish MDReader on the official Microsoft Store for Windows 10 & 11 users.
 
 ### P18-T001 — Microsoft Partner Center Package Identity & Manifest Configuration
-**ID:** P18-T001 · **FEATURE:** Store / Manifest · **PRIORITY:** P0 · **DEPENDS_ON:** P17-T004 · **STATUS:** READY · **ESTIMATE:** 20 mins · **FILES_SCOPE:** `src/MDReader.App/Package.appxmanifest`
+**ID:** P18-T001 · **FEATURE:** Store / Manifest · **PRIORITY:** P0 · **DEPENDS_ON:** P17-T004 · **STATUS:** ON_HOLD · **ESTIMATE:** 20 mins · **FILES_SCOPE:** `src/MDReader.App/Package.appxmanifest`
 - **AGENT PROMPT:** "Configure `Package.appxmanifest` with Microsoft Partner Center reserved app identity (Package Name, Publisher ID `CN=...`, PhoneProductId, Version). Define Windows Store capability declarations and file type associations."
 - **ACCEPTANCE CRITERIA:** Package manifest matches Partner Center app identity without schema or identity mismatch warnings.
 - **TEST:** XML schema validation and MSIX packaging tool check.
 
 ### P18-T002 — Store Visual Assets, Logos, and High-Res Store Screenshots
-**ID:** P18-T002 · **FEATURE:** Store / Media · **PRIORITY:** P1 · **DEPENDS_ON:** P18-T001 · **STATUS:** READY · **ESTIMATE:** 25 mins · **FILES_SCOPE:** `docs/store_assets/`, `src/MDReader.App/Assets/`
+**ID:** P18-T002 · **FEATURE:** Store / Media · **PRIORITY:** P1 · **DEPENDS_ON:** P18-T001 · **STATUS:** ON_HOLD · **ESTIMATE:** 25 mins · **FILES_SCOPE:** `docs/store_assets/`, `src/MDReader.App/Assets/`
 - **AGENT PROMPT:** "Produce all mandatory and promotional visual assets required by Microsoft Store: 300x300 App Tile, 150x150 Logo, 44x44 Small Icon, StoreLogo (50x50), Wide 310x150, Splash Screen, and 4 high-resolution 1920x1080 Store showcase screenshots (Light Theme, Dark Theme, Sepia Reading, Dual-Pane Editor, Comments)."
 - **ACCEPTANCE CRITERIA:** All assets match Microsoft Partner Center exact pixel dimensions and format requirements.
 - **TEST:** Automated image dimension inspection script.
 
 ### P18-T003 — Windows App Certification Kit (WACK) Compliance Audit
-**ID:** P18-T003 · **FEATURE:** Compliance / WACK · **PRIORITY:** P0 · **DEPENDS_ON:** P18-T001 · **STATUS:** READY · **ESTIMATE:** 20 mins · **FILES_SCOPE:** `reports/wack_report.xml`
+**ID:** P18-T003 · **FEATURE:** Compliance / WACK · **PRIORITY:** P0 · **DEPENDS_ON:** P18-T001 · **STATUS:** ON_HOLD · **ESTIMATE:** 20 mins · **FILES_SCOPE:** `reports/wack_report.xml`
 - **AGENT PROMPT:** "Run the official Windows App Certification Kit (`appcert.exe`) on the Store MSIX package to test security, binary analyzer, supported APIs, manifest validation, and clean uninstall. Fix any flagged issues."
 - **ACCEPTANCE CRITERIA:** WACK test outputs PASSED (0 errors, 0 warnings).
 - **TEST:** `appcert.exe test -appxpackagepath ... -reportoutputpath reports/wack_report.xml`.
 
 ### P18-T004 — Store Listing Content, Privacy Policy, and Submission Guide
-**ID:** P18-T004 · **FEATURE:** Store / Governance · **PRIORITY:** P0 · **DEPENDS_ON:** P18-T003 · **STATUS:** READY · **ESTIMATE:** 20 mins · **FILES_SCOPE:** `docs/PRIVACY_POLICY.md`, `docs/STORE_LISTING.md`, `docs/MICROSOFT_STORE_SUBMISSION_GUIDE.md`
+**ID:** P18-T004 · **FEATURE:** Store / Governance · **PRIORITY:** P0 · **DEPENDS_ON:** P18-T003 · **STATUS:** ON_HOLD · **ESTIMATE:** 20 mins · **FILES_SCOPE:** `docs/PRIVACY_POLICY.md`, `docs/STORE_LISTING.md`, `docs/MICROSOFT_STORE_SUBMISSION_GUIDE.md`
 - **AGENT PROMPT:** "Create compliant Privacy Policy (`docs/PRIVACY_POLICY.md` highlighting 100% offline local privacy), complete Store listing descriptions in Arabic and English, keywords, age rating questionnaire guide, and step-by-step submission walkthrough for Microsoft Partner Center."
 - **ACCEPTANCE CRITERIA:** All submission materials prepared for immediate copy-paste into Partner Center dashboard.
 - **TEST:** Review against Microsoft Store submission policies.
+
+---
+
+## Phase 19 — Advanced Reader Experience, Outline, Focus Mode & Document Export (فهرس العناوين، وضع التركيز، والتصدير)
+
+**Status:** PLANNED (لتكويدها لاحقاً بناءً على طلب المستخدم) · **Depends on:** Phase 16 complete · **Triggered by:** User request for Outline navigation, F11 Zen mode, PDF/HTML export, word count reading time, and refined Material 3 / Fluent 2 capsule toolbar.
+
+### P19-T001 — Interactive Table of Contents & Outline Navigation (فهرس العناوين التفاعلي)
+**ID:** P19-T001 · **FEATURE:** Reader / Navigation · **PRIORITY:** P0 · **DEPENDS_ON:** P16-T005 · **STATUS:** PLANNED · **ESTIMATE:** 25 mins · **FILES_SCOPE:** `src/MDReader.App/Features/Reader/Views/MainPage.xaml`, `src/MDReader.App/Features/Reader/ViewModels/ReaderViewModel.cs`, `src/MDReader.App/Assets/Renderer/viewer.html`
+- **AGENT PROMPT:** "Implement an interactive Table of Contents (Outline) sidebar extracting all H1-H6 headings dynamically. Highlight the currently read section in real-time using IntersectionObserver (Active Section Spy) and enable instant smooth jump on heading click."
+- **ACCEPTANCE CRITERIA:** Outline drawer lists all document sections in hierarchical tree; clicking a section scrolls directly to it; scrolling updates active heading indicator.
+- **TEST:** Multi-heading markdown fixture outline test.
+
+### P19-T002 — Immersive Fullscreen Zen / Focus Mode (F11) (وضع التركيز التام)
+**ID:** P19-T002 · **FEATURE:** Shell / FocusMode · **PRIORITY:** P1 · **DEPENDS_ON:** P19-T001 · **STATUS:** PLANNED · **ESTIMATE:** 15 mins · **FILES_SCOPE:** `src/MDReader.App/Features/Shell/Views/MainWindow.xaml.cs`, `src/MDReader.App/Features/Reader/Views/MainPage.xaml`
+- **AGENT PROMPT:** "Add F11 fullscreen toggle that hides the titlebar, menu bar, tabs, and toolbars, presenting 100% pure distraction-free reading with smooth hover reveal for the exit button (Escape or F11)."
+- **ACCEPTANCE CRITERIA:** Pressing F11 enters borderless true fullscreen; Escape or F11 restores standard window state smoothly.
+- **TEST:** Keyboard accelerator and window state verification.
+
+### P19-T003 — One-Click Publication-Grade PDF & Offline HTML Export (تصدير وطباعة المستند)
+**ID:** P19-T003 · **FEATURE:** Export / Printing · **PRIORITY:** P0 · **DEPENDS_ON:** P19-T001 · **STATUS:** PLANNED · **ESTIMATE:** 25 mins · **FILES_SCOPE:** `src/MDReader.App/Features/Reader/Views/MainPage.xaml.cs`, `src/MDReader.App/Assets/Renderer/viewer.html`
+- **AGENT PROMPT:** "Implement high-fidelity export using CoreWebView2 `PrintToPdfAsync` and standalone HTML bundler (with inlined CSS, KaTeX math, alerts, and tables) so users can export their documents to publication-grade PDF or standalone offline HTML with 1 click."
+- **ACCEPTANCE CRITERIA:** Exported PDF preserves theme, formatting, mathematical equations, and alerts cleanly with vector clarity.
+- **TEST:** PDF output fixture test.
+
+### P19-T004 — Document Reading Analytics Status Bar (عداد الكلمات ووقت القراءة التقديري)
+**ID:** P19-T004 · **FEATURE:** Reader / Analytics · **PRIORITY:** P2 · **DEPENDS_ON:** P19-T001 · **STATUS:** PLANNED · **ESTIMATE:** 15 mins · **FILES_SCOPE:** `src/MDReader.App/Features/Reader/Views/MainPage.xaml`, `src/MDReader.App/Features/Reader/ViewModels/ReaderViewModel.cs`
+- **AGENT PROMPT:** "Implement a subtle modern status bar displaying live document stats: Word count, Character count, Line count, and Estimated Reading Time (based on 200 WPM standard reading speed, e.g. 'Reading time: ~4 min')."
+- **ACCEPTANCE CRITERIA:** Typing or opening a document updates word count and estimated reading time live without UI lag.
+- **TEST:** Arabic and English word count unit tests.
+
+### P19-T005 — Distraction-Free Adaptive Reading Layout & Pill-Shaped Toolbar Refinement (تحسين الشريط الكبسولي والهوامش)
+**ID:** P19-T005 · **FEATURE:** Design / UX · **PRIORITY:** P1 · **DEPENDS_ON:** P19-T001 · **STATUS:** PLANNED · **ESTIMATE:** 20 mins · **FILES_SCOPE:** `src/MDReader.App/Features/Reader/Views/MainPage.xaml`, `src/MDReader.App/Shared/Styles/App.xaml`
+- **AGENT PROMPT:** "Refine the reading layout following Fluent 2 and Material 3 principles: grouped pill-shaped toolbars, auto-hiding edit controls in Read mode, and adaptive reading width (centered reading column with comfortable 720px max reading width option for book-like readability)."
+- **ACCEPTANCE CRITERIA:** Reading mode provides optimal ergonomic line length and modern pill button aesthetic.
+- **TEST:** Visual inspection across 1080p, 1440p, and 4K displays.

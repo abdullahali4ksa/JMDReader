@@ -2,10 +2,20 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Run MDReader (.NET CLI)",
+            "name": "MDReader (WinUI 3)",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
+            "program": "${workspaceFolder}/src/MDReader.App/bin/x64/Debug/net10.0-windows10.0.26100.0/win-x64/MDReader.App.exe",
+            "args": [],
+            "cwd": "${workspaceFolder}/src/MDReader.App/bin/x64/Debug/net10.0-windows10.0.26100.0/win-x64",
+            "stopAtEntry": false,
+            "console": "internalConsole"
+        },
+        {
+            "name": "Run via dotnet run",
+            "type": "coreclr",
+            "request": "launch",
             "program": "dotnet",
             "args": [
                 "run",

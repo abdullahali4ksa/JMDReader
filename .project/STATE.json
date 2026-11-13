@@ -7,7 +7,7 @@
   "status": "WAITING_FOR_USER_AUTHORIZATION",
   "last_completed_phase": "PHASE-15",
   "last_completed_task": "P15-T007",
-  "last_verified_commit": "f0045f3",
+  "last_verified_commit": "HEAD",
   "build_status": "PASS",
   "test_status": "PASS",
   "test_summary": "74/74 passed",
@@ -23,13 +23,14 @@
     "architecture": "Hybrid (WinUI 3 Shell + Offline WebView2 Engine)",
     "authorized_at": "2026-11-13",
     "scope": [
-      "Phase 15: Multi-Theme, Full-Width Read Mode, Auto-Scroll, Perfect Tables, Comments Drawer, Modern AppIcon (COMPLETED)",
+      "Phase 15: Multi-Theme, Full-Width Read Mode, Auto-Scroll, Perfect Tables, Comments Drawer, Modern AppIcon (COMPLETED & VERIFIED)",
       "Phase 16: Standard Windows Installer (Next-Next-Install Setup Wizard, Code Signing, MSIX, Shortcuts, File Associations) (PLANNED)",
       "Phase 17: GitHub CI/CD Automation & GitHub Releases Pipeline (PLANNED)",
-      "Phase 18: Microsoft Store Submission & Partner Center Certification (PLANNED)"
+      "Phase 18: Microsoft Store Submission & Partner Center Certification (ON_HOLD)",
+      "Phase 19: Advanced Reader Experience (Table of Contents Outline, Zen F11 Focus Mode, PDF/HTML Export, Reading Analytics) (PLANNED)"
     ]
   },
   "start_date": "2026-10-08",
   "backlog_complete": false,
-  "note": "Phases 16, 17, and 18 added to TASKS.md. Execution paused awaiting explicit user authorization ('ولا تستمر بالمهام هذه حتى اخبرك بذلك')."
+  "note": "Phase 18 placed ON_HOLD per user instruction. Phase 19 registered with numbered tasks. Fixed comments multi-add concurrency, enabled AppIcon on dotnet run, created desktop/start menu shortcuts, and configured VS Code launch/tasks."
 }

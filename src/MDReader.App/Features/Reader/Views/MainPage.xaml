@@ -111,20 +111,20 @@
                                     <Button Content="{Binding AutoScrollGlyph}" Width="30" Height="28" Padding="0" FontSize="12" Command="{Binding ToggleAutoScrollCommand}" ToolTipService.ToolTip="{Binding Strings.TooltipAutoScroll, FallbackValue='Smooth Auto-Scroll'}" />
                                     <ComboBox
                                         x:Name="ScrollSpeedCombo"
-                                        SelectedIndex="2"
+                                        SelectedIndex="1"
                                         SelectionChanged="ScrollSpeedCombo_SelectionChanged"
                                         TextSubmitted="ScrollSpeedCombo_TextSubmitted"
                                         IsEditable="True"
-                                        Width="68"
+                                        Width="72"
                                         Height="28"
                                         Padding="4,1"
                                         FontSize="11"
-                                        ToolTipService.ToolTip="{Binding Strings.TooltipAutoScrollSpeed, FallbackValue='Speed (0.25x, 0.5x, 1x, 1.5x, 2x or Custom)'}">
-                                        <ComboBoxItem Content="0.25x" Tag="0.25" />
-                                        <ComboBoxItem Content="0.5x" Tag="0.5" />
-                                        <ComboBoxItem Content="1.0x" Tag="1.0" />
-                                        <ComboBoxItem Content="1.5x" Tag="1.5" />
-                                        <ComboBoxItem Content="2.0x" Tag="2.0" />
+                                        ToolTipService.ToolTip="{Binding Strings.TooltipAutoScrollSpeed, FallbackValue='Auto-Scroll Speed (1x, 2x, 3x, 4x, 5x or Custom)'}">
+                                        <ComboBoxItem Content="1x (بطيء)" Tag="1.0" />
+                                        <ComboBoxItem Content="2x (طبيعي)" Tag="2.0" />
+                                        <ComboBoxItem Content="3x (متوسط)" Tag="3.0" />
+                                        <ComboBoxItem Content="4x (سريع)" Tag="4.0" />
+                                        <ComboBoxItem Content="5x (فائق)" Tag="5.0" />
                                     </ComboBox>
                                 </StackPanel>
                             </Border>

@@ -551,7 +551,8 @@
 
         let isAutoScrolling = false;
         let autoScrollAnimId = null;
-        let scrollSpeedPxPerFrame = 0.85;
+        let scrollSpeedPxPerFrame = 1.0;
+        let scrollAccumulator = 0.0;
 
         function autoScrollStep() {
             if (!isAutoScrolling) return;
@@ -567,7 +568,13 @@
                 }
                 return;
             }
-            window.scrollBy(0, scrollSpeedPxPerFrame);
+
+            scrollAccumulator += scrollSpeedPxPerFrame;
+            if (scrollAccumulator >= 1.0) {
+                const pxToScroll = Math.floor(scrollAccumulator);
+                window.scrollBy(0, pxToScroll);
+                scrollAccumulator -= pxToScroll;
+            }
             autoScrollAnimId = requestAnimationFrame(autoScrollStep);
         }
 
@@ -576,17 +583,17 @@
                 cancelAnimationFrame(autoScrollAnimId);
                 autoScrollAnimId = null;
             }
+            scrollAccumulator = 0.0;
             isAutoScrolling = !!enabled;
             if (isAutoScrolling) {
-                const multiplier = typeof speedLevel === 'number' && speedLevel > 0 ? speedLevel : 1.0;
-                // Fluid conveyor-belt teleprompter speed (baseline 1.0x = 0.75 px/frame):
-                // 0.25x = ~11.2 px/sec (ultra relaxed reading)
-                // 0.5x  = ~22.5 px/sec (calm reading)
-                // 1.0x  = ~45.0 px/sec (standard reading pace)
-                // 1.5x  = ~67.5 px/sec (brisk reading)
-                // 2.0x  = ~90.0 px/sec (fast scanning)
-                // Custom: multiplier * 0.75 px/frame
-                scrollSpeedPxPerFrame = Math.max(0.08, multiplier * 0.75);
+                const lvl = typeof speedLevel === 'number' && speedLevel > 0 ? speedLevel : 2.0;
+                // Standard reading & teleprompter speeds:
+                // Level 1: 0.60 px/frame (~36 px/sec - relaxed reading)
+                // Level 2: 1.10 px/frame (~66 px/sec - normal reading)
+                // Level 3: 1.85 px/frame (~111 px/sec - brisk reading)
+                // Level 4: 2.90 px/frame (~174 px/sec - fast skimming)
+                // Level 5: 4.20 px/frame (~252 px/sec - high speed scan)
+                scrollSpeedPxPerFrame = Math.max(0.3, lvl * 0.55);
                 autoScrollAnimId = requestAnimationFrame(autoScrollStep);
             }
         }

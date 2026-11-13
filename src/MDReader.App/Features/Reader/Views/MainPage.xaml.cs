@@ -148,28 +148,59 @@ public sealed partial class MainPage : Page
             catch { }
         }
 
-        // Synchronize editor colors with the selected reading theme
+        // Synchronize page and window requested theme
+        var pageElementTheme = (theme == "Dark") ? ElementTheme.Dark : ElementTheme.Light;
+        this.RequestedTheme = pageElementTheme;
+        if (App.MainWindow?.Content is FrameworkElement rootElem)
+        {
+            rootElem.RequestedTheme = pageElementTheme;
+        }
+
+        // Synchronize editor colors and visual states with the selected theme
         if (MarkdownEditorTextBox != null)
         {
+            Color bgColor, fgColor, borderColor;
+            ElementTheme editorTheme;
+
             switch (theme)
             {
                 case "Light":
-                    MarkdownEditorTextBox.Background = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255));
-                    MarkdownEditorTextBox.Foreground = new SolidColorBrush(Color.FromArgb(255, 31, 35, 40));
-                    MarkdownEditorTextBox.BorderBrush = new SolidColorBrush(Color.FromArgb(255, 208, 215, 222));
+                    editorTheme = ElementTheme.Light;
+                    bgColor = Color.FromArgb(255, 255, 255, 255);
+                    fgColor = Color.FromArgb(255, 31, 35, 40);
+                    borderColor = Color.FromArgb(255, 208, 215, 222);
                     break;
                 case "Sepia":
-                    MarkdownEditorTextBox.Background = new SolidColorBrush(Color.FromArgb(255, 251, 240, 217));
-                    MarkdownEditorTextBox.Foreground = new SolidColorBrush(Color.FromArgb(255, 56, 52, 40));
-                    MarkdownEditorTextBox.BorderBrush = new SolidColorBrush(Color.FromArgb(255, 220, 208, 184));
+                    editorTheme = ElementTheme.Light;
+                    bgColor = Color.FromArgb(255, 251, 240, 217);
+                    fgColor = Color.FromArgb(255, 56, 52, 40);
+                    borderColor = Color.FromArgb(255, 220, 208, 184);
                     break;
                 case "Dark":
                 default:
-                    MarkdownEditorTextBox.Background = new SolidColorBrush(Color.FromArgb(255, 13, 17, 23));
-                    MarkdownEditorTextBox.Foreground = new SolidColorBrush(Color.FromArgb(255, 230, 237, 243));
-                    MarkdownEditorTextBox.BorderBrush = new SolidColorBrush(Color.FromArgb(255, 48, 54, 61));
+                    editorTheme = ElementTheme.Dark;
+                    bgColor = Color.FromArgb(255, 13, 17, 23);
+                    fgColor = Color.FromArgb(255, 230, 237, 243);
+                    borderColor = Color.FromArgb(255, 48, 54, 61);
                     break;
             }
+
+            MarkdownEditorTextBox.RequestedTheme = editorTheme;
+            var bgBrush = new SolidColorBrush(bgColor);
+            var fgBrush = new SolidColorBrush(fgColor);
+            var borderBrush = new SolidColorBrush(borderColor);
+
+            MarkdownEditorTextBox.Background = bgBrush;
+            MarkdownEditorTextBox.Foreground = fgBrush;
+            MarkdownEditorTextBox.BorderBrush = borderBrush;
+
+            // Override WinUI TextBox VisualState template brushes so Focused / PointerOver never reverts to black
+            MarkdownEditorTextBox.Resources["TextControlBackground"] = bgBrush;
+            MarkdownEditorTextBox.Resources["TextControlBackgroundPointerOver"] = bgBrush;
+            MarkdownEditorTextBox.Resources["TextControlBackgroundFocused"] = bgBrush;
+            MarkdownEditorTextBox.Resources["TextControlForeground"] = fgBrush;
+            MarkdownEditorTextBox.Resources["TextControlForegroundPointerOver"] = fgBrush;
+            MarkdownEditorTextBox.Resources["TextControlForegroundFocused"] = fgBrush;
         }
     }
 

@@ -29,7 +29,7 @@ public sealed partial class ReaderViewModel : ObservableObject
     private ReaderViewMode _viewMode = ReaderViewMode.Preview;
     private string _currentTheme = "Light";
     private bool _isAutoScrolling;
-    private double _scrollSpeed = 1.0;
+    private double _scrollSpeed = 2.0;
     private bool _isCommentsPaneOpen;
     private string _newCommentText = string.Empty;
     private string _selectedQuoteText = string.Empty;

@@ -10,9 +10,11 @@ using MDReader.Core.Markdown;
 
 namespace MDReader.App.Features.Reader.ViewModels;
 
+public enum ReaderViewMode { Split, Editor, Preview }
+
 /// <summary>
 /// ViewModel for the document reader — manages multi-tab document sessions,
-/// content display, error messaging, and zoom state.
+/// content display, editor view modes, and zoom state.
 /// </summary>
 public sealed partial class ReaderViewModel : ObservableObject
 {
@@ -23,9 +25,29 @@ public sealed partial class ReaderViewModel : ObservableObject
     private bool _isLoading;
     private double _zoomRatio = 1.0;
     private DocumentTabViewModel? _selectedTab;
+    private ReaderViewMode _viewMode = ReaderViewMode.Split;
 
     /// <summary>Collection of active document tabs.</summary>
     public ObservableCollection<DocumentTabViewModel> Tabs { get; } = new();
+
+    /// <summary>Gets or sets the current view mode (Split, Editor, Preview).</summary>
+    public ReaderViewMode ViewMode
+    {
+        get => _viewMode;
+        set
+        {
+            if (SetProperty(ref _viewMode, value))
+            {
+                OnPropertyChanged(nameof(IsEditorVisible));
+                OnPropertyChanged(nameof(IsPreviewVisible));
+                OnPropertyChanged(nameof(IsSplitMode));
+            }
+        }
+    }
+
+    public bool IsEditorVisible => _viewMode == ReaderViewMode.Split || _viewMode == ReaderViewMode.Editor;
+    public bool IsPreviewVisible => _viewMode == ReaderViewMode.Split || _viewMode == ReaderViewMode.Preview;
+    public bool IsSplitMode => _viewMode == ReaderViewMode.Split;
 
     /// <summary>Gets or sets the active document tab.</summary>
     public DocumentTabViewModel? SelectedTab
@@ -117,10 +139,10 @@ public sealed partial class ReaderViewModel : ObservableObject
     }
 
     /// <summary>True when no document is loaded or active.</summary>
-    public bool IsEmpty => _errorMessage is null && !_isLoading && (Tabs.Count == 0 || (_selectedTab is null && string.IsNullOrEmpty(_currentDocumentPath)));
+    public bool IsEmpty => _errorMessage is null && !_isLoading && (Tabs.Count == 0 || (_selectedTab is null && string.IsNullOrEmpty(_currentDocumentPath) && string.IsNullOrEmpty(_documentContent)));
 
-    /// <summary>True when a document is loaded and ready for rendering.</summary>
-    public bool HasDocument => _errorMessage is null && !_isLoading && (_selectedTab is not null || !string.IsNullOrEmpty(_currentDocumentPath));
+    /// <summary>True when a document is loaded and ready for rendering or editing.</summary>
+    public bool HasDocument => _errorMessage is null && !_isLoading && (_selectedTab is not null || !string.IsNullOrEmpty(_currentDocumentPath) || !string.IsNullOrEmpty(_documentContent));
 
     /// <summary>True when there is an active error to display.</summary>
     public bool HasError => _errorMessage is not null;
@@ -154,6 +176,38 @@ public sealed partial class ReaderViewModel : ObservableObject
     /// <summary>Gets the zoom percentage string for display (e.g., "100%").</summary>
     public string ZoomPercentage => $"{(int)(_zoomRatio * 100)}%";
 
+    [RelayCommand]
+    public void SwitchViewMode(string mode)
+    {
+        if (Enum.TryParse<ReaderViewMode>(mode, true, out var m))
+        {
+            ViewMode = m;
+        }
+    }
+
+    [RelayCommand]
+    public void InsertMarkdownSyntax(string syntax)
+    {
+        if (_selectedTab == null) return;
+        var insertion = syntax switch
+        {
+            "bold" => "**Bold Text**",
+            "italic" => "*Italic Text*",
+            "heading" => "\n\n## New Heading\n\n",
+            "code" => "\n\n```csharp\n// Code here\n```\n\n",
+            "mermaid" => "\n\n```mermaid\nflowchart TD\n    A[Start] --> B[Process]\n    B --> C[End]\n```\n\n",
+            "alert" => "\n\n> [!NOTE]\n> Notification message.\n\n",
+            "table" => "\n\n| Header 1 | Header 2 |\n| :--- | :--- |\n| Cell 1 | Cell 2 |\n\n",
+            "math" => " $E=mc^2$ ",
+            _ => string.Empty
+        };
+
+        if (!string.IsNullOrEmpty(insertion))
+        {
+            DocumentContent = (DocumentContent ?? string.Empty) + insertion;
+        }
+    }
+
     /// <summary>Zoom in by 10% (Ctrl++).</summary>
     [RelayCommand]
     private void ZoomIn()
@@ -183,7 +237,6 @@ public sealed partial class ReaderViewModel : ObservableObject
         IsLoading = true;
         try
         {
-            // Check if already open in a tab
             var existing = Tabs.FirstOrDefault(t => string.Equals(t.FilePath, info.FilePath, StringComparison.OrdinalIgnoreCase));
             if (existing != null)
             {
@@ -196,7 +249,6 @@ public sealed partial class ReaderViewModel : ObservableObject
             var session = DocumentSession.FromFile(info.FilePath, content);
             var tab = new DocumentTabViewModel(session);
 
-            // If we currently have just one untitled empty tab, replace it
             if (Tabs.Count == 1 && string.IsNullOrEmpty(Tabs[0].FilePath) && !Tabs[0].IsDirty && string.IsNullOrEmpty(Tabs[0].Content))
             {
                 Tabs[0] = tab;

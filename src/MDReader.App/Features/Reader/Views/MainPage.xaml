@@ -16,7 +16,7 @@
     <!--
         Main content area of the application.
         Shows open document tabs at the top, then toolbars, followed by
-        rendered Markdown content or empty/error states.
+        the dual-pane editor & Antigravity preview or empty/error states.
     -->
     <Grid
         Background="{ThemeResource AppBackgroundBrush}"
@@ -57,55 +57,78 @@
             </TabView.TabItemTemplate>
         </TabView>
 
-        <!-- Zoom toolbar (visible when document is loaded) -->
+        <!-- Main Toolbar (View Mode Switcher + Formatting Toolbar + Zoom) -->
         <Border
-            x:Name="ZoomToolbar"
+            x:Name="MainToolbar"
             Grid.Row="1"
             Background="{ThemeResource AppBackgroundBrush}"
             BorderBrush="{ThemeResource AppBorderBrush}"
             BorderThickness="0,0,0,1"
             Padding="12,6"
             Visibility="{Binding HasDocument, Converter={StaticResource BoolToVisibilityConverter}}"
-            AutomationProperties.Name="Zoom controls">
-            <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
-                <Button
-                    x:Name="ZoomOutButton"
-                    Content="−"
-                    FontSize="18"
-                    FontWeight="SemiBold"
-                    Width="36"
-                    Height="36"
-                    Command="{Binding ZoomOutCommand}"
-                    AutomationProperties.Name="Zoom out"
-                    ToolTipService.ToolTip="Zoom out (Ctrl+-)" />
-                <TextBlock
-                    x:Name="ZoomPercentageText"
-                    Text="{Binding ZoomPercentage}"
-                    VerticalAlignment="Center"
-                    MinWidth="48"
-                    TextAlignment="Center"
-                    Style="{StaticResource AppSecondaryTextStyle}"
-                    AutomationProperties.Name="Zoom level" />
-                <Button
-                    x:Name="ZoomInButton"
-                    Content="+"
-                    FontSize="18"
-                    FontWeight="SemiBold"
-                    Width="36"
-                    Height="36"
-                    Command="{Binding ZoomInCommand}"
-                    AutomationProperties.Name="Zoom in"
-                    ToolTipService.ToolTip="Zoom in (Ctrl++)" />
-                <Button
-                    x:Name="ZoomResetButton"
-                    Content="⟲"
-                    FontSize="16"
-                    Width="36"
-                    Height="36"
-                    Command="{Binding ResetZoomCommand}"
-                    AutomationProperties.Name="Reset zoom"
-                    ToolTipService.ToolTip="Reset zoom (Ctrl+0)" />
-            </StackPanel>
+            AutomationProperties.Name="Document toolbar">
+            <Grid>
+                <!-- Left: View Mode Switcher + Quick Formatting Toolbar -->
+                <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Left">
+                    <Button Content="◫ Split" Padding="8,4" FontSize="12" Command="{Binding SwitchViewModeCommand}" CommandParameter="Split" ToolTipService.ToolTip="Split View (Editor + Preview)" />
+                    <Button Content="✏️ Edit" Padding="8,4" FontSize="12" Command="{Binding SwitchViewModeCommand}" CommandParameter="Editor" ToolTipService.ToolTip="Editor Only" />
+                    <Button Content="📖 Read" Padding="8,4" FontSize="12" Command="{Binding SwitchViewModeCommand}" CommandParameter="Preview" ToolTipService.ToolTip="Preview Only (Antigravity Mode)" />
+
+                    <AppBarSeparator />
+
+                    <Button Content="B" FontWeight="Bold" Width="28" Height="28" Padding="0" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="bold" ToolTipService.ToolTip="Bold (**text**)" />
+                    <Button Content="I" FontStyle="Italic" Width="28" Height="28" Padding="0" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="italic" ToolTipService.ToolTip="Italic (*text*)" />
+                    <Button Content="H" Width="28" Height="28" Padding="0" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="heading" ToolTipService.ToolTip="Heading" />
+                    <Button Content="&lt;&gt;" Width="28" Height="28" Padding="0" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="code" ToolTipService.ToolTip="Code block" />
+                    <Button Content="📊 Mermaid" Padding="6,2" FontSize="11" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="mermaid" ToolTipService.ToolTip="Insert Mermaid diagram" />
+                    <Button Content="💡 Alert" Padding="6,2" FontSize="11" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="alert" ToolTipService.ToolTip="Insert Antigravity Alert" />
+                    <Button Content="∑ Math" Padding="6,2" FontSize="11" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="math" ToolTipService.ToolTip="Insert Math formula" />
+                </StackPanel>
+
+                <!-- Right: Zoom controls -->
+                <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+                    <Button
+                        x:Name="ZoomOutButton"
+                        Content="−"
+                        FontSize="18"
+                        FontWeight="SemiBold"
+                        Width="32"
+                        Height="32"
+                        Padding="0"
+                        Command="{Binding ZoomOutCommand}"
+                        AutomationProperties.Name="Zoom out"
+                        ToolTipService.ToolTip="Zoom out (Ctrl+-)" />
+                    <TextBlock
+                        x:Name="ZoomPercentageText"
+                        Text="{Binding ZoomPercentage}"
+                        VerticalAlignment="Center"
+                        MinWidth="42"
+                        TextAlignment="Center"
+                        Style="{StaticResource AppSecondaryTextStyle}"
+                        AutomationProperties.Name="Zoom level" />
+                    <Button
+                        x:Name="ZoomInButton"
+                        Content="+"
+                        FontSize="18"
+                        FontWeight="SemiBold"
+                        Width="32"
+                        Height="32"
+                        Padding="0"
+                        Command="{Binding ZoomInCommand}"
+                        AutomationProperties.Name="Zoom in"
+                        ToolTipService.ToolTip="Zoom in (Ctrl++)" />
+                    <Button
+                        x:Name="ZoomResetButton"
+                        Content="⟲"
+                        FontSize="14"
+                        Width="32"
+                        Height="32"
+                        Padding="0"
+                        Command="{Binding ResetZoomCommand}"
+                        AutomationProperties.Name="Reset zoom"
+                        ToolTipService.ToolTip="Reset zoom (Ctrl+0)" />
+                </StackPanel>
+            </Grid>
         </Border>
 
         <Border
@@ -132,26 +155,54 @@
             </StackPanel>
         </Border>
 
-        <!-- Document content (shown when a document is loaded) -->
-        <ScrollViewer
-            x:Name="DocumentContentViewer"
+        <!-- Dual Pane Workspace: Editor (Column 0) + Antigravity Preview (Column 2) -->
+        <Grid
             Grid.Row="3"
-            HorizontalScrollMode="Auto"
-            VerticalScrollMode="Auto"
-            Visibility="{Binding HasDocument, Converter={StaticResource BoolToVisibilityConverter}}"
-            AutomationProperties.Name="Document content">
+            Visibility="{Binding HasDocument, Converter={StaticResource BoolToVisibilityConverter}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Editor Pane -->
+            <Grid
+                Grid.Column="0"
+                Visibility="{Binding IsEditorVisible, Converter={StaticResource BoolToVisibilityConverter}}"
+                Margin="8,8,4,8">
+                <TextBox
+                    x:Name="MarkdownEditorTextBox"
+                    Text="{Binding DocumentContent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    AcceptsReturn="True"
+                    TextWrapping="Wrap"
+                    IsSpellCheckEnabled="False"
+                    FontFamily="Cascadia Code, Consolas, Monaco, monospace"
+                    FontSize="14"
+                    Padding="16"
+                    BorderBrush="{ThemeResource AppBorderBrush}"
+                    Background="{ThemeResource AppBackgroundBrush}"
+                    AutomationProperties.Name="Markdown editor input" />
+            </Grid>
+
+            <!-- Divider line -->
             <Border
-                Background="{ThemeResource AppBackgroundBrush}"
-                Margin="24"
-                Padding="24"
-                CornerRadius="8"
-                BorderBrush="{ThemeResource AppBorderBrush}"
-                BorderThickness="1">
-                <StackPanel
-                    x:Name="RenderedDocumentPanel"
-                    Spacing="2" />
-            </Border>
-        </ScrollViewer>
+                Grid.Column="1"
+                Width="1"
+                Background="{ThemeResource AppBorderBrush}"
+                Visibility="{Binding IsSplitMode, Converter={StaticResource BoolToVisibilityConverter}}" />
+
+            <!-- Antigravity Preview Pane (WebView2) -->
+            <Grid
+                Grid.Column="2"
+                Visibility="{Binding IsPreviewVisible, Converter={StaticResource BoolToVisibilityConverter}}"
+                Margin="4,8,8,8">
+                <WebView2
+                    x:Name="AntigravityViewer"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    AutomationProperties.Name="Antigravity markdown viewer" />
+            </Grid>
+        </Grid>
 
         <!-- Empty / welcome state -->
         <StackPanel
@@ -181,7 +232,7 @@
                 TextAlignment="Center" />
         </StackPanel>
 
-        <!-- Loading state (shown while a document is being parsed) -->
+        <!-- Loading state -->
         <StackPanel
             x:Name="LoadingStatePanel"
             Grid.Row="3"

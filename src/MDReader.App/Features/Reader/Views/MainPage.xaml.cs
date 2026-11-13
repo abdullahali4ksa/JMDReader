@@ -1,42 +1,40 @@
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
+using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
+using Microsoft.Web.WebView2.Core;
 using MDReader.App.Features.Reader.ViewModels;
-using Windows.UI.Core;
+using MDReader.Core.Documents;
 using Windows.System;
-
-// To learn more about WinUI, the WinUI project structure,
-// and more about our app templates, see: http://aka.ms/winui-project-info.
 
 namespace MDReader.App.Features.Reader.Views;
 
 /// <summary>
-/// The main content page displayed inside the application window.
-/// Receives the ReaderViewModel via navigation parameters, sets it as the
-/// page's DataContext for MVVM binding, and renders the parsed Markdown
-/// element tree into WinUI controls via <see cref="MarkdownRenderer"/>.
+/// The main content page displaying open document tabs, formatting toolbar,
+/// the markdown editor, and the Antigravity offline WebView2 renderer.
 /// </summary>
 public sealed partial class MainPage : Page
 {
-    private readonly MarkdownRenderer _renderer = new();
     private ReaderViewModel? _viewModel;
     private readonly List<int> _findMatches = new();
     private int _currentFindIndex = -1;
+    private bool _isWebViewInitialized;
 
     public MainPage()
     {
         InitializeComponent();
+        Loaded += async (s, e) => await InitializeWebViewAsync();
     }
 
-    /// <summary>
-    /// Called when the page is navigated to. Sets the ReaderViewModel
-    /// passed from MainWindow as this page's DataContext and subscribes to
-    /// its property changes so the rendered content refreshes on load/replace.
-    /// </summary>
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
@@ -45,16 +43,96 @@ public sealed partial class MainPage : Page
             _viewModel = readerViewModel;
             DataContext = readerViewModel;
             _viewModel.PropertyChanged += OnViewModelPropertyChanged;
-            RenderDocument();
+            UpdateWebViewContent();
         }
     }
 
-    /// <summary>Detaches the handler when the page is unloaded.</summary>
     protected override void OnNavigatedFrom(NavigationEventArgs e)
     {
         base.OnNavigatedFrom(e);
         if (_viewModel is not null)
             _viewModel.PropertyChanged -= OnViewModelPropertyChanged;
+    }
+
+    private async Task InitializeWebViewAsync()
+    {
+        if (_isWebViewInitialized) return;
+
+        try
+        {
+            await AntigravityViewer.EnsureCoreWebView2Async();
+            var assetsFolder = Path.Combine(AppContext.BaseDirectory, "Assets", "Renderer");
+            AntigravityViewer.CoreWebView2.SetVirtualHostNameToFolderMapping(
+                "appassets.local",
+                assetsFolder,
+                CoreWebView2HostResourceAccessKind.Allow);
+
+            AntigravityViewer.CoreWebView2.WebMessageReceived += OnWebMessageReceived;
+            AntigravityViewer.NavigationCompleted += (s, e) =>
+            {
+                _isWebViewInitialized = true;
+                UpdateWebViewContent();
+                ApplyZoom();
+            };
+
+            AntigravityViewer.Source = new Uri("https://appassets.local/viewer.html");
+        }
+        catch
+        {
+            // Gracefully handle environments without WebView2 runtime
+        }
+    }
+
+    private void UpdateWebViewContent()
+    {
+        if (!_isWebViewInitialized || AntigravityViewer.CoreWebView2 == null)
+            return;
+
+        try
+        {
+            var markdown = _viewModel?.DocumentContent ?? string.Empty;
+            var json = JsonSerializer.Serialize(new
+            {
+                type = "setContent",
+                markdown = markdown
+            });
+            AntigravityViewer.CoreWebView2.PostWebMessageAsJson(json);
+        }
+        catch { }
+    }
+
+    private void OnWebMessageReceived(CoreWebView2 sender, CoreWebView2WebMessageReceivedEventArgs args)
+    {
+        try
+        {
+            using var doc = JsonDocument.Parse(args.WebMessageAsJson);
+            var root = doc.RootElement;
+            if (root.TryGetProperty("type", out var typeProp) && typeProp.GetString() == "linkClick")
+            {
+                var url = root.GetProperty("url").GetString();
+                if (!string.IsNullOrEmpty(url))
+                {
+                    if (url.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+                        url.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+                    {
+                        Process.Start(new ProcessStartInfo { FileName = url, UseShellExecute = true });
+                    }
+                    else if (url.EndsWith(".md", StringComparison.OrdinalIgnoreCase) ||
+                             url.EndsWith(".markdown", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var currentDir = Path.GetDirectoryName(_viewModel?.CurrentDocumentPath);
+                        var target = Path.GetFullPath(Path.Combine(currentDir ?? ".", url));
+                        if (File.Exists(target))
+                        {
+                            var info = MarkdownFileReader.ReadFile(target);
+                            var content = File.ReadAllText(target, Encoding.UTF8);
+                            _viewModel?.LoadDocument(info, content);
+                        }
+                    }
+                }
+            }
+        }
+        catch { }
     }
 
     public void ShowFind()
@@ -156,11 +234,11 @@ public sealed partial class MainPage : Page
 
     private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(ReaderViewModel.Elements) ||
-            e.PropertyName == nameof(ReaderViewModel.HasDocument) ||
-            e.PropertyName == nameof(ReaderViewModel.SelectedTab))
+        if (e.PropertyName == nameof(ReaderViewModel.DocumentContent) ||
+            e.PropertyName == nameof(ReaderViewModel.SelectedTab) ||
+            e.PropertyName == nameof(ReaderViewModel.HasDocument))
         {
-            RenderDocument();
+            UpdateWebViewContent();
         }
         else if (e.PropertyName == nameof(ReaderViewModel.ZoomRatio))
         {
@@ -168,41 +246,20 @@ public sealed partial class MainPage : Page
         }
     }
 
-    /// <summary>
-    /// Rebuilds the visual tree from the current element model. Clearing the
-    /// panel first releases the previous document's controls when a new
-    /// document replaces the current one.
-    /// </summary>
-    private void RenderDocument()
-    {
-        RenderedDocumentPanel.Children.Clear();
-
-        var elements = _viewModel?.Elements;
-        if (elements is null)
-            return;
-
-        var basePath = _viewModel?.CurrentDocumentPath;
-        foreach (var element in _renderer.Render(elements, basePath))
-            RenderedDocumentPanel.Children.Add(element);
-
-        ApplyZoom();
-    }
-
-    /// <summary>
-    /// Applies the current zoom ratio to the rendered document panel via a
-    /// ScaleTransform. The zoom is applied as a render transform so it does
-    /// not affect layout or cause infinite measure/arrange cycles.
-    /// </summary>
     private void ApplyZoom()
     {
-        if (_viewModel is null)
+        if (_viewModel is null || !_isWebViewInitialized || AntigravityViewer.CoreWebView2 == null)
             return;
 
-        var scale = _viewModel.ZoomRatio;
-        RenderedDocumentPanel.RenderTransform = new ScaleTransform
+        try
         {
-            ScaleX = scale,
-            ScaleY = scale,
-        };
+            var json = JsonSerializer.Serialize(new
+            {
+                type = "setZoom",
+                zoom = _viewModel.ZoomRatio
+            });
+            AntigravityViewer.CoreWebView2.PostWebMessageAsJson(json);
+        }
+        catch { }
     }
 }

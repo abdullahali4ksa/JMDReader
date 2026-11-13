@@ -51,6 +51,8 @@
                     <MenuFlyoutItem Text="🌙 Dark (داكن / أسود)" Command="{Binding SetThemeCommand}" CommandParameter="Dark" />
                     <MenuFlyoutItem Text="📜 Sepia (رمادي / بيج مريح للقراءة)" Command="{Binding SetThemeCommand}" CommandParameter="Sepia" />
                 </MenuFlyoutSubItem>
+                <MenuFlyoutSeparator />
+                <MenuFlyoutItem Text="⌨️ Keyboard Shortcuts  (F1)" Click="KeyboardShortcuts_Click" />
             </MenuBarItem>
         </MenuBar>
 

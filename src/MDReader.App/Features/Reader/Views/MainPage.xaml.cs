@@ -15,6 +15,9 @@ using Microsoft.UI.Xaml.Navigation;
 using Microsoft.Web.WebView2.Core;
 using MDReader.App.Features.Reader.ViewModels;
 using MDReader.Core.Documents;
+using MDReader.Core.Markdown;
+using Windows.ApplicationModel.DataTransfer;
+using Windows.Storage;
 using Windows.System;
 using Windows.UI;
 
@@ -27,13 +30,19 @@ namespace MDReader.App.Features.Reader.Views;
 public sealed partial class MainPage : Page
 {
     private ReaderViewModel? _viewModel;
-    private readonly List<int> _findMatches = new();
+    private readonly List<(int Index, int Length)> _findMatches = new();
     private int _currentFindIndex = -1;
     private bool _isWebViewInitialized;
+    private readonly DispatcherTimer _renderDebounceTimer = new() { Interval = TimeSpan.FromMilliseconds(180) };
 
     public MainPage()
     {
         InitializeComponent();
+        _renderDebounceTimer.Tick += (s, e) =>
+        {
+            _renderDebounceTimer.Stop();
+            ExecuteUpdateWebViewContent();
+        };
         Loaded += async (s, e) => await InitializeWebViewAsync();
     }
 
@@ -47,7 +56,7 @@ public sealed partial class MainPage : Page
             _viewModel.PropertyChanged += OnViewModelPropertyChanged;
             UpdateViewModeColumns();
             ApplyTheme();
-            UpdateWebViewContent();
+            UpdateWebViewContent(immediate: true);
         }
     }
 
@@ -75,7 +84,7 @@ public sealed partial class MainPage : Page
             AntigravityViewer.NavigationCompleted += (s, e) =>
             {
                 _isWebViewInitialized = true;
-                UpdateWebViewContent();
+                UpdateWebViewContent(immediate: true);
                 ApplyTheme();
                 ApplyZoom();
             };
@@ -88,7 +97,25 @@ public sealed partial class MainPage : Page
         }
     }
 
-    private void UpdateWebViewContent()
+    private void UpdateWebViewContent(bool immediate = false)
+    {
+        if (!_isWebViewInitialized || AntigravityViewer.CoreWebView2 == null)
+            return;
+
+        if (immediate)
+        {
+            _renderDebounceTimer.Stop();
+            ExecuteUpdateWebViewContent();
+        }
+        else
+        {
+            // Debounce rapid typing to avoid UI freezing on large documents (P20-T001)
+            _renderDebounceTimer.Stop();
+            _renderDebounceTimer.Start();
+        }
+    }
+
+    private void ExecuteUpdateWebViewContent()
     {
         if (!_isWebViewInitialized || AntigravityViewer.CoreWebView2 == null)
             return;
@@ -164,6 +191,14 @@ public sealed partial class MainPage : Page
         catch { }
     }
 
+    private void ScrollSpeedCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_viewModel != null && ScrollSpeedCombo?.SelectedItem is ComboBoxItem item && int.TryParse(item.Tag?.ToString(), out var seconds))
+        {
+            _viewModel.ScrollSpeedSeconds = seconds;
+        }
+    }
+
     private void DeleteComment_Click(object sender, RoutedEventArgs e)
     {
         if (sender is Button btn && btn.DataContext is DocumentComment comment)
@@ -178,60 +213,85 @@ public sealed partial class MainPage : Page
         {
             using var doc = JsonDocument.Parse(args.WebMessageAsJson);
             var root = doc.RootElement.Clone();
-            DispatcherQueue.TryEnqueue(() =>
+            if (root.TryGetProperty("type", out var typeProp))
             {
-                if (root.TryGetProperty("type", out var typeProp))
+                var type = typeProp.GetString();
+                if (type == "textSelected" && root.TryGetProperty("text", out var textProp))
                 {
-                    var type = typeProp.GetString();
-                    if (type == "linkClick")
+                    var selectedText = textProp.GetString() ?? string.Empty;
+                    if (_viewModel != null && !string.IsNullOrWhiteSpace(selectedText))
                     {
-                        var url = root.GetProperty("url").GetString();
-                        if (!string.IsNullOrEmpty(url))
+                        _viewModel.SelectedQuoteText = selectedText;
+                        if (!_viewModel.IsCommentsPaneOpen)
                         {
-                            if (url.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
-                                url.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
-                            {
-                                Process.Start(new ProcessStartInfo { FileName = url, UseShellExecute = true });
-                            }
-                            else if (url.EndsWith(".md", StringComparison.OrdinalIgnoreCase) ||
-                                     url.EndsWith(".markdown", StringComparison.OrdinalIgnoreCase))
-                            {
-                                var currentDir = Path.GetDirectoryName(_viewModel?.CurrentDocumentPath);
-                                var target = Path.GetFullPath(Path.Combine(currentDir ?? ".", url));
-                                if (File.Exists(target))
-                                {
-                                    var info = MarkdownFileReader.ReadFile(target);
-                                    var content = File.ReadAllText(target, Encoding.UTF8);
-                                    _viewModel?.LoadDocument(info, content);
-                                }
-                            }
-                        }
-                    }
-                    else if (type == "autoScrollEnded")
-                    {
-                        if (_viewModel != null) _viewModel.IsAutoScrolling = false;
-                    }
-                    else if (type == "textSelected")
-                    {
-                        if (_viewModel != null && root.TryGetProperty("text", out var textProp))
-                        {
-                            _viewModel.SelectedQuoteText = textProp.GetString() ?? string.Empty;
-                        }
-                    }
-                    else if (type == "activeHeadingChanged")
-                    {
-                        if (_viewModel != null && root.TryGetProperty("id", out var idProp))
-                        {
-                            var id = idProp.GetString();
-                            var match = System.Linq.Enumerable.FirstOrDefault(_viewModel.OutlineItems, o => o.Id == id);
-                            if (match != null)
-                            {
-                                _viewModel.ActiveOutlineItem = match;
-                            }
+                            _viewModel.IsCommentsPaneOpen = true;
                         }
                     }
                 }
-            });
+            }
+        }
+        catch { }
+    }
+
+    private async void ExportPdf_Click(object sender, RoutedEventArgs e)
+    {
+        if (!_isWebViewInitialized || AntigravityViewer.CoreWebView2 == null)
+            return;
+
+        try
+        {
+            var picker = new Windows.Storage.Pickers.FileSavePicker();
+            picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.DocumentsLibrary;
+            picker.FileTypeChoices.Add("PDF Document", new List<string> { ".pdf" });
+            picker.SuggestedFileName = Path.GetFileNameWithoutExtension(_viewModel?.CurrentDocumentPath ?? "Document") + ".pdf";
+
+            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
+            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+
+            var file = await picker.PickSaveFileAsync();
+            if (file != null)
+            {
+                var printSettings = AntigravityViewer.CoreWebView2.Environment.CreatePrintSettings();
+                printSettings.ShouldPrintBackgrounds = true;
+                printSettings.HeaderTitle = _viewModel?.CurrentDocumentPathDisplay ?? "MDReader";
+                var success = await AntigravityViewer.CoreWebView2.PrintToPdfAsync(file.Path, printSettings);
+                if (success)
+                {
+                    Process.Start(new ProcessStartInfo(file.Path) { UseShellExecute = true });
+                }
+            }
+        }
+        catch { }
+    }
+
+    private async void ExportHtml_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var picker = new Windows.Storage.Pickers.FileSavePicker();
+            picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.DocumentsLibrary;
+            picker.FileTypeChoices.Add("Standalone HTML Document", new List<string> { ".html" });
+            picker.SuggestedFileName = Path.GetFileNameWithoutExtension(_viewModel?.CurrentDocumentPath ?? "Document") + ".html";
+
+            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
+            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+
+            var file = await picker.PickSaveFileAsync();
+            if (file != null)
+            {
+                var assetsFolder = Path.Combine(AppContext.BaseDirectory, "Assets", "Renderer");
+                var viewerHtmlPath = Path.Combine(assetsFolder, "viewer.html");
+                var template = File.Exists(viewerHtmlPath) ? await File.ReadAllTextAsync(viewerHtmlPath) : "<html><body><div id=\"content\"></div></body></html>";
+
+                var mdContent = _viewModel?.DocumentContent ?? string.Empty;
+                var safeMdJson = JsonSerializer.Serialize(mdContent);
+                var exportedHtml = template.Replace(
+                    "let currentMarkdown = \"\";",
+                    $"let currentMarkdown = {safeMdJson}; window.addEventListener('DOMContentLoaded', () => parseAndRender(currentMarkdown));");
+
+                await File.WriteAllTextAsync(file.Path, exportedHtml, Encoding.UTF8);
+                Process.Start(new ProcessStartInfo(file.Path) { UseShellExecute = true });
+            }
         }
         catch { }
     }
@@ -256,18 +316,17 @@ public sealed partial class MainPage : Page
         }
     }
 
-    private void ScrollSpeedCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void FindOption_Changed(object sender, RoutedEventArgs e)
     {
-        if (_viewModel == null || ScrollSpeedCombo.SelectedItem is not ComboBoxItem item)
-            return;
-
-        if (int.TryParse(item.Tag?.ToString(), out int speed))
-        {
-            _viewModel.ScrollSpeedSeconds = speed;
-        }
+        RunFindQuery();
     }
 
     private void FindTextBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        RunFindQuery();
+    }
+
+    private void RunFindQuery()
     {
         _findMatches.Clear();
         _currentFindIndex = -1;
@@ -280,12 +339,11 @@ public sealed partial class MainPage : Page
             return;
         }
 
-        var position = 0;
-        while ((position = content.IndexOf(query, position, StringComparison.CurrentCultureIgnoreCase)) >= 0)
-        {
-            _findMatches.Add(position);
-            position += query.Length;
-        }
+        bool matchCase = MatchCaseToggle?.IsChecked == true;
+        bool isRegex = RegexToggle?.IsChecked == true;
+
+        var matches = MarkdownEditorUtilities.FindMatches(content, query, matchCase, isRegex);
+        _findMatches.AddRange(matches);
 
         if (_findMatches.Count == 0)
         {
@@ -312,6 +370,60 @@ public sealed partial class MainPage : Page
         {
             FindBar.Visibility = Visibility.Collapsed;
             e.Handled = true;
+        }
+    }
+
+    private void ReplaceTextBox_KeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        if (e.Key == VirtualKey.Enter)
+        {
+            Replace_Click(sender, e);
+            e.Handled = true;
+        }
+    }
+
+    private void Replace_Click(object sender, RoutedEventArgs e)
+    {
+        if (_viewModel == null || _findMatches.Count == 0 || _currentFindIndex < 0 || _currentFindIndex >= _findMatches.Count)
+            return;
+
+        var match = _findMatches[_currentFindIndex];
+        var content = _viewModel.DocumentContent ?? string.Empty;
+        var query = FindTextBox.Text;
+        var replacement = ReplaceTextBox.Text ?? string.Empty;
+        bool matchCase = MatchCaseToggle?.IsChecked == true;
+        bool isRegex = RegexToggle?.IsChecked == true;
+
+        var (newContent, count) = MarkdownEditorUtilities.ReplaceText(content, query, replacement, matchCase, isRegex, match.Index, match.Length);
+        if (count > 0)
+        {
+            _viewModel.DocumentContent = newContent;
+            ReplaceStatusText.Text = "✓ Replaced match";
+            RunFindQuery();
+        }
+    }
+
+    private void ReplaceAll_Click(object sender, RoutedEventArgs e)
+    {
+        if (_viewModel == null) return;
+        var content = _viewModel.DocumentContent ?? string.Empty;
+        var query = FindTextBox.Text;
+        var replacement = ReplaceTextBox.Text ?? string.Empty;
+        if (string.IsNullOrEmpty(query)) return;
+
+        bool matchCase = MatchCaseToggle?.IsChecked == true;
+        bool isRegex = RegexToggle?.IsChecked == true;
+
+        var (newContent, count) = MarkdownEditorUtilities.ReplaceText(content, query, replacement, matchCase, isRegex);
+        if (count > 0)
+        {
+            _viewModel.DocumentContent = newContent;
+            ReplaceStatusText.Text = $"✓ Replaced {count} matches";
+            RunFindQuery();
+        }
+        else
+        {
+            ReplaceStatusText.Text = "0 matches found";
         }
     }
 
@@ -345,98 +457,153 @@ public sealed partial class MainPage : Page
 
         try
         {
-            var dataPackage = new Windows.ApplicationModel.DataTransfer.DataPackage();
+            var dataPackage = new DataPackage();
             dataPackage.SetText(path);
-            Windows.ApplicationModel.DataTransfer.Clipboard.SetContent(dataPackage);
+            Clipboard.SetContent(dataPackage);
 
-            PathCopiedBadge.Visibility = Visibility.Visible;
-            var timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(2.0) };
-            timer.Tick += (s, args) =>
+            if (PathCopiedBadge != null)
             {
-                PathCopiedBadge.Visibility = Visibility.Collapsed;
-                timer.Stop();
-            };
-            timer.Start();
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"Failed to copy document path to clipboard: {ex.Message}");
-        }
-    }
-
-    private async void ExportPdf_Click(object sender, RoutedEventArgs e)
-    {
-        await ExportToPdfAsync();
-    }
-
-    public async Task ExportToPdfAsync()
-    {
-        if (!_isWebViewInitialized || AntigravityViewer.CoreWebView2 == null)
-            return;
-
-        try
-        {
-            var picker = new Windows.Storage.Pickers.FileSavePicker();
-            picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.DocumentsLibrary;
-            picker.FileTypeChoices.Add("PDF Document", new List<string> { ".pdf" });
-            picker.SuggestedFileName = (_viewModel?.SelectedTab?.Title ?? "Document").Replace(" *", "") + ".pdf";
-
-            var hwnd = Process.GetCurrentProcess().MainWindowHandle;
-            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
-
-            var file = await picker.PickSaveFileAsync();
-            if (file != null)
-            {
-                var settings = AntigravityViewer.CoreWebView2.Environment.CreatePrintSettings();
-                settings.ShouldPrintBackgrounds = true;
-                settings.ShouldPrintHeaderAndFooter = false;
-                await AntigravityViewer.CoreWebView2.PrintToPdfAsync(file.Path, settings);
+                PathCopiedBadge.Visibility = Visibility.Visible;
+                var timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
+                timer.Tick += (s, args) =>
+                {
+                    timer.Stop();
+                    PathCopiedBadge.Visibility = Visibility.Collapsed;
+                };
+                timer.Start();
             }
         }
         catch { }
     }
 
-    private async void ExportHtml_Click(object sender, RoutedEventArgs e)
+    private void MarkdownEditorTextBox_DragOver(object sender, DragEventArgs e)
     {
-        await ExportToHtmlAsync();
+        if (e.DataView.Contains(StandardDataFormats.StorageItems))
+        {
+            e.AcceptedOperation = DataPackageOperation.Copy;
+        }
     }
 
-    public async Task ExportToHtmlAsync()
+    private async void MarkdownEditorTextBox_Drop(object sender, DragEventArgs e)
     {
+        if (e.DataView.Contains(StandardDataFormats.StorageItems))
+        {
+            var items = await e.DataView.GetStorageItemsAsync();
+            foreach (var item in items)
+            {
+                if (item is StorageFile file && MarkdownEditorUtilities.IsImageFile(file.FileType))
+                {
+                    await InsertImageFileAsync(file);
+                }
+            }
+        }
+    }
+
+    private async void MarkdownEditorTextBox_KeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        if (e.Key == VirtualKey.V && InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Control).HasFlag(VirtualKeyStates.Down))
+        {
+            var clipboard = Clipboard.GetContent();
+            if (clipboard.Contains(StandardDataFormats.Bitmap))
+            {
+                e.Handled = true;
+                await InsertClipboardBitmapAsync(clipboard);
+            }
+            else if (clipboard.Contains(StandardDataFormats.StorageItems))
+            {
+                var items = await clipboard.GetStorageItemsAsync();
+                foreach (var item in items)
+                {
+                    if (item is StorageFile file && MarkdownEditorUtilities.IsImageFile(file.FileType))
+                    {
+                        e.Handled = true;
+                        await InsertImageFileAsync(file);
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    private async Task InsertImageFileAsync(StorageFile file)
+    {
+        if (_viewModel == null) return;
         try
         {
-            var picker = new Windows.Storage.Pickers.FileSavePicker();
-            picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.DocumentsLibrary;
-            picker.FileTypeChoices.Add("HTML Webpage", new List<string> { ".html", ".htm" });
-            picker.SuggestedFileName = (_viewModel?.SelectedTab?.Title ?? "Document").Replace(" *", "") + ".html";
+            var docDir = !string.IsNullOrWhiteSpace(_viewModel.CurrentDocumentPath)
+                ? Path.GetDirectoryName(_viewModel.CurrentDocumentPath)
+                : null;
 
-            var hwnd = Process.GetCurrentProcess().MainWindowHandle;
-            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+            var fileName = Path.GetFileName(file.Path);
+            var (targetDir, targetFilePath, relativePath) = MarkdownEditorUtilities.GetImageDestination(docDir, fileName);
 
-            var file = await picker.PickSaveFileAsync();
-            if (file != null)
+            if (!string.Equals(file.Path, targetFilePath, StringComparison.OrdinalIgnoreCase))
             {
-                var viewerPath = Path.Combine(AppContext.BaseDirectory, "Assets", "Renderer", "viewer.html");
-                var template = File.Exists(viewerPath) ? File.ReadAllText(viewerPath) : string.Empty;
-                var md = _viewModel?.DocumentContent ?? string.Empty;
-                var jsonEscapedMd = JsonSerializer.Serialize(md);
-                var standalone = template.Replace("parseAntigravityMarkdown(data.markdown || \"\")", $"parseAntigravityMarkdown({jsonEscapedMd})");
-                standalone = standalone.Replace("document.body.setAttribute('data-theme', t);", $"document.body.setAttribute('data-theme', '{(_viewModel?.CurrentTheme ?? "dark").ToLower()}');");
-                await File.WriteAllTextAsync(file.Path, standalone, Encoding.UTF8);
+                await Task.Run(() => File.Copy(file.Path, targetFilePath, overwrite: true));
             }
+
+            var snippet = MarkdownEditorUtilities.GenerateMarkdownImageSnippet(Path.GetFileNameWithoutExtension(fileName), relativePath);
+            InsertSnippetAtCaret(snippet);
         }
         catch { }
     }
 
-    protected override void OnKeyDown(KeyRoutedEventArgs e)
+    private async Task InsertClipboardBitmapAsync(DataPackageView clipboard)
     {
-        base.OnKeyDown(e);
-        if (e.Key == VirtualKey.F11)
+        if (_viewModel == null) return;
+        try
         {
-            _viewModel?.ToggleZenMode();
-            e.Handled = true;
+            var bitmapStream = await clipboard.GetBitmapAsync();
+            var docDir = !string.IsNullOrWhiteSpace(_viewModel.CurrentDocumentPath)
+                ? Path.GetDirectoryName(_viewModel.CurrentDocumentPath)
+                : null;
+
+            var fileName = $"pasted_image_{DateTime.Now:yyyyMMdd_HHmmss}.png";
+            var (targetDir, targetFilePath, relativePath) = MarkdownEditorUtilities.GetImageDestination(docDir, fileName);
+
+            using (var stream = await bitmapStream.OpenReadAsync())
+            using (var netStream = stream.AsStreamForRead())
+            using (var fileStream = File.Create(targetFilePath))
+            {
+                await netStream.CopyToAsync(fileStream);
+            }
+
+            var snippet = MarkdownEditorUtilities.GenerateMarkdownImageSnippet("Pasted Image", relativePath);
+            InsertSnippetAtCaret(snippet);
         }
-        else if (e.Key == VirtualKey.Escape && (_viewModel?.IsZenMode ?? false))
+        catch { }
+    }
+
+    private void InsertSnippetAtCaret(string snippet)
+    {
+        if (MarkdownEditorTextBox == null || _viewModel == null) return;
+
+        var text = _viewModel.DocumentContent ?? string.Empty;
+        var start = MarkdownEditorTextBox.SelectionStart;
+        var length = MarkdownEditorTextBox.SelectionLength;
+
+        var sb = new StringBuilder(text.Length + snippet.Length);
+        sb.Append(text.Substring(0, start));
+        sb.Append(snippet);
+        sb.Append(text.Substring(start + length));
+
+        _viewModel.DocumentContent = sb.ToString();
+        MarkdownEditorTextBox.SelectionStart = start + snippet.Length;
+        MarkdownEditorTextBox.SelectionLength = 0;
+        MarkdownEditorTextBox.Focus(FocusState.Programmatic);
+    }
+
+    private void ExitZenMode_Click(object sender, RoutedEventArgs e)
+    {
+        if (_viewModel != null)
+        {
+            _viewModel.IsZenMode = false;
+        }
+    }
+
+    private void MainPage_KeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        if (e.Key == VirtualKey.Escape && _viewModel != null && _viewModel.IsZenMode)
         {
             _viewModel.IsZenMode = false;
             e.Handled = true;
@@ -459,13 +626,18 @@ public sealed partial class MainPage : Page
 
     private void UpdateFindResult()
     {
+        if (_findMatches.Count == 0 || _currentFindIndex < 0 || _currentFindIndex >= _findMatches.Count) return;
         var content = _viewModel?.DocumentContent ?? string.Empty;
-        var start = _findMatches[_currentFindIndex];
-        var queryLength = FindTextBox.Text.Length;
-        var previewStart = Math.Max(0, start - 32);
-        var previewLength = Math.Min(content.Length - previewStart, queryLength + 64);
+        var match = _findMatches[_currentFindIndex];
+        var previewStart = Math.Max(0, match.Index - 32);
+        var previewLength = Math.Min(content.Length - previewStart, match.Length + 64);
         FindStatusText.Text = $"{_currentFindIndex + 1} of {_findMatches.Count}";
         FindPreviewText.Text = content.Substring(previewStart, previewLength).Replace('\r', ' ').Replace('\n', ' ');
+
+        if (MarkdownEditorTextBox != null && match.Index + match.Length <= content.Length)
+        {
+            MarkdownEditorTextBox.Select(match.Index, match.Length);
+        }
     }
 
     private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -483,11 +655,14 @@ public sealed partial class MainPage : Page
         {
             ApplyAutoScroll();
         }
-        else if (e.PropertyName == nameof(ReaderViewModel.DocumentContent) ||
-                 e.PropertyName == nameof(ReaderViewModel.SelectedTab) ||
+        else if (e.PropertyName == nameof(ReaderViewModel.SelectedTab) ||
                  e.PropertyName == nameof(ReaderViewModel.HasDocument))
         {
-            UpdateWebViewContent();
+            UpdateWebViewContent(immediate: true);
+        }
+        else if (e.PropertyName == nameof(ReaderViewModel.DocumentContent))
+        {
+            UpdateWebViewContent(immediate: false);
         }
         else if (e.PropertyName == nameof(ReaderViewModel.ZoomRatio))
         {

@@ -856,3 +856,38 @@ The `FILES_SCOPE` on each original P01 task is the allowlist. Dependencies are d
 - **ACCEPTANCE CRITERIA:** Reading mode provides optimal ergonomic line length and modern pill button aesthetic.
 - **TEST:** Visual layout verification.
 - **VERIFICATION:** Confirmed grouped pill-shaped navigation, auto-hiding formatting buttons in Read mode, and clean borders.
+
+
+---
+
+## Phase 20 — Advanced Productivity, Virtualization & Usability (الإنتاجية المتقدمة وسرعة المعالجة)
+
+**Status:** DONE (4/4 tasks: P20-T001..P20-T004 verified) · **Depends on:** Phase 19 complete · **Triggered by:** User recommendation request for high-performance large document handling, image drag-and-drop, advanced regex find-and-replace, and keyboard shortcuts guide.
+
+### P20-T001 — Performance Virtualization & Debounced Rendering (تسريع معالجة المستندات الضخمة)
+**ID:** P20-T001 · **FEATURE:** Performance / Editor · **PRIORITY:** P0 · **DEPENDS_ON:** P19-T005 · **STATUS:** DONE · **ESTIMATE:** 20 mins · **FILES_SCOPE:** `src/MDReader.App/Features/Reader/Views/MainPage.xaml.cs`
+- **AGENT PROMPT:** "Introduce high-efficiency DispatcherTimer debouncing (180ms delay) for editor input to decouple rapid typing from WebView2 full-document re-renders, preventing UI freeze when handling documents exceeding 10,000 lines."
+- **ACCEPTANCE CRITERIA:** Editor remains silky smooth at 60 FPS while typing rapidly in large documents; preview synchronizes immediately upon pause.
+- **TEST:** 10MB document typing responsiveness.
+- **VERIFICATION:** Confirmed `_renderDebounceTimer` with 180ms interval, immediate updates on tab switches and debounced updates on editor input.
+
+### P20-T002 — Drag & Drop and Clipboard Image Pasting (سحب وإفلات ولصق الصور)
+**ID:** P20-T002 · **FEATURE:** Editor / Media · **PRIORITY:** P0 · **DEPENDS_ON:** P20-T001 · **STATUS:** DONE · **ESTIMATE:** 25 mins · **FILES_SCOPE:** `src/MDReader.Core/Markdown/MarkdownEditorUtilities.cs`, `src/MDReader.App/Features/Reader/Views/MainPage.xaml`, `src/MDReader.App/Features/Reader/Views/MainPage.xaml.cs`
+- **AGENT PROMPT:** "Allow users to drag and drop image files (.png, .jpg, .webp, .svg, .gif) directly into the Markdown editor, or paste images from the Windows clipboard (Ctrl+V). Automatically copy the image to an `images/` directory adjacent to the file and insert `![ImageName](images/...)` markdown syntax at the caret."
+- **ACCEPTANCE CRITERIA:** Dropping or pasting an image creates the file locally and inserts the markdown image tag instantly.
+- **TEST:** `MarkdownEditorUtilitiesTests.IsImageFile_CorrectlyIdentifiesImages` and `GenerateMarkdownImageSnippet_CreatesStandardMarkdownTag` passed.
+- **VERIFICATION:** Confirmed `MarkdownEditorTextBox_DragOver`, `MarkdownEditorTextBox_Drop`, `InsertClipboardBitmapAsync`, and caret insertion.
+
+### P20-T003 — Advanced Find & Replace with Regular Expressions (البحث والاستبدال المتقدم والتعبيرات النمطية)
+**ID:** P20-T003 · **FEATURE:** Search / Replace · **PRIORITY:** P0 · **DEPENDS_ON:** P20-T001 · **STATUS:** DONE · **ESTIMATE:** 25 mins · **FILES_SCOPE:** `src/MDReader.Core/Markdown/MarkdownEditorUtilities.cs`, `src/MDReader.App/Features/Reader/Views/MainPage.xaml`, `src/MDReader.App/Features/Reader/Views/MainPage.xaml.cs`
+- **AGENT PROMPT:** "Expand the search bar into a full Find & Replace drawer supporting case sensitivity toggle (Aa), regular expressions toggle (.*), Next/Previous navigation, single replace, and global Replace All with instant match counter."
+- **ACCEPTANCE CRITERIA:** Users can find and replace text across the entire markdown document using both literal strings and regular expressions; caret moves to and highlights matches.
+- **TEST:** `MarkdownEditorUtilitiesTests.FindMatches_WithRegex` and `ReplaceText_AllOccurrences_PlainAndRegex` passed.
+- **VERIFICATION:** Confirmed `MatchCaseToggle`, `RegexToggle`, `ReplaceTextBox`, `Replace_Click`, and `ReplaceAll_Click`.
+
+### P20-T004 — Interactive Keyboard Shortcuts Cheat Sheet Dialog (دليل اختصارات لوحة المفاتيح)
+**ID:** P20-T004 · **FEATURE:** Shell / Help · **PRIORITY:** P1 · **DEPENDS_ON:** P20-T001 · **STATUS:** DONE · **ESTIMATE:** 15 mins · **FILES_SCOPE:** `src/MDReader.App/Features/Shell/Views/MainWindow.xaml`, `src/MDReader.App/Features/Shell/Views/MainWindow.xaml.cs`
+- **AGENT PROMPT:** "Provide an accessible interactive cheat sheet dialog displaying all keyboard shortcuts in MDReader (Ctrl+N, Ctrl+O, Ctrl+S, Ctrl+F, Ctrl+B, F11, Ctrl+P, Ctrl+E, Zoom, etc.), accessible via menu item or F1 / Ctrl+/."
+- **ACCEPTANCE CRITERIA:** Pressing F1 or selecting Keyboard Shortcuts in the Settings menu opens an elegant Fluent dialog listing all commands.
+- **TEST:** F1 accelerator and dialog invocation.
+- **VERIFICATION:** Confirmed `ShowKeyboardShortcutsDialogAsync` and MenuFlyoutItem under Settings.

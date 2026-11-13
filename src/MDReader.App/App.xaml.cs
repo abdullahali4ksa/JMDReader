@@ -24,6 +24,7 @@ namespace MDReader.App;
 /// </summary>
 public partial class App : Application
 {
+    public static Window? MainWindow { get; private set; }
     private Window? _window;
     
     /// <summary>
@@ -54,6 +55,7 @@ public partial class App : Application
         try
         {
             _window = new MainWindow();
+            MainWindow = _window;
             _window.Activate();
         }
         catch (Exception ex)

@@ -5,12 +5,12 @@
   "current_phase": "PHASE-18",
   "current_task": "P18-T001",
   "status": "ALL_ACTIVE_PHASES_COMPLETE",
-  "last_completed_phase": "PHASE-17",
-  "last_completed_task": "P17-T004",
-  "last_verified_commit": "fbc71c1",
+  "last_completed_phase": "PHASE-20",
+  "last_completed_task": "P20-T004",
+  "last_verified_commit": "a1e5162",
   "build_status": "PASS",
   "test_status": "PASS",
-  "test_summary": "77/77 passed",
+  "test_summary": "91/91 passed",
   "blocked": false,
   "block_reason": null,
   "plan_review": {
@@ -25,6 +25,7 @@
     "scope": [
       "Phase 15: Multi-Theme, Full-Width Read Mode, Auto-Scroll, Perfect Tables, Comments Drawer, Modern AppIcon (COMPLETED)",
       "Phase 19: Advanced Reader Experience (Table of Contents Outline, Zen F11 Focus Mode, PDF/HTML Export, Reading Analytics) (COMPLETED)",
+      "Phase 20: Performance Debouncing, Image Drag & Drop, Regex Find & Replace, Keyboard Shortcuts Dialog (COMPLETED)",
       "Phase 16: Standard Windows Installer (Next-Next-Install Setup Wizard, Code Signing, MSIX, Shortcuts, File Associations) (COMPLETED)",
       "Phase 17: GitHub CI/CD Automation & GitHub Releases Pipeline (COMPLETED)",
       "Phase 18: Microsoft Store Submission & Partner Center Certification (ON_HOLD per user instruction)"
@@ -32,5 +33,5 @@
   },
   "start_date": "2026-10-08",
   "backlog_complete": true,
-  "note": "Phases 15, 19, 16, and 17 are 100% COMPLETED and verified (77/77 tests passing, Setup Wizard MDReader-Setup-x64.exe and MDReader-x64.msix generated and signed, CI/CD and Winget manifests created). Phase 18 is held until user requests."
+  "note": "Phases 15, 19, 20, 16, and 17 are 100% COMPLETED and verified (91/91 tests passing, Setup Wizard MDReader-Setup-x64.exe and MDReader-x64.msix generated and signed, CI/CD and Winget manifests created). Phase 18 is held until user requests."
 }

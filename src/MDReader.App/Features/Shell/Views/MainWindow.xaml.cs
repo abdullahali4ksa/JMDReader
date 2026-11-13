@@ -3,6 +3,7 @@ using System.IO;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media;
 using Windows.ApplicationModel.DataTransfer;
 using MDReader.App.Features.Reader.ViewModels;
 using MDReader.App.Features.Reader.Views;
@@ -114,6 +115,8 @@ public sealed partial class MainWindow : Window
             () => readerViewModel.ZoomOutCommand.Execute(null));
         RegisterKeyboardAccelerator(VirtualKey.Subtract, VirtualKeyModifiers.Control,
             () => readerViewModel.ZoomOutCommand.Execute(null));
+        RegisterKeyboardAccelerator(VirtualKey.F1, VirtualKeyModifiers.None,
+            async () => await ShowKeyboardShortcutsDialogAsync());
     }
 
     private void WorkspaceTreeView_ItemInvoked(TreeView sender, TreeViewItemInvokedEventArgs args)
@@ -135,6 +138,94 @@ public sealed partial class MainWindow : Window
         RootGrid.KeyboardAccelerators.Add(accelerator);
     }
     private void Find_Click(object sender, RoutedEventArgs e) => (RootFrame.Content as MainPage)?.ShowFind();
+
+    private async void KeyboardShortcuts_Click(object sender, RoutedEventArgs e)
+    {
+        await ShowKeyboardShortcutsDialogAsync();
+    }
+
+    private async System.Threading.Tasks.Task ShowKeyboardShortcutsDialogAsync()
+    {
+        if (Content?.XamlRoot == null) return;
+
+        var stack = new StackPanel { Spacing = 8, MaxWidth = 460 };
+        var intro = new TextBlock
+        {
+            Text = "MDReader Antigravity Keyboard Shortcuts / اختصارات لوحة المفاتيح",
+            FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
+            FontSize = 14,
+            Margin = new Thickness(0, 0, 0, 8)
+        };
+        stack.Children.Add(intro);
+
+        var shortcuts = new (string Key, string Desc)[]
+        {
+            ("Ctrl + N", "New Document / مستند جديد"),
+            ("Ctrl + O", "Open Markdown File / فتح ملف"),
+            ("Ctrl + Shift + O", "Open Folder Workspace / فتح مجلد مساحة عمل"),
+            ("Ctrl + S", "Save Document / حفظ"),
+            ("Ctrl + Shift + S", "Save As / حفظ باسم"),
+            ("Ctrl + W", "Close Current Tab / إغلاق التبويب"),
+            ("Ctrl + F", "Find & Replace / بحث واستبدال متقدم"),
+            ("Ctrl + B", "Toggle Workspace Sidebar / الشريط الجانبي للمجلد"),
+            ("F11", "Zen Focus Mode / وضع التركيز التام"),
+            ("Ctrl + P", "Export to PDF / تصدير وطباعة PDF"),
+            ("Ctrl + E", "Export to Standalone HTML / تصدير صفحة ويب كاملة"),
+            ("Ctrl + +/-", "Zoom In / Out / تكبير وتصغير العرض"),
+            ("Ctrl + 0", "Reset Zoom / إعادة ضبط الزووم 100%"),
+            ("F1", "Keyboard Shortcuts / دليل الاختصارات")
+        };
+
+        foreach (var (k, d) in shortcuts)
+        {
+            var row = new Grid { Margin = new Thickness(0, 2, 0, 2) };
+            row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(140) });
+            row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+
+            var keyBadge = new Border
+            {
+                Background = (Brush)Application.Current.Resources["AppSubtleBackgroundBrush"],
+                BorderBrush = (Brush)Application.Current.Resources["AppBorderBrush"],
+                BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(4),
+                Padding = new Thickness(6, 2, 6, 2),
+                HorizontalAlignment = HorizontalAlignment.Left
+            };
+            keyBadge.Child = new TextBlock
+            {
+                Text = k,
+                FontFamily = new FontFamily("Cascadia Code, Consolas"),
+                FontSize = 11,
+                FontWeight = Microsoft.UI.Text.FontWeights.SemiBold
+            };
+            Grid.SetColumn(keyBadge, 0);
+
+            var descText = new TextBlock
+            {
+                Text = d,
+                FontSize = 12,
+                VerticalAlignment = VerticalAlignment.Center,
+                Margin = new Thickness(8, 0, 0, 0)
+            };
+            Grid.SetColumn(descText, 1);
+
+            row.Children.Add(keyBadge);
+            row.Children.Add(descText);
+            stack.Children.Add(row);
+        }
+
+        var scroll = new ScrollViewer { Content = stack, MaxHeight = 440 };
+
+        var dialog = new ContentDialog
+        {
+            Title = "⌨️ Keyboard Shortcuts",
+            Content = scroll,
+            CloseButtonText = "Close",
+            XamlRoot = Content.XamlRoot
+        };
+
+        await dialog.ShowAsync();
+    }
 
     private void RootGrid_DragOver(object sender, DragEventArgs e)
     {

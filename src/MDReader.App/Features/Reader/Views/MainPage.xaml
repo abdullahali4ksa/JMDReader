@@ -5,18 +5,20 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:converters="using:MDReader.App.Shared.Converters"
     xmlns:viewModels="using:MDReader.App.Features.Reader.ViewModels"
+    xmlns:docs="using:MDReader.Core.Documents"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
     <Page.Resources>
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
     </Page.Resources>
 
     <!--
         Main content area of the application.
-        Shows open document tabs at the top, then toolbars, followed by
-        the dual-pane editor & Antigravity preview or empty/error states.
+        Shows open document tabs at the top, then modern toolbars, followed by
+        the dual-pane editor, Antigravity preview, and comments drawer.
     -->
     <Grid
         Background="{ThemeResource AppBackgroundBrush}"
@@ -57,7 +59,7 @@
             </TabView.TabItemTemplate>
         </TabView>
 
-        <!-- Main Toolbar (View Mode Switcher + Formatting Toolbar + Zoom) -->
+        <!-- Main Toolbar (View Mode Switcher + Formatting Toolbar + Auto-Scroll + Theme + Comments + Zoom) -->
         <Border
             x:Name="MainToolbar"
             Grid.Row="1"
@@ -68,21 +70,51 @@
             Visibility="{Binding HasDocument, Converter={StaticResource BoolToVisibilityConverter}}"
             AutomationProperties.Name="Document toolbar">
             <Grid>
-                <!-- Left: View Mode Switcher + Quick Formatting Toolbar -->
+                <!-- Left: View Mode Switcher + Formatting + Reading Tools -->
                 <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Left">
-                    <Button Content="◫ Split" Padding="8,4" FontSize="12" Command="{Binding SwitchViewModeCommand}" CommandParameter="Split" ToolTipService.ToolTip="Split View (Editor + Preview)" />
+                    <!-- View Modes -->
+                    <Button Content="◫ Split" Padding="8,4" FontSize="12" Command="{Binding SwitchViewModeCommand}" CommandParameter="Split" ToolTipService.ToolTip="Split View (Editor + Live Preview)" />
                     <Button Content="✏️ Edit" Padding="8,4" FontSize="12" Command="{Binding SwitchViewModeCommand}" CommandParameter="Editor" ToolTipService.ToolTip="Editor Only" />
-                    <Button Content="📖 Read" Padding="8,4" FontSize="12" Command="{Binding SwitchViewModeCommand}" CommandParameter="Preview" ToolTipService.ToolTip="Preview Only (Antigravity Mode)" />
+                    <Button Content="📖 Read" Padding="8,4" FontSize="12" Command="{Binding SwitchViewModeCommand}" CommandParameter="Preview" ToolTipService.ToolTip="Reading Mode (Full Width Antigravity)" />
+
+                    <AppBarSeparator Visibility="{Binding IsEditorVisible, Converter={StaticResource BoolToVisibilityConverter}}" />
+
+                    <!-- Quick Formatting Toolbar (Visible in Split & Editor) -->
+                    <StackPanel Orientation="Horizontal" Spacing="4" Visibility="{Binding IsEditorVisible, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <Button Content="B" FontWeight="Bold" Width="28" Height="28" Padding="0" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="bold" ToolTipService.ToolTip="Bold (**text**)" />
+                        <Button Content="I" FontStyle="Italic" Width="28" Height="28" Padding="0" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="italic" ToolTipService.ToolTip="Italic (*text*)" />
+                        <Button Content="H" Width="28" Height="28" Padding="0" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="heading" ToolTipService.ToolTip="Heading" />
+                        <Button Content="&lt;&gt;" Width="28" Height="28" Padding="0" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="code" ToolTipService.ToolTip="Code block" />
+                        <Button Content="📊 Mermaid" Padding="6,2" FontSize="11" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="mermaid" ToolTipService.ToolTip="Insert Mermaid diagram" />
+                        <Button Content="💡 Alert" Padding="6,2" FontSize="11" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="alert" ToolTipService.ToolTip="Insert Antigravity Alert" />
+                        <Button Content="∑ Math" Padding="6,2" FontSize="11" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="math" ToolTipService.ToolTip="Insert Math formula" />
+                    </StackPanel>
 
                     <AppBarSeparator />
 
-                    <Button Content="B" FontWeight="Bold" Width="28" Height="28" Padding="0" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="bold" ToolTipService.ToolTip="Bold (**text**)" />
-                    <Button Content="I" FontStyle="Italic" Width="28" Height="28" Padding="0" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="italic" ToolTipService.ToolTip="Italic (*text*)" />
-                    <Button Content="H" Width="28" Height="28" Padding="0" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="heading" ToolTipService.ToolTip="Heading" />
-                    <Button Content="&lt;&gt;" Width="28" Height="28" Padding="0" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="code" ToolTipService.ToolTip="Code block" />
-                    <Button Content="📊 Mermaid" Padding="6,2" FontSize="11" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="mermaid" ToolTipService.ToolTip="Insert Mermaid diagram" />
-                    <Button Content="💡 Alert" Padding="6,2" FontSize="11" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="alert" ToolTipService.ToolTip="Insert Antigravity Alert" />
-                    <Button Content="∑ Math" Padding="6,2" FontSize="11" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="math" ToolTipService.ToolTip="Insert Math formula" />
+                    <!-- Auto-Scroll Reading Controls -->
+                    <Button Content="{Binding AutoScrollButtonText}" Padding="8,4" FontSize="12" Command="{Binding ToggleAutoScrollCommand}" ToolTipService.ToolTip="Hands-free auto-scrolling for comfortable reading" />
+                    <ComboBox
+                        x:Name="ScrollSpeedCombo"
+                        SelectedIndex="1"
+                        SelectionChanged="ScrollSpeedCombo_SelectionChanged"
+                        Width="74"
+                        Padding="6,3"
+                        FontSize="11"
+                        ToolTipService.ToolTip="Auto-Scroll Speed (Interval in seconds)">
+                        <ComboBoxItem Content="1s" Tag="1" />
+                        <ComboBoxItem Content="2s" Tag="2" />
+                        <ComboBoxItem Content="3s" Tag="3" />
+                        <ComboBoxItem Content="5s" Tag="5" />
+                    </ComboBox>
+
+                    <AppBarSeparator />
+
+                    <!-- Theme Cycle Button (Dark / Light / Sepia) -->
+                    <Button Content="{Binding ThemeGlyph}" Padding="8,4" FontSize="13" Command="{Binding CycleThemeCommand}" ToolTipService.ToolTip="Cycle Reading Theme (Dark 🌙 / Light ☀️ / Sepia 📜)" />
+
+                    <!-- Comments Drawer Toggle -->
+                    <Button Content="💬 Comments" Padding="8,4" FontSize="12" Command="{Binding ToggleCommentsPaneCommand}" ToolTipService.ToolTip="Open or close document comments drawer" />
                 </StackPanel>
 
                 <!-- Right: Zoom controls -->
@@ -155,17 +187,18 @@
             </StackPanel>
         </Border>
 
-        <!-- Dual Pane Workspace: Editor (Column 0) + Antigravity Preview (Column 2) -->
+        <!-- Dual Pane Workspace + Comments Drawer: Editor (Col 0) + Divider (Col 1) + Preview (Col 2) + Comments (Col 3) -->
         <Grid
             Grid.Row="3"
             Visibility="{Binding HasDocument, Converter={StaticResource BoolToVisibilityConverter}}">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
+                <ColumnDefinition x:Name="EditorCol" Width="*" />
+                <ColumnDefinition x:Name="DividerCol" Width="Auto" />
+                <ColumnDefinition x:Name="PreviewCol" Width="*" />
+                <ColumnDefinition x:Name="CommentsCol" Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <!-- Editor Pane -->
+            <!-- Editor Pane (Column 0) -->
             <Grid
                 Grid.Column="0"
                 Visibility="{Binding IsEditorVisible, Converter={StaticResource BoolToVisibilityConverter}}"
@@ -184,24 +217,98 @@
                     AutomationProperties.Name="Markdown editor input" />
             </Grid>
 
-            <!-- Divider line -->
+            <!-- Divider line (Column 1) -->
             <Border
                 Grid.Column="1"
                 Width="1"
                 Background="{ThemeResource AppBorderBrush}"
                 Visibility="{Binding IsSplitMode, Converter={StaticResource BoolToVisibilityConverter}}" />
 
-            <!-- Antigravity Preview Pane (WebView2) -->
+            <!-- Antigravity Preview Pane (Column 2) -->
             <Grid
                 Grid.Column="2"
                 Visibility="{Binding IsPreviewVisible, Converter={StaticResource BoolToVisibilityConverter}}"
-                Margin="4,8,8,8">
+                Margin="4,8,4,8">
                 <WebView2
                     x:Name="AntigravityViewer"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Stretch"
                     AutomationProperties.Name="Antigravity markdown viewer" />
             </Grid>
+
+            <!-- Comments Drawer Panel (Column 3) -->
+            <Border
+                x:Name="CommentsDrawer"
+                Grid.Column="3"
+                Width="320"
+                Background="{ThemeResource AppBackgroundBrush}"
+                BorderBrush="{ThemeResource AppBorderBrush}"
+                BorderThickness="1,0,0,0"
+                Padding="12,10"
+                Visibility="{Binding IsCommentsPaneOpen, Converter={StaticResource BoolToVisibilityConverter}}"
+                AutomationProperties.Name="Comments Drawer">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <!-- Header -->
+                    <Grid Grid.Row="0" Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                            <TextBlock Text="💬 COMMENTS &amp; NOTES" FontWeight="Bold" FontSize="12" Foreground="{ThemeResource AppSecondaryTextBrush}" />
+                        </StackPanel>
+                        <Button Grid.Column="1" Content="✕" Width="26" Height="26" Padding="0" FontSize="11" Command="{Binding ToggleCommentsPaneCommand}" ToolTipService.ToolTip="Close Comments" />
+                    </Grid>
+
+                    <!-- Add Comment Box -->
+                    <Border Grid.Row="1" Background="{ThemeResource AppBackgroundBrush}" BorderBrush="{ThemeResource AppBorderBrush}" BorderThickness="1" CornerRadius="6" Padding="8" Margin="0,0,0,10">
+                        <StackPanel Spacing="6">
+                            <!-- Selected quote preview if any -->
+                            <Grid Visibility="{Binding SelectedQuoteText, Converter={StaticResource StringToVisibilityConverter}}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{Binding SelectedQuoteText}" MaxLines="2" TextTrimming="CharacterEllipsis" FontSize="11" FontStyle="Italic" Foreground="{ThemeResource AppSecondaryTextBrush}" VerticalAlignment="Center" />
+                                <Button Grid.Column="1" Content="✕" Width="20" Height="20" Padding="0" FontSize="10" Command="{Binding ClearQuoteCommand}" ToolTipService.ToolTip="Clear quoted text" />
+                            </Grid>
+                            <TextBox x:Name="NewCommentInput" PlaceholderText="Write a comment or annotation..." Text="{Binding NewCommentText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True" Height="64" FontSize="12" />
+                            <Button Content="➕ Add Comment" HorizontalAlignment="Right" Padding="8,4" FontSize="11" Command="{Binding AddCommentCommand}" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Comments List -->
+                    <ListView Grid.Row="2" ItemsSource="{Binding Comments}" SelectionMode="None">
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="docs:DocumentComment">
+                                <Border Margin="0,0,0,8" Padding="10" Background="{ThemeResource AppBackgroundBrush}" BorderBrush="{ThemeResource AppBorderBrush}" BorderThickness="1" CornerRadius="6">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <Grid Grid.Row="0">
+                                            <TextBlock Text="{Binding CreatedAtDisplay}" FontSize="10" Foreground="{ThemeResource AppSecondaryTextBrush}" VerticalAlignment="Center" />
+                                            <Button Content="🗑️" HorizontalAlignment="Right" Padding="4,2" FontSize="10" Background="Transparent" BorderThickness="0" Command="{Binding DataContext.DeleteCommentCommand, ElementName=CommentsDrawer}" CommandParameter="{Binding}" ToolTipService.ToolTip="Delete Comment" />
+                                        </Grid>
+                                        <Border Grid.Row="1" Margin="0,4" Padding="6,4" Background="rgba(127,127,127,0.08)" CornerRadius="4" Visibility="{Binding SelectedText, Converter={StaticResource StringToVisibilityConverter}}">
+                                            <TextBlock Text="{Binding SelectedText}" FontSize="11" FontStyle="Italic" TextWrapping="Wrap" />
+                                        </Border>
+                                        <TextBlock Grid.Row="2" Text="{Binding CommentText}" FontSize="12" TextWrapping="Wrap" Margin="0,4,0,0" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Grid>
+            </Border>
         </Grid>
 
         <!-- Empty / welcome state -->

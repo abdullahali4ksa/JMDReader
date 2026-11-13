@@ -221,8 +221,15 @@ public sealed partial class ShellViewModel : ObservableObject
     }
 
     [RelayCommand]
+    public void SetTheme(string theme)
+    {
+        _readerViewModel.SetTheme(theme);
+    }
+
+    [RelayCommand]
     private Task ThemeSettingsAsync()
     {
+        _readerViewModel.CycleTheme();
         return Task.CompletedTask;
     }
 

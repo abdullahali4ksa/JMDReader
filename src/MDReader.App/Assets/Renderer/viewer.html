@@ -12,6 +12,7 @@
             --code-bg: #f6f8fa;
             --link-color: #0969da;
             --table-row-odd: #f6f8fa;
+            --table-header-bg: #f1f3f5;
             --alert-note-border: #0969da;
             --alert-note-bg: rgba(9, 105, 218, 0.08);
             --alert-tip-border: #1a7f37;
@@ -22,6 +23,7 @@
             --alert-warning-bg: rgba(154, 103, 0, 0.08);
             --alert-caution-border: #cf222e;
             --alert-caution-bg: rgba(207, 34, 46, 0.08);
+            --selection-bg: rgba(9, 105, 218, 0.25);
         }
 
         [data-theme="dark"] {
@@ -31,6 +33,7 @@
             --code-bg: #161b22;
             --link-color: #2f81f7;
             --table-row-odd: #161b22;
+            --table-header-bg: #21262d;
             --alert-note-border: #2f81f7;
             --alert-note-bg: rgba(56, 139, 253, 0.12);
             --alert-tip-border: #3fb950;
@@ -41,6 +44,32 @@
             --alert-warning-bg: rgba(187, 128, 9, 0.12);
             --alert-caution-border: #f85149;
             --alert-caution-bg: rgba(248, 81, 73, 0.12);
+            --selection-bg: rgba(47, 129, 247, 0.35);
+        }
+
+        [data-theme="sepia"] {
+            --bg-color: #fbf0d9;
+            --text-color: #383428;
+            --border-color: #dcd0b8;
+            --code-bg: #f2e4c8;
+            --link-color: #8c5716;
+            --table-row-odd: #f5e9d0;
+            --table-header-bg: #ebdcc0;
+            --alert-note-border: #7b5b28;
+            --alert-note-bg: rgba(123, 91, 40, 0.12);
+            --alert-tip-border: #3b6b35;
+            --alert-tip-bg: rgba(59, 107, 53, 0.12);
+            --alert-important-border: #6d4b8e;
+            --alert-important-bg: rgba(109, 75, 142, 0.12);
+            --alert-warning-border: #99621e;
+            --alert-warning-bg: rgba(153, 98, 30, 0.12);
+            --alert-caution-border: #a82e2e;
+            --alert-caution-bg: rgba(168, 46, 46, 0.12);
+            --selection-bg: rgba(140, 87, 22, 0.25);
+        }
+
+        ::selection {
+            background: var(--selection-bg);
         }
 
         body {
@@ -70,7 +99,7 @@
         h2 { font-size: 1.5em; border-bottom: 1px solid var(--border-color); padding-bottom: 0.3em; }
         h3 { font-size: 1.25em; }
 
-        p, blockquote, ul, ol, dl, table, pre { margin-top: 0; margin-bottom: 16px; }
+        p, blockquote, ul, ol, dl, pre { margin-top: 0; margin-bottom: 16px; }
 
         a { color: var(--link-color); text-decoration: none; }
         a:hover { text-decoration: underline; }
@@ -112,11 +141,48 @@
         .markdown-alert-caution { border-color: var(--alert-caution-border); background-color: var(--alert-caution-bg); }
         .markdown-alert-caution .alert-title { color: var(--alert-caution-border); }
 
-        /* Tables */
-        table { border-collapse: collapse; width: 100%; margin-bottom: 16px; display: block; overflow-x: auto; }
-        th, td { padding: 8px 14px; border: 1px solid var(--border-color); }
-        th { font-weight: 600; background-color: var(--code-bg); }
-        tr:nth-child(2n) { background-color: var(--table-row-odd); }
+        /* High-Fidelity GFM Tables */
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            margin: 18px 0;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-color);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            min-width: 480px;
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        th, td {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+            vertical-align: top;
+        }
+        th:last-child, td:last-child {
+            border-right: none;
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+        th {
+            font-weight: 600;
+            background-color: var(--table-header-bg);
+            color: var(--text-color);
+            text-align: left;
+        }
+        tr:nth-child(even) {
+            background-color: var(--table-row-odd);
+        }
+        tr:hover {
+            background-color: rgba(127, 127, 127, 0.08);
+        }
 
         /* Code Blocks with Header and Copy Button */
         .code-block-container {
@@ -214,7 +280,6 @@
     <div id="content"></div>
 
     <script>
-        // High-fidelity Markdown & Antigravity AST Parser
         const alertIcons = {
             note: 'ℹ️',
             tip: '💡',
@@ -222,6 +287,8 @@
             warning: '⚠️',
             caution: '🛑'
         };
+
+        let autoScrollInterval = null;
 
         function isRtlText(text) {
             return /[\u0590-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/.test(text);
@@ -236,6 +303,30 @@
                 .replace(/'/g, "&#039;");
         }
 
+        function isTableSeparatorLine(line) {
+            const trimmed = line.trim();
+            // Must contain at least one dash or plus and pipes
+            if (!/[\|\+][\s\:\-\+]+[\|\+]/.test(trimmed) && !/^\s*[\:\-\+]+\s*\|\s*[\:\-\+]+\s*$/.test(trimmed)) {
+                return false;
+            }
+            // All non-whitespace chars must be |, +, -, or :
+            return /^[\s\|\+\-\:]+$/.test(trimmed) && trimmed.includes("-");
+        }
+
+        function isTableRowLine(line) {
+            const trimmed = line.trim();
+            if (trimmed.length < 2) return false;
+            if (trimmed.startsWith("|") && trimmed.includes("|", 1)) return true;
+            return trimmed.includes("|");
+        }
+
+        function splitRowCells(line) {
+            let trimmed = line.trim();
+            if (trimmed.startsWith("|")) trimmed = trimmed.substring(1);
+            if (trimmed.endsWith("|")) trimmed = trimmed.substring(0, trimmed.length - 1);
+            return trimmed.split("|").map(c => c.trim());
+        }
+
         function parseAntigravityMarkdown(md) {
             if (!md) return "";
 
@@ -244,8 +335,6 @@
             let inCodeBlock = false;
             let codeLang = "";
             let codeLines = [];
-            let inTable = false;
-            let tableRows = [];
 
             for (let i = 0; i < lines.length; i++) {
                 let line = lines[i];
@@ -253,7 +342,6 @@
                 // Fenced Code Block
                 if (line.trim().startsWith("```")) {
                     if (inCodeBlock) {
-                        // Close code block
                         let fullCode = codeLines.join("\n");
                         if (codeLang.toLowerCase() === "mermaid") {
                             html.push(`<div class="mermaid-container"><strong>[Mermaid Diagram]</strong><pre class="mermaid">${escapeHtml(fullCode)}</pre></div>`);
@@ -341,27 +429,41 @@
                     continue;
                 }
 
-                // Table Rows
-                if (line.trim().startsWith("|") && line.trim().endsWith("|")) {
-                    // Check if separator
-                    if (/^\|(\s*:?-+:?\s*\|)+$/.test(line.trim())) {
-                        continue;
+                // GFM & ASCII Tables (Lookahead for table header + separator)
+                if (isTableRowLine(line) && i + 1 < lines.length && isTableSeparatorLine(lines[i + 1])) {
+                    let headerCells = splitRowCells(line);
+                    let separatorLine = lines[i + 1];
+                    let alignments = splitRowCells(separatorLine).map(col => {
+                        let t = col.trim();
+                        if (t.startsWith(":") && t.endsWith(":")) return "center";
+                        if (t.endsWith(":")) return "right";
+                        return "left";
+                    });
+
+                    i++; // skip separator line
+
+                    let tableHtml = ['<div class="table-wrapper"><table><thead><tr>'];
+                    headerCells.forEach((c, idx) => {
+                        let align = alignments[idx] || "left";
+                        tableHtml.push(`<th style="text-align: ${align}">${parseInline(c)}</th>`);
+                    });
+                    tableHtml.push('</tr></thead><tbody>');
+
+                    // Consume subsequent table data rows
+                    while (i + 1 < lines.length && isTableRowLine(lines[i + 1]) && !isTableSeparatorLine(lines[i + 1])) {
+                        i++;
+                        let rowCells = splitRowCells(lines[i]);
+                        tableHtml.push('<tr>');
+                        rowCells.forEach((c, idx) => {
+                            let align = alignments[idx] || "left";
+                            tableHtml.push(`<td style="text-align: ${align}">${parseInline(c)}</td>`);
+                        });
+                        tableHtml.push('</tr>');
                     }
-                    let cells = line.trim().slice(1, -1).split("|").map(c => c.trim());
-                    if (!inTable) {
-                        inTable = true;
-                        html.push("<table><thead><tr>");
-                        cells.forEach(c => html.push(`<th>${parseInline(c)}</th>`));
-                        html.push("</tr></thead><tbody>");
-                    } else {
-                        html.push("<tr>");
-                        cells.forEach(c => html.push(`<td>${parseInline(c)}</td>`));
-                        html.push("</tr>");
-                    }
+
+                    tableHtml.push('</tbody></table></div>');
+                    html.push(tableHtml.join(""));
                     continue;
-                } else if (inTable) {
-                    html.push("</tbody></table>");
-                    inTable = false;
                 }
 
                 // List items and Task Lists
@@ -387,10 +489,6 @@
                 // Normal Paragraph
                 let dirClass = isRtlText(line) ? "rtl" : "ltr";
                 html.push(`<p class="${dirClass}">${parseInline(line)}</p>`);
-            }
-
-            if (inTable) {
-                html.push("</tbody></table>");
             }
 
             return html.join("\n");
@@ -445,17 +543,53 @@
             });
         }
 
+        function setAutoScroll(enabled, intervalSeconds) {
+            if (autoScrollInterval) {
+                clearInterval(autoScrollInterval);
+                autoScrollInterval = null;
+            }
+            if (enabled) {
+                const intervalMs = Math.max(500, (intervalSeconds || 2) * 1000);
+                autoScrollInterval = setInterval(() => {
+                    const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+                    if (window.scrollY >= maxScroll - 5) {
+                        clearInterval(autoScrollInterval);
+                        autoScrollInterval = null;
+                        if (window.chrome && window.chrome.webview) {
+                            window.chrome.webview.postMessage({ type: 'autoScrollEnded' });
+                        }
+                        return;
+                    }
+                    window.scrollBy({ top: 90, behavior: 'smooth' });
+                }, intervalMs);
+            }
+        }
+
+        // Notify text selection for comments
+        document.addEventListener('selectionchange', () => {
+            const sel = window.getSelection();
+            const text = sel ? sel.toString().trim() : '';
+            if (text.length > 0 && text.length < 500 && window.chrome && window.chrome.webview) {
+                window.chrome.webview.postMessage({ type: 'textSelected', text: text });
+            }
+        });
+
         // Bridge listener for messages from WinUI 3 C#
         window.chrome?.webview?.addEventListener('message', event => {
             const data = event.data;
+            if (!data) return;
+
             if (data.type === 'setContent') {
                 const rendered = parseAntigravityMarkdown(data.markdown || "");
                 document.getElementById('content').innerHTML = rendered;
                 window.chrome.webview.postMessage({ type: 'rendered' });
             } else if (data.type === 'setTheme') {
-                document.body.setAttribute('data-theme', data.theme === 'Light' ? 'light' : 'dark');
+                const t = (data.theme || 'dark').toLowerCase();
+                document.body.setAttribute('data-theme', t);
             } else if (data.type === 'setZoom') {
                 document.body.style.zoom = data.zoom;
+            } else if (data.type === 'autoScroll') {
+                setAutoScroll(data.enabled, data.intervalSeconds);
             }
         });
     </script>

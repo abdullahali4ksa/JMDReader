@@ -341,7 +341,7 @@ public class MarkdownAstTests
     {
         var doc = Parse("| A | B |\n|---|---|\n| **bold** | `code` |\n");
         var table = Assert.IsType<MarkdownTableElement>(Assert.Single(doc.Blocks));
-        Assert.Equal(1, table.Rows.Count); // single row with nested inlines, safe
+        Assert.Single(table.Rows); // single row with nested inlines, safe
         Assert.Contains("bold", table.Rows[0][0]);
         Assert.Contains("code", table.Rows[0][1]);
     }

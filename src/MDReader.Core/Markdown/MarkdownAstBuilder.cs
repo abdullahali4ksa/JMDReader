@@ -127,7 +127,7 @@ internal sealed class MarkdownAstBuilder
                 // GFM task list: check for a TaskList inline in the item's first paragraph.
                 foreach (var child in lib)
                 {
-                    if (child is ParagraphBlock p)
+                    if (child is ParagraphBlock p && p.Inline != null)
                     {
                         foreach (var inline in p.Inline)
                         {

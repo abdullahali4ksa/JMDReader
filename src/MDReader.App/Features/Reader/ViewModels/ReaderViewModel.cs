@@ -14,7 +14,7 @@ public enum ReaderViewMode { Split, Editor, Preview }
 
 /// <summary>
 /// ViewModel for the document reader — manages multi-tab document sessions,
-/// content display, editor view modes, and zoom state.
+/// content display, editor view modes, theming, auto-scrolling, and comments.
 /// </summary>
 public sealed partial class ReaderViewModel : ObservableObject
 {
@@ -26,9 +26,18 @@ public sealed partial class ReaderViewModel : ObservableObject
     private double _zoomRatio = 1.0;
     private DocumentTabViewModel? _selectedTab;
     private ReaderViewMode _viewMode = ReaderViewMode.Split;
+    private string _currentTheme = "Dark";
+    private bool _isAutoScrolling;
+    private int _scrollSpeedSeconds = 2;
+    private bool _isCommentsPaneOpen;
+    private string _newCommentText = string.Empty;
+    private string _selectedQuoteText = string.Empty;
 
     /// <summary>Collection of active document tabs.</summary>
     public ObservableCollection<DocumentTabViewModel> Tabs { get; } = new();
+
+    /// <summary>Collection of in-document comments.</summary>
+    public ObservableCollection<DocumentComment> Comments { get; } = new();
 
     /// <summary>Gets or sets the current view mode (Split, Editor, Preview).</summary>
     public ReaderViewMode ViewMode
@@ -48,6 +57,130 @@ public sealed partial class ReaderViewModel : ObservableObject
     public bool IsEditorVisible => _viewMode == ReaderViewMode.Split || _viewMode == ReaderViewMode.Editor;
     public bool IsPreviewVisible => _viewMode == ReaderViewMode.Split || _viewMode == ReaderViewMode.Preview;
     public bool IsSplitMode => _viewMode == ReaderViewMode.Split;
+
+    /// <summary>Gets or sets the current theme (Light, Dark, Sepia, System).</summary>
+    public string CurrentTheme
+    {
+        get => _currentTheme;
+        set
+        {
+            if (SetProperty(ref _currentTheme, value))
+            {
+                OnPropertyChanged(nameof(ThemeGlyph));
+            }
+        }
+    }
+
+    public string ThemeGlyph => CurrentTheme switch
+    {
+        "Light" => "☀️",
+        "Sepia" => "📜",
+        _ => "🌙"
+    };
+
+    [RelayCommand]
+    public void SetTheme(string theme)
+    {
+        CurrentTheme = theme;
+    }
+
+    [RelayCommand]
+    public void CycleTheme()
+    {
+        CurrentTheme = CurrentTheme switch
+        {
+            "Dark" => "Light",
+            "Light" => "Sepia",
+            _ => "Dark"
+        };
+    }
+
+    /// <summary>Gets or sets whether auto-scroll is actively running.</summary>
+    public bool IsAutoScrolling
+    {
+        get => _isAutoScrolling;
+        set
+        {
+            if (SetProperty(ref _isAutoScrolling, value))
+                OnPropertyChanged(nameof(AutoScrollButtonText));
+        }
+    }
+
+    /// <summary>Scroll interval in seconds (1 to 5).</summary>
+    public int ScrollSpeedSeconds
+    {
+        get => _scrollSpeedSeconds;
+        set => SetProperty(ref _scrollSpeedSeconds, value);
+    }
+
+    public string AutoScrollButtonText => IsAutoScrolling ? "⏸ Pause" : "▶ Auto-Scroll";
+
+    [RelayCommand]
+    public void ToggleAutoScroll()
+    {
+        IsAutoScrolling = !IsAutoScrolling;
+    }
+
+    /// <summary>Gets or sets whether the comments drawer is open.</summary>
+    public bool IsCommentsPaneOpen
+    {
+        get => _isCommentsPaneOpen;
+        set => SetProperty(ref _isCommentsPaneOpen, value);
+    }
+
+    public string NewCommentText
+    {
+        get => _newCommentText;
+        set => SetProperty(ref _newCommentText, value);
+    }
+
+    public string SelectedQuoteText
+    {
+        get => _selectedQuoteText;
+        set
+        {
+            if (SetProperty(ref _selectedQuoteText, value))
+            {
+                OnPropertyChanged(nameof(HasSelectedQuote));
+            }
+        }
+    }
+
+    public bool HasSelectedQuote => !string.IsNullOrWhiteSpace(_selectedQuoteText);
+
+    [RelayCommand]
+    public void ClearQuote()
+    {
+        SelectedQuoteText = string.Empty;
+    }
+
+    [RelayCommand]
+    public void ToggleCommentsPane()
+    {
+        IsCommentsPaneOpen = !IsCommentsPaneOpen;
+    }
+
+    [RelayCommand]
+    public void AddComment()
+    {
+        if (string.IsNullOrWhiteSpace(NewCommentText)) return;
+
+        Comments.Add(new DocumentComment
+        {
+            CommentText = NewCommentText.Trim(),
+            SelectedText = SelectedQuoteText.Trim()
+        });
+
+        NewCommentText = string.Empty;
+        SelectedQuoteText = string.Empty;
+    }
+
+    [RelayCommand]
+    public void DeleteComment(DocumentComment comment)
+    {
+        if (comment != null)
+            Comments.Remove(comment);
+    }
 
     /// <summary>Gets or sets the active document tab.</summary>
     public DocumentTabViewModel? SelectedTab
@@ -197,7 +330,7 @@ public sealed partial class ReaderViewModel : ObservableObject
             "code" => "\n\n```csharp\n// Code here\n```\n\n",
             "mermaid" => "\n\n```mermaid\nflowchart TD\n    A[Start] --> B[Process]\n    B --> C[End]\n```\n\n",
             "alert" => "\n\n> [!NOTE]\n> Notification message.\n\n",
-            "table" => "\n\n| Header 1 | Header 2 |\n| :--- | :--- |\n| Cell 1 | Cell 2 |\n\n",
+            "table" => "\n\n| Part | Topic | Question Range | Total |\n| :--- | :--- | :--- | :--- |\n| Part A | IT Components | Q1 - Q10 | 9 |\n\n",
             "math" => " $E=mc^2$ ",
             _ => string.Empty
         };

@@ -46,7 +46,11 @@
                 <MenuFlyoutItem Text="Find  (Ctrl+F)" Click="Find_Click" />
             </MenuBarItem>
             <MenuBarItem Title="Settings">
-                <MenuFlyoutItem Text="Theme" Command="{Binding ThemeSettingsCommand}" />
+                <MenuFlyoutSubItem Text="🎨 Theme / المظهر">
+                    <MenuFlyoutItem Text="☀️ Light (أبيض)" Command="{Binding SetThemeCommand}" CommandParameter="Light" />
+                    <MenuFlyoutItem Text="🌙 Dark (داكن / أسود)" Command="{Binding SetThemeCommand}" CommandParameter="Dark" />
+                    <MenuFlyoutItem Text="📜 Sepia (رمادي / بيج مريح للقراءة)" Command="{Binding SetThemeCommand}" CommandParameter="Sepia" />
+                </MenuFlyoutSubItem>
             </MenuBarItem>
         </MenuBar>
 
@@ -66,10 +70,16 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" Margin="4,0,4,8">
+                    <Grid Margin="4,0,4,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
                         <TextBlock Text="WORKSPACE" FontWeight="Bold" FontSize="11" Foreground="{ThemeResource AppSecondaryTextBrush}" VerticalAlignment="Center" />
-                        <Button Content="📁 Open" Margin="12,0,0,0" Padding="8,4" FontSize="11" Command="{Binding OpenFolderCommand}" ToolTipService.ToolTip="Open workspace folder" />
-                    </StackPanel>
+                        <Button Grid.Column="1" Content="📁 Open" Margin="6,0,4,0" Padding="6,3" FontSize="11" Command="{Binding OpenFolderCommand}" ToolTipService.ToolTip="Open workspace folder" />
+                        <Button Grid.Column="2" Content="✕" Width="26" Height="26" Padding="0" FontSize="11" Command="{Binding ToggleWorkspacePaneCommand}" ToolTipService.ToolTip="Close workspace sidebar (Ctrl+B)" />
+                    </Grid>
                     <TreeView
                         x:Name="WorkspaceTreeView"
                         Grid.Row="1"

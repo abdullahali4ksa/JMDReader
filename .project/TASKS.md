@@ -661,3 +661,52 @@ The `FILES_SCOPE` on each original P01 task is the allowlist. Dependencies are d
 - **ACCEPTANCE CRITERIA:** 0 crashes, 0 memory leaks; all tests pass; stress testing succeeds under 2 seconds.
 - **TEST:** `dotnet test` (71/71 passed) + `dotnet build` (0 errors).
 - **VERIFICATION:** Confirmed 71 automated tests passing, 1MB file parsed under 1s, Arabic/English mixed bidirectional persistence verified.
+
+---
+
+## Phase 15 — Reader UX Refinement, Multi-Theme, Auto-Scroll, Perfect Tables & Comments
+
+**Status:** DONE (7/7 tasks: P15-T001..P15-T007 verified) · **Depends on:** Phase 14 complete · **Triggered by:** User feedback on theme switching (White/Black/Sepia), full-page reading mode column collapse, auto-scroll with speed controls, sidebar close button, table parsing perfection, comment system, and modern design overhaul.
+
+### P15-T001 — Fix View Mode Column Collapse for Full Width Reading and Editing
+**ID:** P15-T001 · **FEATURE:** Shell / Layout · **PRIORITY:** P0 · **DEPENDS_ON:** P14-T001 · **STATUS:** DONE · **ESTIMATE:** 15 mins · **FILES_SCOPE:** `src/MDReader.App/Features/Reader/Views/MainPage.xaml`, `src/MDReader.App/Features/Reader/Views/MainPage.xaml.cs`
+- **AGENT PROMPT:** "Collapse the unused Grid column to width 0 in Editor and Preview (Read) modes so that Read mode expands to 100% full window width instead of remaining split in half."
+- **ACCEPTANCE CRITERIA:** Clicking 'Read' collapses the editor column to 0, giving the preview 100% full width; clicking 'Edit' gives the editor 100% full width; 'Split' restores 50%/50%.
+- **TEST:** UI layout width verification.
+- **VERIFICATION:** Confirmed `UpdateViewModeColumns()` sets EditorCol.Width = 0 and PreviewCol.Width = 1* in Preview mode.
+
+### P15-T002 — Implement Multi-Theme Engine (Light, Dark, Sepia, System)
+**ID:** P15-T002 · **FEATURE:** Theming / UI · **PRIORITY:** P0 · **DEPENDS_ON:** P15-T001 · **STATUS:** DONE · **ESTIMATE:** 20 mins · **FILES_SCOPE:** `src/MDReader.App/Features/Shell/ViewModels/ShellViewModel.cs`, `src/MDReader.App/Features/Reader/ViewModels/ReaderViewModel.cs`, `src/MDReader.App/Features/Shell/Views/MainWindow.xaml`, `src/MDReader.App/Assets/Renderer/viewer.html`
+- **AGENT PROMPT:** "Implement Light (white), Dark (black), Sepia (reading eye-care tone), and System themes. Synchronize theme across both WinUI controls (editor background/text) and WebView2 viewer."
+- **ACCEPTANCE CRITERIA:** Switching themes instantly changes the entire window (shell, editor, and preview) to Light, Dark, or Sepia.
+- **VERIFICATION:** Confirmed 3 reading themes with synchronized WinUI SolidColorBrush palette and WebView2 `data-theme` switching.
+
+### P15-T003 — Implement Hands-Free Auto-Scroll with Speed Controls
+**ID:** P15-T003 · **FEATURE:** Reader / Productivity · **PRIORITY:** P1 · **DEPENDS_ON:** P15-T002 · **STATUS:** DONE · **ESTIMATE:** 20 mins · **FILES_SCOPE:** `src/MDReader.App/Features/Reader/Views/MainPage.xaml`, `src/MDReader.App/Features/Reader/ViewModels/ReaderViewModel.cs`, `src/MDReader.App/Assets/Renderer/viewer.html`
+- **AGENT PROMPT:** "Add an Auto-Scroll control to the reading toolbar with Play/Pause button and speed selection (1s, 2s, 3s, 5s). Smoothly scroll the document downwards in WebView2."
+- **ACCEPTANCE CRITERIA:** Clicking Play starts smooth auto-scrolling at the selected second intervals; clicking Pause stops it.
+- **VERIFICATION:** Confirmed `ToggleAutoScrollCommand`, `ScrollSpeedSeconds` selector combo, and WebView2 `autoScroll` bridge with bottom-detection callback.
+
+### P15-T004 — Add Workspace Sidebar Close Button ('X')
+**ID:** P15-T004 · **FEATURE:** Shell / Sidebar · **PRIORITY:** P1 · **DEPENDS_ON:** P15-T001 · **STATUS:** DONE · **ESTIMATE:** 10 mins · **FILES_SCOPE:** `src/MDReader.App/Features/Shell/Views/MainWindow.xaml`
+- **AGENT PROMPT:** "Add a visible close button ('✕') at the top right of the Workspace sidebar header to easily close/collapse the pane."
+- **ACCEPTANCE CRITERIA:** Clicking the '✕' button closes the sidebar; `Ctrl+B` toggles it as before.
+- **VERIFICATION:** Confirmed close button in sidebar header bound to `ToggleWorkspacePaneCommand`.
+
+### P15-T005 — High-Fidelity GFM Table & Markdown Parser Engine
+**ID:** P15-T005 · **FEATURE:** Rendering / GFM Tables · **PRIORITY:** P0 · **DEPENDS_ON:** P15-T002 · **STATUS:** DONE · **ESTIMATE:** 25 mins · **FILES_SCOPE:** `src/MDReader.App/Assets/Renderer/viewer.html`
+- **AGENT PROMPT:** "Upgrade the markdown table and block parser in viewer.html to robustly handle complex GFM tables with alignments, zebra striping, smooth borders, and responsive overflow."
+- **ACCEPTANCE CRITERIA:** Complex tables with question ranges, multiple columns, and pipes render with perfect formatting and alignment.
+- **VERIFICATION:** Confirmed `isTableSeparatorLine` handles `+`, `-`, `:`, `|`, splits cells cleanly, wraps in `.table-wrapper`, and applies zebra striping.
+
+### P15-T006 — Document Comments and Annotations Sidebar Panel
+**ID:** P15-T006 · **FEATURE:** Collaboration / Notes · **PRIORITY:** P1 · **DEPENDS_ON:** P15-T003 · **STATUS:** DONE · **ESTIMATE:** 25 mins · **FILES_SCOPE:** `src/MDReader.Core/Documents/DocumentComment.cs`, `src/MDReader.App/Features/Reader/ViewModels/ReaderViewModel.cs`, `src/MDReader.App/Features/Reader/Views/MainPage.xaml`
+- **AGENT PROMPT:** "Implement a Comments system with a right-side drawer panel in reading mode, allowing users to add comments with timestamps and view the list of comments."
+- **ACCEPTANCE CRITERIA:** Clicking 'Comments' opens the panel; users can add, view, and delete comments on the active document.
+- **VERIFICATION:** Confirmed `DocumentComment` model, unit tests in `DocumentCommentTests.cs`, right-side drawer with selected text quoting, and delete actions.
+
+### P15-T007 — Modern Fluent / Material Design Overhaul & Modern App Icon
+**ID:** P15-T007 · **FEATURE:** Design / Branding · **PRIORITY:** P0 · **DEPENDS_ON:** P15-T005 · **STATUS:** DONE · **ESTIMATE:** 20 mins · **FILES_SCOPE:** `src/MDReader.App/Assets/AppIcon.ico`, `src/MDReader.App/Assets/`
+- **AGENT PROMPT:** "Overhaul the UI styling with modern Fluent Design 2 / Material 3 principles (pill buttons, cohesive card elevation, subtle borders) and create a high-res modern app icon."
+- **ACCEPTANCE CRITERIA:** Sleek modern visual design; updated modern application icon.
+- **VERIFICATION:** Generated multi-resolution 256x256 `AppIcon.ico` with dark indigo gradient squircle, open book fold, electric indigo 'M' and cyan reading accent arrow, plus updated PNG logos.

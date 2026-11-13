@@ -10,17 +10,19 @@ using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using Microsoft.Web.WebView2.Core;
 using MDReader.App.Features.Reader.ViewModels;
 using MDReader.Core.Documents;
 using Windows.System;
+using Windows.UI;
 
 namespace MDReader.App.Features.Reader.Views;
 
 /// <summary>
 /// The main content page displaying open document tabs, formatting toolbar,
-/// the markdown editor, and the Antigravity offline WebView2 renderer.
+/// the markdown editor, Antigravity offline WebView2 renderer, and comments drawer.
 /// </summary>
 public sealed partial class MainPage : Page
 {
@@ -43,6 +45,8 @@ public sealed partial class MainPage : Page
             _viewModel = readerViewModel;
             DataContext = readerViewModel;
             _viewModel.PropertyChanged += OnViewModelPropertyChanged;
+            UpdateViewModeColumns();
+            ApplyTheme();
             UpdateWebViewContent();
         }
     }
@@ -72,6 +76,7 @@ public sealed partial class MainPage : Page
             {
                 _isWebViewInitialized = true;
                 UpdateWebViewContent();
+                ApplyTheme();
                 ApplyZoom();
             };
 
@@ -101,33 +106,106 @@ public sealed partial class MainPage : Page
         catch { }
     }
 
+    private void ApplyTheme()
+    {
+        if (_viewModel == null) return;
+        var theme = _viewModel.CurrentTheme;
+
+        if (_isWebViewInitialized && AntigravityViewer.CoreWebView2 != null)
+        {
+            try
+            {
+                var json = JsonSerializer.Serialize(new { type = "setTheme", theme = theme });
+                AntigravityViewer.CoreWebView2.PostWebMessageAsJson(json);
+            }
+            catch { }
+        }
+
+        // Synchronize editor colors with the selected reading theme
+        if (MarkdownEditorTextBox != null)
+        {
+            switch (theme)
+            {
+                case "Light":
+                    MarkdownEditorTextBox.Background = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255));
+                    MarkdownEditorTextBox.Foreground = new SolidColorBrush(Color.FromArgb(255, 31, 35, 40));
+                    MarkdownEditorTextBox.BorderBrush = new SolidColorBrush(Color.FromArgb(255, 208, 215, 222));
+                    break;
+                case "Sepia":
+                    MarkdownEditorTextBox.Background = new SolidColorBrush(Color.FromArgb(255, 251, 240, 217));
+                    MarkdownEditorTextBox.Foreground = new SolidColorBrush(Color.FromArgb(255, 56, 52, 40));
+                    MarkdownEditorTextBox.BorderBrush = new SolidColorBrush(Color.FromArgb(255, 220, 208, 184));
+                    break;
+                case "Dark":
+                default:
+                    MarkdownEditorTextBox.Background = new SolidColorBrush(Color.FromArgb(255, 13, 17, 23));
+                    MarkdownEditorTextBox.Foreground = new SolidColorBrush(Color.FromArgb(255, 230, 237, 243));
+                    MarkdownEditorTextBox.BorderBrush = new SolidColorBrush(Color.FromArgb(255, 48, 54, 61));
+                    break;
+            }
+        }
+    }
+
+    private void ApplyAutoScroll()
+    {
+        if (!_isWebViewInitialized || AntigravityViewer.CoreWebView2 == null || _viewModel == null)
+            return;
+
+        try
+        {
+            var json = JsonSerializer.Serialize(new
+            {
+                type = "autoScroll",
+                enabled = _viewModel.IsAutoScrolling,
+                intervalSeconds = _viewModel.ScrollSpeedSeconds
+            });
+            AntigravityViewer.CoreWebView2.PostWebMessageAsJson(json);
+        }
+        catch { }
+    }
+
     private void OnWebMessageReceived(CoreWebView2 sender, CoreWebView2WebMessageReceivedEventArgs args)
     {
         try
         {
             using var doc = JsonDocument.Parse(args.WebMessageAsJson);
             var root = doc.RootElement;
-            if (root.TryGetProperty("type", out var typeProp) && typeProp.GetString() == "linkClick")
+            if (root.TryGetProperty("type", out var typeProp))
             {
-                var url = root.GetProperty("url").GetString();
-                if (!string.IsNullOrEmpty(url))
+                var type = typeProp.GetString();
+                if (type == "linkClick")
                 {
-                    if (url.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
-                        url.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+                    var url = root.GetProperty("url").GetString();
+                    if (!string.IsNullOrEmpty(url))
                     {
-                        Process.Start(new ProcessStartInfo { FileName = url, UseShellExecute = true });
-                    }
-                    else if (url.EndsWith(".md", StringComparison.OrdinalIgnoreCase) ||
-                             url.EndsWith(".markdown", StringComparison.OrdinalIgnoreCase))
-                    {
-                        var currentDir = Path.GetDirectoryName(_viewModel?.CurrentDocumentPath);
-                        var target = Path.GetFullPath(Path.Combine(currentDir ?? ".", url));
-                        if (File.Exists(target))
+                        if (url.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+                            url.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
                         {
-                            var info = MarkdownFileReader.ReadFile(target);
-                            var content = File.ReadAllText(target, Encoding.UTF8);
-                            _viewModel?.LoadDocument(info, content);
+                            Process.Start(new ProcessStartInfo { FileName = url, UseShellExecute = true });
                         }
+                        else if (url.EndsWith(".md", StringComparison.OrdinalIgnoreCase) ||
+                                 url.EndsWith(".markdown", StringComparison.OrdinalIgnoreCase))
+                        {
+                            var currentDir = Path.GetDirectoryName(_viewModel?.CurrentDocumentPath);
+                            var target = Path.GetFullPath(Path.Combine(currentDir ?? ".", url));
+                            if (File.Exists(target))
+                            {
+                                var info = MarkdownFileReader.ReadFile(target);
+                                var content = File.ReadAllText(target, Encoding.UTF8);
+                                _viewModel?.LoadDocument(info, content);
+                            }
+                        }
+                    }
+                }
+                else if (type == "autoScrollEnded")
+                {
+                    if (_viewModel != null) _viewModel.IsAutoScrolling = false;
+                }
+                else if (type == "textSelected")
+                {
+                    if (_viewModel != null && root.TryGetProperty("text", out var textProp))
+                    {
+                        _viewModel.SelectedQuoteText = textProp.GetString() ?? string.Empty;
                     }
                 }
             }
@@ -152,6 +230,17 @@ public sealed partial class MainPage : Page
         if (args.Item is DocumentTabViewModel tab)
         {
             _viewModel?.CloseTab(tab);
+        }
+    }
+
+    private void ScrollSpeedCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_viewModel == null || ScrollSpeedCombo.SelectedItem is not ComboBoxItem item)
+            return;
+
+        if (int.TryParse(item.Tag?.ToString(), out int speed))
+        {
+            _viewModel.ScrollSpeedSeconds = speed;
         }
     }
 
@@ -234,15 +323,54 @@ public sealed partial class MainPage : Page
 
     private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(ReaderViewModel.DocumentContent) ||
-            e.PropertyName == nameof(ReaderViewModel.SelectedTab) ||
-            e.PropertyName == nameof(ReaderViewModel.HasDocument))
+        if (e.PropertyName == nameof(ReaderViewModel.ViewMode))
+        {
+            UpdateViewModeColumns();
+        }
+        else if (e.PropertyName == nameof(ReaderViewModel.CurrentTheme))
+        {
+            ApplyTheme();
+        }
+        else if (e.PropertyName == nameof(ReaderViewModel.IsAutoScrolling) ||
+                 e.PropertyName == nameof(ReaderViewModel.ScrollSpeedSeconds))
+        {
+            ApplyAutoScroll();
+        }
+        else if (e.PropertyName == nameof(ReaderViewModel.DocumentContent) ||
+                 e.PropertyName == nameof(ReaderViewModel.SelectedTab) ||
+                 e.PropertyName == nameof(ReaderViewModel.HasDocument))
         {
             UpdateWebViewContent();
         }
         else if (e.PropertyName == nameof(ReaderViewModel.ZoomRatio))
         {
             ApplyZoom();
+        }
+    }
+
+    private void UpdateViewModeColumns()
+    {
+        if (_viewModel == null || EditorCol == null || PreviewCol == null || DividerCol == null)
+            return;
+
+        switch (_viewModel.ViewMode)
+        {
+            case ReaderViewMode.Editor:
+                EditorCol.Width = new GridLength(1, GridUnitType.Star);
+                DividerCol.Width = new GridLength(0);
+                PreviewCol.Width = new GridLength(0);
+                break;
+            case ReaderViewMode.Preview:
+                EditorCol.Width = new GridLength(0);
+                DividerCol.Width = new GridLength(0);
+                PreviewCol.Width = new GridLength(1, GridUnitType.Star);
+                break;
+            case ReaderViewMode.Split:
+            default:
+                EditorCol.Width = new GridLength(1, GridUnitType.Star);
+                DividerCol.Width = GridLength.Auto;
+                PreviewCol.Width = new GridLength(1, GridUnitType.Star);
+                break;
         }
     }
 

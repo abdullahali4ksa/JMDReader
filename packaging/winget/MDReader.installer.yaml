@@ -1,0 +1,20 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.1.6.0.schema.json
+
+PackageIdentifier: MDReader.MDReader
+PackageVersion: 1.0.1
+MinimumOSVersion: 10.0.17763.0
+InstallerType: inno
+InstallModes:
+  - interactive
+  - silent
+  - silentWithProgress
+Installers:
+  - Architecture: x64
+    InstallerUrl: https://github.com/MDReader/MDReader/releases/download/v1.0.1/MDReader-Setup-x64.exe
+    InstallerSha256: 7C48113166767451B64D107744E4474A9D15805B81DF28B62C91A42FDB891CE9
+    Scope: user
+    InstallerSwitches:
+      Silent: /VERYSILENT /SUPPRESSMSGBOXES /NORESTART
+      SilentWithProgress: /SILENT /NORESTART
+ManifestType: installer
+ManifestVersion: 1.6.0

@@ -112,5 +112,6 @@ logs/
 *.tmp
 *.temp
 
-# Build artifacts (MSIX, ZIP, reports)
+# Build artifacts (MSIX, ZIP, reports, distribution)
 artifacts/
+dist/

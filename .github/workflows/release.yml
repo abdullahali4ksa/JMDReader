@@ -1,0 +1,97 @@
+name: Release Build & Distribution Pipeline
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Install Inno Setup Compiler
+        run: |
+          choco install innosetup --no-progress
+
+      - name: Restore NuGet Packages
+        run: |
+          dotnet restore MDReader.sln
+
+      - name: Execute Automated Unit Tests (MDReader.Core.Tests)
+        run: |
+          dotnet test tests/MDReader.Core.Tests/MDReader.Core.Tests.csproj -c Release --logger "console;verbosity=normal"
+
+      - name: Build Standalone Self-Contained Binaries
+        run: |
+          powershell -ExecutionPolicy Bypass -File scripts/build-release.ps1
+
+      - name: Compile and Sign Windows Setup Wizard (MDReader-Setup-x64.exe)
+        run: |
+          powershell -ExecutionPolicy Bypass -File scripts/build-installer.ps1 -SkipBuild
+
+      - name: Compile Native Windows MSIX Package (MDReader-x64.msix)
+        run: |
+          powershell -ExecutionPolicy Bypass -File scripts/build-msix.ps1
+          Copy-Item "dist/msix/MDReader.App_1.0.1.0_x64_Test/MDReader.App_1.0.1.0_x64.msix" -Destination "dist/installer/MDReader-x64.msix" -Force
+
+      - name: Generate Release Checksums (SHA-256)
+        id: checksums
+        shell: pwsh
+        run: |
+          $files = Get-ChildItem -Path "dist/installer" -Include "*.exe", "*.msix"
+          $checksumReport = @()
+          foreach ($file in $files) {
+              $hash = (Get-FileHash -Path $file.FullName -Algorithm SHA256).Hash
+              $checksumReport += "$hash  $($file.Name)"
+          }
+          $checksumReport | Out-File -FilePath "dist/installer/SHA256SUMS.txt" -Encoding ascii
+          Get-Content "dist/installer/SHA256SUMS.txt"
+
+      - name: Create GitHub Release with Installer Assets
+        uses: softprops/action-gh-release@v2
+        with:
+          name: MDReader ${{ github.ref_name }}
+          tag_name: ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          body: |
+            ## 🚀 MDReader Release ${{ github.ref_name }}
+            
+            Modern Antigravity-grade Markdown Reader and Editor for Windows 10 & 11.
+            
+            ### 📦 Download Assets
+            - **[MDReader-Setup-x64.exe](https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/MDReader-Setup-x64.exe)** — Standard Windows Setup Wizard (Recommended for all users).
+            - **[MDReader-x64.msix](https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/MDReader-x64.msix)** — Signed Windows MSIX App Package for App Installer.
+            
+            ### 🛡️ SHA-256 Verifications
+            Check the attached `SHA256SUMS.txt` for integrity verification.
+            
+            ### ✨ Highlights in this release
+            - Hybrid WinUI 3 + Offline WebView2 Engine.
+            - Tri-mode viewing (Split View, Edit, Read).
+            - Tri-theme support (Light, Dark, Sepia).
+            - Interactive Table of Contents (Outline) with real-time heading spy.
+            - F11 Zen / Focus Mode for distraction-free reading.
+            - Comments Drawer with automatic quote capture.
+            - Hands-free auto-scrolling with configurable interval.
+            - Antigravity alerts, LaTeX math, Mermaid diagrams, and GFM tables.
+            - High-fidelity PDF export and standalone offline HTML export.
+          files: |
+            dist/installer/MDReader-Setup-x64.exe
+            dist/installer/MDReader-x64.msix
+            dist/installer/SHA256SUMS.txt

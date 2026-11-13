@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.6.0.schema.json
+
+PackageIdentifier: MDReader.MDReader
+PackageVersion: 1.0.1
+PackageLocale: en-US
+Publisher: MDReader
+PublisherUrl: https://github.com/MDReader/MDReader
+PublisherSupportUrl: https://github.com/MDReader/MDReader/issues
+PackageName: MDReader
+PackageUrl: https://github.com/MDReader/MDReader
+License: MIT
+LicenseUrl: https://github.com/MDReader/MDReader/blob/master/LICENSE
+ShortDescription: Modern Antigravity-grade Markdown Reader and Editor for Windows.
+Description: >
+  MDReader is a high-performance native Windows Markdown reader and editor built with WinUI 3
+  and an offline WebView2 engine. Features tri-mode view (Split/Edit/Read), tri-theme styling
+  (Light/Dark/Sepia), table of contents outline, F11 Zen focus mode, comments drawer,
+  auto-scrolling, KaTeX math, Mermaid diagrams, and one-click PDF/HTML export.
+Tags:
+  - markdown
+  - reader
+  - editor
+  - winui3
+  - antigravity
+  - katex
+  - mermaid
+ManifestType: defaultLocale
+ManifestVersion: 1.6.0

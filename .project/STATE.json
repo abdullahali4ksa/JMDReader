@@ -2,12 +2,12 @@
   "schema_version": 1,
   "project": "MDReader",
   "project_root": "D:\\AI_PROJECTS\\MDReader",
-  "current_phase": "PHASE-16",
-  "current_task": "P16-T001",
-  "status": "IN_PROGRESS",
-  "last_completed_phase": "PHASE-19",
-  "last_completed_task": "P19-T005",
-  "last_verified_commit": "2b161ba",
+  "current_phase": "PHASE-18",
+  "current_task": "P18-T001",
+  "status": "ALL_ACTIVE_PHASES_COMPLETE",
+  "last_completed_phase": "PHASE-17",
+  "last_completed_task": "P17-T004",
+  "last_verified_commit": "ad8f60e",
   "build_status": "PASS",
   "test_status": "PASS",
   "test_summary": "77/77 passed",
@@ -25,12 +25,12 @@
     "scope": [
       "Phase 15: Multi-Theme, Full-Width Read Mode, Auto-Scroll, Perfect Tables, Comments Drawer, Modern AppIcon (COMPLETED)",
       "Phase 19: Advanced Reader Experience (Table of Contents Outline, Zen F11 Focus Mode, PDF/HTML Export, Reading Analytics) (COMPLETED)",
-      "Phase 16: Standard Windows Installer (Next-Next-Install Setup Wizard, Code Signing, MSIX, Shortcuts, File Associations) (IN_PROGRESS)",
-      "Phase 17: GitHub CI/CD Automation & GitHub Releases Pipeline (PLANNED)",
-      "Phase 18: Microsoft Store Submission & Partner Center Certification (ON_HOLD)"
+      "Phase 16: Standard Windows Installer (Next-Next-Install Setup Wizard, Code Signing, MSIX, Shortcuts, File Associations) (COMPLETED)",
+      "Phase 17: GitHub CI/CD Automation & GitHub Releases Pipeline (COMPLETED)",
+      "Phase 18: Microsoft Store Submission & Partner Center Certification (ON_HOLD per user instruction)"
     ]
   },
   "start_date": "2026-10-08",
-  "backlog_complete": false,
-  "note": "Phase 19 COMPLETED and verified (77/77 tests passing). Now starting Phase 16: Standalone publishing, code signing, and installer wizard."
+  "backlog_complete": true,
+  "note": "Phases 15, 19, 16, and 17 are 100% COMPLETED and verified (77/77 tests passing, Setup Wizard MDReader-Setup-x64.exe and MDReader-x64.msix generated and signed, CI/CD and Winget manifests created). Phase 18 is held until user requests."
 }

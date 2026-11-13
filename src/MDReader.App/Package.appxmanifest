@@ -11,7 +11,7 @@
 
   <Identity
     Name="MDReader.MDReader"
-    Publisher="CN=AppPublisher"
+    Publisher="CN=MDReader Developer, O=MDReader, C=SA"
     Version="1.0.1.0" />
 
   <mp:PhoneIdentity PhoneProductId="3361C559-1964-49C7-82CB-6EF2BEC14BF9" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
@@ -47,6 +47,18 @@
         <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" />
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
       </uap:VisualElements>
+      <Extensions>
+        <uap:Extension Category="windows.fileTypeAssociation">
+          <uap:FileTypeAssociation Name="markdown">
+            <uap:DisplayName>Markdown Document</uap:DisplayName>
+            <uap:Logo>Assets\StoreLogo.png</uap:Logo>
+            <uap:SupportedFileTypes>
+              <uap:FileType>.md</uap:FileType>
+              <uap:FileType>.markdown</uap:FileType>
+            </uap:SupportedFileTypes>
+          </uap:FileTypeAssociation>
+        </uap:Extension>
+      </Extensions>
     </Application>
   </Applications>
 

@@ -66,115 +66,135 @@
         <Border
             x:Name="MainToolbar"
             Grid.Row="1"
-            Background="{ThemeResource AppBackgroundBrush}"
+            Background="{ThemeResource AppSubtleBackgroundBrush}"
             BorderBrush="{ThemeResource AppBorderBrush}"
             BorderThickness="0,0,0,1"
-            Padding="12,5"
+            Padding="12,6"
             Visibility="{Binding HasDocument, Converter={StaticResource BoolToVisibilityConverter}}"
             AutomationProperties.Name="Document toolbar">
-            <StackPanel Spacing="5" Visibility="{Binding IsNormalUiVisible, Converter={StaticResource BoolToVisibilityConverter}}">
-                <Grid>
-                    <!-- Left: View Mode Switcher + Formatting + Reading Tools -->
-                <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Left">
-                    <!-- View Modes -->
-                    <Button Content="◫ Split" Padding="8,4" FontSize="12" Command="{Binding SwitchViewModeCommand}" CommandParameter="Split" ToolTipService.ToolTip="Split View (Editor + Live Preview)" />
-                    <Button Content="✏️ Edit" Padding="8,4" FontSize="12" Command="{Binding SwitchViewModeCommand}" CommandParameter="Editor" ToolTipService.ToolTip="Editor Only" />
-                    <Button Content="📖 Read" Padding="8,4" FontSize="12" Command="{Binding SwitchViewModeCommand}" CommandParameter="Preview" ToolTipService.ToolTip="Reading Mode (Full Width Antigravity)" />
+            <StackPanel Spacing="6" Visibility="{Binding IsNormalUiVisible, Converter={StaticResource BoolToVisibilityConverter}}">
+                <Grid ColumnSpacing="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
 
-                    <AppBarSeparator Visibility="{Binding IsEditorVisible, Converter={StaticResource BoolToVisibilityConverter}}" />
+                    <!-- Left: Scrollable or adaptive pill command groups -->
+                    <ScrollViewer Grid.Column="0" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled" HorizontalScrollMode="Enabled" VerticalScrollMode="Disabled">
+                        <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                            <!-- View Modes Group (Pill cluster) -->
+                            <Border Background="{ThemeResource AppBackgroundBrush}" BorderBrush="{ThemeResource AppBorderBrush}" BorderThickness="1" CornerRadius="6" Padding="2">
+                                <StackPanel Orientation="Horizontal" Spacing="2">
+                                    <Button Content="◫" Width="30" Height="28" Padding="0" FontSize="13" Command="{Binding SwitchViewModeCommand}" CommandParameter="Split" ToolTipService.ToolTip="Split View (عادية: محرر + معاينة)" />
+                                    <Button Content="✏️" Width="30" Height="28" Padding="0" FontSize="12" Command="{Binding SwitchViewModeCommand}" CommandParameter="Editor" ToolTipService.ToolTip="Editor Only (محرر فقط)" />
+                                    <Button Content="📖" Width="30" Height="28" Padding="0" FontSize="12" Command="{Binding SwitchViewModeCommand}" CommandParameter="Preview" ToolTipService.ToolTip="Reading Mode (وضع القراءة الكامل)" />
+                                </StackPanel>
+                            </Border>
 
-                    <!-- Quick Formatting Toolbar (Visible in Split & Editor) -->
-                    <StackPanel Orientation="Horizontal" Spacing="4" Visibility="{Binding IsEditorVisible, Converter={StaticResource BoolToVisibilityConverter}}">
-                        <Button Content="B" FontWeight="Bold" Width="28" Height="28" Padding="0" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="bold" ToolTipService.ToolTip="Bold (**text**)" />
-                        <Button Content="I" FontStyle="Italic" Width="28" Height="28" Padding="0" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="italic" ToolTipService.ToolTip="Italic (*text*)" />
-                        <Button Content="H" Width="28" Height="28" Padding="0" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="heading" ToolTipService.ToolTip="Heading" />
-                        <Button Content="&lt;&gt;" Width="28" Height="28" Padding="0" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="code" ToolTipService.ToolTip="Code block" />
-                        <Button Content="📊 Mermaid" Padding="6,2" FontSize="11" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="mermaid" ToolTipService.ToolTip="Insert Mermaid diagram" />
-                        <Button Content="💡 Alert" Padding="6,2" FontSize="11" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="alert" ToolTipService.ToolTip="Insert Antigravity Alert" />
-                        <Button Content="∑ Math" Padding="6,2" FontSize="11" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="math" ToolTipService.ToolTip="Insert Math formula" />
-                    </StackPanel>
+                            <!-- Formatting Group (Pill cluster, visible in Split & Editor) -->
+                            <Border Background="{ThemeResource AppBackgroundBrush}" BorderBrush="{ThemeResource AppBorderBrush}" BorderThickness="1" CornerRadius="6" Padding="2" Visibility="{Binding IsEditorVisible, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <StackPanel Orientation="Horizontal" Spacing="2">
+                                    <Button Content="B" FontWeight="Bold" Width="28" Height="28" Padding="0" FontSize="12" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="bold" ToolTipService.ToolTip="Bold / عريض (**text**)" />
+                                    <Button Content="I" FontStyle="Italic" Width="28" Height="28" Padding="0" FontSize="12" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="italic" ToolTipService.ToolTip="Italic / مائل (*text*)" />
+                                    <Button Content="H" Width="28" Height="28" Padding="0" FontSize="12" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="heading" ToolTipService.ToolTip="Heading / عنوان (# Title)" />
+                                    <Button Content="&lt;&gt;" Width="28" Height="28" Padding="0" FontSize="11" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="code" ToolTipService.ToolTip="Code Block / كتلة كود (```)" />
+                                    <Button Content="📊" Width="28" Height="28" Padding="0" FontSize="12" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="mermaid" ToolTipService.ToolTip="Insert Mermaid Diagram / رسم هيكلي" />
+                                    <Button Content="💡" Width="28" Height="28" Padding="0" FontSize="12" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="alert" ToolTipService.ToolTip="Insert Alert / تنبيه ([!NOTE])" />
+                                    <Button Content="∑" Width="28" Height="28" Padding="0" FontSize="13" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="math" ToolTipService.ToolTip="Insert Math Formula / معادلة رياضية ($$)" />
+                                </StackPanel>
+                            </Border>
 
-                    <AppBarSeparator />
+                            <!-- Reading Tools Group (Pill cluster) -->
+                            <Border Background="{ThemeResource AppBackgroundBrush}" BorderBrush="{ThemeResource AppBorderBrush}" BorderThickness="1" CornerRadius="6" Padding="2">
+                                <StackPanel Orientation="Horizontal" Spacing="2">
+                                    <Button Content="📑" Width="30" Height="28" Padding="0" FontSize="13" Command="{Binding ToggleOutlinePaneCommand}" ToolTipService.ToolTip="Outline / فهرس العناوين التفاعلي" />
+                                    <Button Content="{Binding AutoScrollGlyph}" Width="30" Height="28" Padding="0" FontSize="12" Command="{Binding ToggleAutoScrollCommand}" ToolTipService.ToolTip="Auto-Scroll / قراءة تلقائية بدون لمس" />
+                                    <ComboBox
+                                        x:Name="ScrollSpeedCombo"
+                                        SelectedIndex="1"
+                                        SelectionChanged="ScrollSpeedCombo_SelectionChanged"
+                                        Width="62"
+                                        Height="28"
+                                        Padding="4,1"
+                                        FontSize="11"
+                                        ToolTipService.ToolTip="Auto-Scroll Speed (سرعة القراءة التلقائية بالثواني)">
+                                        <ComboBoxItem Content="1s" Tag="1" />
+                                        <ComboBoxItem Content="2s" Tag="2" />
+                                        <ComboBoxItem Content="3s" Tag="3" />
+                                        <ComboBoxItem Content="5s" Tag="5" />
+                                    </ComboBox>
+                                </StackPanel>
+                            </Border>
 
-                    <!-- Reading tools: Outline & Auto-Scroll -->
-                    <Button Content="📑 Outline" Padding="8,4" FontSize="12" Command="{Binding ToggleOutlinePaneCommand}" ToolTipService.ToolTip="Toggle Table of Contents" />
-                    <Button Content="{Binding AutoScrollButtonText}" Padding="8,4" FontSize="12" Command="{Binding ToggleAutoScrollCommand}" ToolTipService.ToolTip="Hands-free auto-scrolling for comfortable reading" />
-                    <ComboBox
-                        x:Name="ScrollSpeedCombo"
-                        SelectedIndex="1"
-                        SelectionChanged="ScrollSpeedCombo_SelectionChanged"
-                        Width="74"
-                        Padding="6,3"
-                        FontSize="11"
-                        ToolTipService.ToolTip="Auto-Scroll Speed (Interval in seconds)">
-                        <ComboBoxItem Content="1s" Tag="1" />
-                        <ComboBoxItem Content="2s" Tag="2" />
-                        <ComboBoxItem Content="3s" Tag="3" />
-                        <ComboBoxItem Content="5s" Tag="5" />
-                    </ComboBox>
+                            <!-- Theme & Comments Group (Pill cluster) -->
+                            <Border Background="{ThemeResource AppBackgroundBrush}" BorderBrush="{ThemeResource AppBorderBrush}" BorderThickness="1" CornerRadius="6" Padding="2">
+                                <StackPanel Orientation="Horizontal" Spacing="2">
+                                    <Button Content="{Binding ThemeGlyph}" Width="30" Height="28" Padding="0" FontSize="13" Command="{Binding CycleThemeCommand}" ToolTipService.ToolTip="Cycle Theme / تبديل مظهر القراءة (داكن 🌙 / أبيض ☀️ / دافئ 📜)" />
+                                    <Button Content="💬" Width="30" Height="28" Padding="0" FontSize="13" Command="{Binding ToggleCommentsPaneCommand}" ToolTipService.ToolTip="Comments Drawer / درج الملاحظات والتعليقات" />
+                                </StackPanel>
+                            </Border>
 
-                    <AppBarSeparator />
+                            <!-- Export Group (Pill cluster) -->
+                            <Border Background="{ThemeResource AppBackgroundBrush}" BorderBrush="{ThemeResource AppBorderBrush}" BorderThickness="1" CornerRadius="6" Padding="2">
+                                <StackPanel Orientation="Horizontal" Spacing="2">
+                                    <Button Content="🖨️" Width="30" Height="28" Padding="0" FontSize="13" Click="ExportPdf_Click" ToolTipService.ToolTip="Export to PDF / طباعة وتصدير كملف PDF" />
+                                    <Button Content="🌐" Width="30" Height="28" Padding="0" FontSize="13" Click="ExportHtml_Click" ToolTipService.ToolTip="Export to Standalone HTML / تصدير صفحة ويب كاملة دون إنترنت" />
+                                </StackPanel>
+                            </Border>
 
-                    <!-- Theme Cycle Button (Dark / Light / Sepia) -->
-                    <Button Content="{Binding ThemeGlyph}" Padding="8,4" FontSize="13" Command="{Binding CycleThemeCommand}" ToolTipService.ToolTip="Cycle Reading Theme (Dark 🌙 / Light ☀️ / Sepia 📜)" />
+                            <!-- Zen Mode Toggle -->
+                            <Button Content="⛶" Width="30" Height="28" Padding="0" FontSize="13" Command="{Binding ToggleZenModeCommand}" ToolTipService.ToolTip="Focus Mode / وضع التركيز التام بملء الشاشة (F11)" />
+                        </StackPanel>
+                    </ScrollViewer>
 
-                    <!-- Comments Drawer Toggle -->
-                    <Button Content="💬 Comments" Padding="8,4" FontSize="12" Command="{Binding ToggleCommentsPaneCommand}" ToolTipService.ToolTip="Open or close document comments drawer" />
-
-                    <AppBarSeparator />
-
-                    <!-- Export Tools -->
-                    <Button Content="🖨️ PDF" Padding="8,4" FontSize="12" Click="ExportPdf_Click" ToolTipService.ToolTip="Export or print document to PDF" />
-                    <Button Content="🌐 HTML" Padding="8,4" FontSize="12" Click="ExportHtml_Click" ToolTipService.ToolTip="Export document to standalone offline HTML" />
-
-                    <!-- Focus Mode F11 -->
-                    <Button Content="{Binding ZenModeButtonText}" Padding="8,4" FontSize="12" Command="{Binding ToggleZenModeCommand}" ToolTipService.ToolTip="Toggle Fullscreen Focus Mode (F11)" />
-                </StackPanel>
-
-                <!-- Right: Zoom controls -->
-                <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
-                    <Button
-                        x:Name="ZoomOutButton"
-                        Content="−"
-                        FontSize="18"
-                        FontWeight="SemiBold"
-                        Width="32"
-                        Height="32"
-                        Padding="0"
-                        Command="{Binding ZoomOutCommand}"
-                        AutomationProperties.Name="Zoom out"
-                        ToolTipService.ToolTip="Zoom out (Ctrl+-)" />
-                    <TextBlock
-                        x:Name="ZoomPercentageText"
-                        Text="{Binding ZoomPercentage}"
-                        VerticalAlignment="Center"
-                        MinWidth="42"
-                        TextAlignment="Center"
-                        Style="{StaticResource AppSecondaryTextStyle}"
-                        AutomationProperties.Name="Zoom level" />
-                    <Button
-                        x:Name="ZoomInButton"
-                        Content="+"
-                        FontSize="18"
-                        FontWeight="SemiBold"
-                        Width="32"
-                        Height="32"
-                        Padding="0"
-                        Command="{Binding ZoomInCommand}"
-                        AutomationProperties.Name="Zoom in"
-                        ToolTipService.ToolTip="Zoom in (Ctrl++)" />
-                    <Button
-                        x:Name="ZoomResetButton"
-                        Content="⟲"
-                        FontSize="14"
-                        Width="32"
-                        Height="32"
-                        Padding="0"
-                        Command="{Binding ResetZoomCommand}"
-                        AutomationProperties.Name="Reset zoom"
-                        ToolTipService.ToolTip="Reset zoom (Ctrl+0)" />
-                </StackPanel>
-            </Grid>
+                    <!-- Right: Zoom controls (Pill cluster) -->
+                    <Border Grid.Column="1" Background="{ThemeResource AppBackgroundBrush}" BorderBrush="{ThemeResource AppBorderBrush}" BorderThickness="1" CornerRadius="6" Padding="2" VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" Spacing="2">
+                            <Button
+                                x:Name="ZoomOutButton"
+                                Content="−"
+                                FontSize="16"
+                                FontWeight="SemiBold"
+                                Width="28"
+                                Height="28"
+                                Padding="0"
+                                Command="{Binding ZoomOutCommand}"
+                                AutomationProperties.Name="Zoom out"
+                                ToolTipService.ToolTip="Zoom Out / تصغير (Ctrl+-)" />
+                            <TextBlock
+                                x:Name="ZoomPercentageText"
+                                Text="{Binding ZoomPercentage}"
+                                VerticalAlignment="Center"
+                                MinWidth="38"
+                                TextAlignment="Center"
+                                FontSize="11"
+                                Style="{StaticResource AppSecondaryTextStyle}"
+                                AutomationProperties.Name="Zoom level"
+                                ToolTipService.ToolTip="Zoom Level / نسبة التكبير" />
+                            <Button
+                                x:Name="ZoomInButton"
+                                Content="+"
+                                FontSize="16"
+                                FontWeight="SemiBold"
+                                Width="28"
+                                Height="28"
+                                Padding="0"
+                                Command="{Binding ZoomInCommand}"
+                                AutomationProperties.Name="Zoom in"
+                                ToolTipService.ToolTip="Zoom In / تكبير (Ctrl++)" />
+                            <Button
+                                x:Name="ZoomResetButton"
+                                Content="⟲"
+                                FontSize="13"
+                                Width="28"
+                                Height="28"
+                                Padding="0"
+                                Command="{Binding ResetZoomCommand}"
+                                AutomationProperties.Name="Reset zoom"
+                                ToolTipService.ToolTip="Reset Zoom 100% / إعادة ضبط 100% (Ctrl+0)" />
+                        </StackPanel>
+                    </Border>
+                </Grid>
 
             <!-- File Path Information Bar (Clickable Information Only, Non-navigational) -->
             <Border
@@ -468,12 +488,14 @@
                     <TextBlock Text="•" FontSize="11" Foreground="{ThemeResource AppSecondaryTextBrush}" VerticalAlignment="Center" />
                     <TextBlock Text="{Binding ReadingTimeDisplay}" FontSize="11" Foreground="{ThemeResource AppSecondaryTextBrush}" VerticalAlignment="Center" />
                 </StackPanel>
-                <!-- Right quick toggles -->
-                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                    <Button Content="📑 Outline" Padding="6,2" FontSize="11" Command="{Binding ToggleOutlinePaneCommand}" ToolTipService.ToolTip="Table of Contents (Outline)" />
-                    <Button Content="💬 Comments" Padding="6,2" FontSize="11" Command="{Binding ToggleCommentsPaneCommand}" ToolTipService.ToolTip="Document Comments Drawer" />
-                    <Button Content="{Binding ZenModeButtonText}" Padding="6,2" FontSize="11" Command="{Binding ToggleZenModeCommand}" ToolTipService.ToolTip="Toggle Focus Mode (F11)" />
-                </StackPanel>
+                <!-- Right quick toggles (Icon-only pill cluster) -->
+                <Border Grid.Column="1" Background="{ThemeResource AppSubtleBackgroundBrush}" BorderBrush="{ThemeResource AppBorderBrush}" BorderThickness="1" CornerRadius="6" Padding="2" VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" Spacing="2">
+                        <Button Content="📑" Width="28" Height="24" Padding="0" FontSize="12" Command="{Binding ToggleOutlinePaneCommand}" ToolTipService.ToolTip="Table of Contents (Outline) / فهرس العناوين" />
+                        <Button Content="💬" Width="28" Height="24" Padding="0" FontSize="12" Command="{Binding ToggleCommentsPaneCommand}" ToolTipService.ToolTip="Comments Drawer / درج الملاحظات والتعليقات" />
+                        <Button Content="⛶" Width="28" Height="24" Padding="0" FontSize="12" Command="{Binding ToggleZenModeCommand}" ToolTipService.ToolTip="Focus Mode (F11) / وضع التركيز التام بملء الشاشة" />
+                    </StackPanel>
+                </Border>
             </Grid>
         </Border>
 

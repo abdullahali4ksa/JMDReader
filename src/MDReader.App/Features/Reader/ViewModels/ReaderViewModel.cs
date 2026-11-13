@@ -181,7 +181,10 @@ public sealed partial class ReaderViewModel : ObservableObject
         set
         {
             if (SetProperty(ref _isAutoScrolling, value))
+            {
                 OnPropertyChanged(nameof(AutoScrollButtonText));
+                OnPropertyChanged(nameof(AutoScrollGlyph));
+            }
         }
     }
 
@@ -193,6 +196,7 @@ public sealed partial class ReaderViewModel : ObservableObject
     }
 
     public string AutoScrollButtonText => IsAutoScrolling ? "⏸ Pause" : "▶ Auto-Scroll";
+    public string AutoScrollGlyph => IsAutoScrolling ? "⏸" : "▶";
 
     [RelayCommand]
     public void ToggleAutoScroll()

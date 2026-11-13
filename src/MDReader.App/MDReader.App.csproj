@@ -14,6 +14,10 @@
     <EnableMsixTooling>true</EnableMsixTooling>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <Company>birotech</Company>
+    <Authors>abdullah ali, birotech</Authors>
+    <Copyright>Copyright © 2026 birotech. All rights reserved.</Copyright>
+    <Product>MDReader</Product>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,21 +1,21 @@
 param(
     [string]$TargetDir = "dist/win-x64",
-    [string]$CertSubject = "CN=ABDULLAHALI4KSA, O=ABDULLAHALI4KSA, C=SA"
+    [string]$CertSubject = "CN=birotech, O=birotech, C=SA"
 )
 
-# 1. Find or create master developer code signing certificate
-$existingCert = Get-ChildItem -Path "Cert:\CurrentUser\My" -CodeSigningCert | Where-Object { $_.Subject -like "*ABDULLAHALI4KSA*" } | Select-Object -First 1
+# 1. Find or create master developer code signing certificate for birotech
+$existingCert = Get-ChildItem -Path "Cert:\CurrentUser\My" -CodeSigningCert | Where-Object { $_.Subject -like "*CN=birotech*" } | Select-Object -First 1
 
 if (-not $existingCert) {
-    Write-Host "Creating new Master Developer Certificate for ABDULLAHALI4KSA..." -ForegroundColor Cyan
-    $existingCert = New-SelfSignedCertificate -Type CodeSigningCert -Subject $CertSubject -CertStoreLocation "Cert:\CurrentUser\My" -NotAfter (Get-Date).AddYears(5)
+    Write-Host "Creating new Master Developer Certificate for birotech..." -ForegroundColor Cyan
+    $existingCert = New-SelfSignedCertificate -Type CodeSigningCert -Subject $CertSubject -CertStoreLocation "Cert:\CurrentUser\My" -NotAfter (Get-Date).AddYears(15)
     
     # Export PFX to packaging/certs
     $certDir = "packaging/certs"
     if (-not (Test-Path $certDir)) { New-Item -ItemType Directory -Path $certDir -Force | Out-Null }
-    $pfxPassword = ConvertTo-SecureString -String "ABDULLAHALI4KSA2026!" -Force -AsPlainText
-    Export-PfxCertificate -Cert $existingCert -FilePath "$certDir/ABDULLAHALI4KSA_Dev.pfx" -Password $pfxPassword | Out-Null
-    Write-Host "Exported Master Developer Certificate to $certDir/ABDULLAHALI4KSA_Dev.pfx" -ForegroundColor Green
+    $pfxPassword = ConvertTo-SecureString -String "Birotech@2026!DevSecKey" -Force -AsPlainText
+    Export-PfxCertificate -Cert $existingCert -FilePath "$certDir/birotech_Dev.pfx" -Password $pfxPassword | Out-Null
+    Write-Host "Exported Master Developer Certificate to $certDir/birotech_Dev.pfx" -ForegroundColor Green
 }
 
 Write-Host "Using certificate: $($existingCert.Thumbprint) ($($existingCert.Subject))" -ForegroundColor Green

@@ -282,7 +282,7 @@
         }
     </style>
 </head>
-<body data-theme="dark">
+<body data-theme="light">
     <div id="content"></div>
 
     <script>
@@ -578,14 +578,15 @@
             }
             isAutoScrolling = !!enabled;
             if (isAutoScrolling) {
-                const lvl = typeof speedLevel === 'number' && speedLevel > 0 ? speedLevel : 2;
-                // Fluid conveyor-belt teleprompter speeds:
-                // lvl 1: 0.45 px/frame (~27 px/sec) - slow & relaxed
-                // lvl 2: 0.85 px/frame (~51 px/sec) - normal reading pace
-                // lvl 3: 1.40 px/frame (~84 px/sec) - moderate
-                // lvl 4: 2.15 px/frame (~129 px/sec) - fast
-                // lvl 5: 3.25 px/frame (~195 px/sec) - rapid
-                scrollSpeedPxPerFrame = Math.max(0.3, lvl * 0.55);
+                const multiplier = typeof speedLevel === 'number' && speedLevel > 0 ? speedLevel : 1.0;
+                // Fluid conveyor-belt teleprompter speed (baseline 1.0x = 0.75 px/frame):
+                // 0.25x = ~11.2 px/sec (ultra relaxed reading)
+                // 0.5x  = ~22.5 px/sec (calm reading)
+                // 1.0x  = ~45.0 px/sec (standard reading pace)
+                // 1.5x  = ~67.5 px/sec (brisk reading)
+                // 2.0x  = ~90.0 px/sec (fast scanning)
+                // Custom: multiplier * 0.75 px/frame
+                scrollSpeedPxPerFrame = Math.max(0.08, multiplier * 0.75);
                 autoScrollAnimId = requestAnimationFrame(autoScrollStep);
             }
         }

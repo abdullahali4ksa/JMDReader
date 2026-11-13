@@ -184,7 +184,7 @@ public sealed partial class MainPage : Page
             {
                 type = "autoScroll",
                 enabled = _viewModel.IsAutoScrolling,
-                speedLevel = _viewModel.ScrollSpeedSeconds
+                speedLevel = _viewModel.ScrollSpeed
             });
             AntigravityViewer.CoreWebView2.PostWebMessageAsJson(json);
         }
@@ -193,9 +193,36 @@ public sealed partial class MainPage : Page
 
     private void ScrollSpeedCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (_viewModel != null && ScrollSpeedCombo?.SelectedItem is ComboBoxItem item && int.TryParse(item.Tag?.ToString(), out var seconds))
+        if (_viewModel == null || ScrollSpeedCombo == null) return;
+
+        if (ScrollSpeedCombo.SelectedItem is ComboBoxItem item &&
+            double.TryParse(item.Tag?.ToString(), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var speed))
         {
-            _viewModel.ScrollSpeedSeconds = seconds;
+            _viewModel.ScrollSpeed = speed;
+        }
+        else if (ScrollSpeedCombo.SelectedItem is string str)
+        {
+            ParseAndApplyCustomSpeed(str);
+        }
+    }
+
+    private void ScrollSpeedCombo_TextSubmitted(ComboBox sender, ComboBoxTextSubmittedEventArgs args)
+    {
+        ParseAndApplyCustomSpeed(args.Text);
+        args.Handled = true;
+    }
+
+    private void ParseAndApplyCustomSpeed(string? rawText)
+    {
+        if (string.IsNullOrWhiteSpace(rawText) || _viewModel == null) return;
+        var clean = rawText.Replace("x", "", StringComparison.OrdinalIgnoreCase).Trim();
+        if (double.TryParse(clean, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var customSpeed) && customSpeed > 0)
+        {
+            _viewModel.ScrollSpeed = customSpeed;
+            if (ScrollSpeedCombo != null && ScrollSpeedCombo.Text != $"{customSpeed}x")
+            {
+                ScrollSpeedCombo.Text = $"{customSpeed}x";
+            }
         }
     }
 
@@ -686,6 +713,7 @@ public sealed partial class MainPage : Page
             ApplyTheme();
         }
         else if (e.PropertyName == nameof(ReaderViewModel.IsAutoScrolling) ||
+                 e.PropertyName == nameof(ReaderViewModel.ScrollSpeed) ||
                  e.PropertyName == nameof(ReaderViewModel.ScrollSpeedSeconds))
         {
             ApplyAutoScroll();

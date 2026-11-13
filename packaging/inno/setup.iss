@@ -5,8 +5,9 @@
 
 #define MyAppName "MDReader"
 #define MyAppVersion "1.0.1"
-#define MyAppPublisher "ABDULLAHALI4KSA"
+#define MyAppPublisher "birotech"
 #define MyAppURL "https://github.com/ABDULLAHALI4KSA/MDReader"
+#define MyAppSupportEmail "Abdullah444ali@outlook.com"
 #define MyAppExeName "MDReader.App.exe"
 #define MyAppId "{{B9A5F148-36D2-475C-9A8E-2B60AC00D413}"
 
@@ -17,8 +18,9 @@ AppVersion={#MyAppVersion}
 AppVerName={#MyAppName} {#MyAppVersion}
 AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
-AppSupportURL={#MyAppURL}
+AppSupportURL=mailto:{#MyAppSupportEmail}
 AppUpdatesURL={#MyAppURL}
+AppCopyright=Copyright (C) 2026 birotech. All rights reserved.
 DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes

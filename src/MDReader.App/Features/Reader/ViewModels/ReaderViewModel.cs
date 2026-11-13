@@ -26,10 +26,10 @@ public sealed partial class ReaderViewModel : ObservableObject
     private bool _isLoading;
     private double _zoomRatio = 1.0;
     private DocumentTabViewModel? _selectedTab;
-    private ReaderViewMode _viewMode = ReaderViewMode.Split;
-    private string _currentTheme = "Dark";
+    private ReaderViewMode _viewMode = ReaderViewMode.Preview;
+    private string _currentTheme = "Light";
     private bool _isAutoScrolling;
-    private int _scrollSpeedSeconds = 2;
+    private double _scrollSpeed = 1.0;
     private bool _isCommentsPaneOpen;
     private string _newCommentText = string.Empty;
     private string _selectedQuoteText = string.Empty;
@@ -205,11 +205,26 @@ public sealed partial class ReaderViewModel : ObservableObject
         }
     }
 
-    /// <summary>Scroll interval in seconds (1 to 5).</summary>
+    /// <summary>Auto-scroll speed multiplier (0.25, 0.5, 1.0, 1.5, 2.0, or custom value).</summary>
+    public double ScrollSpeed
+    {
+        get => _scrollSpeed;
+        set
+        {
+            if (SetProperty(ref _scrollSpeed, Math.Max(0.05, value)))
+            {
+                OnPropertyChanged(nameof(ScrollSpeedDisplay));
+            }
+        }
+    }
+
+    public string ScrollSpeedDisplay => $"{_scrollSpeed}x";
+
+    /// <summary>Legacy integer seconds accessor for backward compatibility.</summary>
     public int ScrollSpeedSeconds
     {
-        get => _scrollSpeedSeconds;
-        set => SetProperty(ref _scrollSpeedSeconds, value);
+        get => (int)Math.Max(1, Math.Round(_scrollSpeed));
+        set => ScrollSpeed = value;
     }
 
     public string AutoScrollButtonText => IsAutoScrolling ? "⏸ Pause" : "▶ Auto-Scroll";

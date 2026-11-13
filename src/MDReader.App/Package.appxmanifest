@@ -10,15 +10,15 @@
   IgnorableNamespaces="uap uap10 rescap systemai">
 
   <Identity
-    Name="MDReader.MDReader"
-    Publisher="CN=MDReader Developer, O=MDReader, C=SA"
+    Name="birotech.MDReader"
+    Publisher="CN=birotech, O=birotech, C=SA"
     Version="1.0.1.0" />
 
   <mp:PhoneIdentity PhoneProductId="3361C559-1964-49C7-82CB-6EF2BEC14BF9" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
     <DisplayName>MDReader</DisplayName>
-    <PublisherDisplayName>MDReader</PublisherDisplayName>
+    <PublisherDisplayName>birotech</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
     <uap10:PackageIntegrity>
       <uap10:Content Enforcement="on"/>

@@ -32,12 +32,91 @@ public sealed partial class ReaderViewModel : ObservableObject
     private bool _isCommentsPaneOpen;
     private string _newCommentText = string.Empty;
     private string _selectedQuoteText = string.Empty;
+    private bool _isOutlinePaneOpen;
+    private DocumentOutlineItem? _activeOutlineItem;
+    private DocumentAnalytics _analytics;
+    private bool _isZenMode;
 
     /// <summary>Collection of active document tabs.</summary>
     public ObservableCollection<DocumentTabViewModel> Tabs { get; } = new();
 
     /// <summary>Collection of in-document comments.</summary>
     public ObservableCollection<DocumentComment> Comments { get; } = new();
+
+    /// <summary>Collection of headings for the table of contents / outline.</summary>
+    public ObservableCollection<DocumentOutlineItem> OutlineItems { get; } = new();
+
+    public bool IsOutlinePaneOpen
+    {
+        get => _isOutlinePaneOpen;
+        set => SetProperty(ref _isOutlinePaneOpen, value);
+    }
+
+    public DocumentOutlineItem? ActiveOutlineItem
+    {
+        get => _activeOutlineItem;
+        set => SetProperty(ref _activeOutlineItem, value);
+    }
+
+    public DocumentAnalytics Analytics
+    {
+        get => _analytics;
+        private set
+        {
+            if (SetProperty(ref _analytics, value))
+            {
+                OnPropertyChanged(nameof(AnalyticsSummary));
+                OnPropertyChanged(nameof(WordCountDisplay));
+                OnPropertyChanged(nameof(ReadingTimeDisplay));
+                OnPropertyChanged(nameof(LineCountDisplay));
+            }
+        }
+    }
+
+    public string AnalyticsSummary => _analytics.FormattedSummary;
+    public string WordCountDisplay => $"{_analytics.WordCount:N0} words";
+    public string ReadingTimeDisplay => $"⏱ ~{_analytics.EstimatedReadingMinutes} min read";
+    public string LineCountDisplay => $"{_analytics.LineCount:N0} lines";
+
+    public bool IsZenMode
+    {
+        get => _isZenMode;
+        set
+        {
+            if (SetProperty(ref _isZenMode, value))
+            {
+                OnPropertyChanged(nameof(IsNormalUiVisible));
+                OnPropertyChanged(nameof(ZenModeButtonText));
+            }
+        }
+    }
+
+    public bool IsNormalUiVisible => !_isZenMode;
+    public string ZenModeButtonText => _isZenMode ? "🗗 Exit Focus" : "🗖 Focus (F11)";
+
+    [RelayCommand]
+    public void ToggleOutlinePane()
+    {
+        IsOutlinePaneOpen = !IsOutlinePaneOpen;
+    }
+
+    [RelayCommand]
+    public void ToggleZenMode()
+    {
+        IsZenMode = !IsZenMode;
+    }
+
+    public void UpdateOutlineAndAnalytics()
+    {
+        OutlineItems.Clear();
+        var items = MarkdownOutlineExtractor.ExtractOutline(DocumentContent);
+        foreach (var item in items)
+        {
+            OutlineItems.Add(item);
+        }
+
+        Analytics = MarkdownOutlineExtractor.ComputeAnalytics(DocumentContent);
+    }
 
     /// <summary>Gets or sets the current view mode (Split, Editor, Preview).</summary>
     public ReaderViewMode ViewMode
@@ -210,6 +289,7 @@ public sealed partial class ReaderViewModel : ObservableObject
                 OnPropertyChanged(nameof(IsEmpty));
                 OnPropertyChanged(nameof(HasDocument));
                 OnPropertyChanged(nameof(HasError));
+                UpdateOutlineAndAnalytics();
             }
         }
     }
@@ -225,6 +305,7 @@ public sealed partial class ReaderViewModel : ObservableObject
                 OnPropertyChanged(nameof(IsEmpty));
                 OnPropertyChanged(nameof(HasDocument));
                 OnPropertyChanged(nameof(HasError));
+                UpdateOutlineAndAnalytics();
             }
         }
     }
@@ -243,6 +324,7 @@ public sealed partial class ReaderViewModel : ObservableObject
                     _elements = _selectedTab.Elements;
                     OnPropertyChanged(nameof(Elements));
                 }
+                UpdateOutlineAndAnalytics();
             }
         }
     }
@@ -267,6 +349,7 @@ public sealed partial class ReaderViewModel : ObservableObject
                 OnPropertyChanged(nameof(IsEmpty));
                 OnPropertyChanged(nameof(HasDocument));
                 OnPropertyChanged(nameof(HasError));
+                UpdateOutlineAndAnalytics();
             }
         }
     }
@@ -291,6 +374,7 @@ public sealed partial class ReaderViewModel : ObservableObject
                 OnPropertyChanged(nameof(IsEmpty));
                 OnPropertyChanged(nameof(HasDocument));
                 OnPropertyChanged(nameof(HasError));
+                UpdateOutlineAndAnalytics();
             }
         }
     }

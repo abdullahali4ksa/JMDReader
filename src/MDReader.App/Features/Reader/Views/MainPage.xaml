@@ -17,8 +17,9 @@
 
     <!--
         Main content area of the application.
-        Shows open document tabs at the top, then modern toolbars, followed by
-        the dual-pane editor, Antigravity preview, and comments drawer.
+        Shows open document tabs at the top, modern toolbars,
+        the dual-pane editor, outline sidebar, Antigravity preview, comments drawer,
+        and bottom reading statistics status bar.
     -->
     <Grid
         Background="{ThemeResource AppBackgroundBrush}"
@@ -30,6 +31,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <!-- Document Tabs -->
@@ -44,6 +46,7 @@
             Background="{ThemeResource AppBackgroundBrush}"
             BorderBrush="{ThemeResource AppBorderBrush}"
             BorderThickness="0,0,0,1"
+            Visibility="{Binding IsNormalUiVisible, Converter={StaticResource BoolToVisibilityConverter}}"
             AutomationProperties.Name="Open document tabs">
             <TabView.TabItemTemplate>
                 <DataTemplate x:DataType="viewModels:DocumentTabViewModel">
@@ -59,7 +62,7 @@
             </TabView.TabItemTemplate>
         </TabView>
 
-        <!-- Main Toolbar (View Mode Switcher + Formatting Toolbar + Auto-Scroll + Theme + Comments + Zoom) -->
+        <!-- Main Toolbar (View Modes + Formatting + Reading Tools + Export + Zoom) -->
         <Border
             x:Name="MainToolbar"
             Grid.Row="1"
@@ -69,7 +72,7 @@
             Padding="12,6"
             Visibility="{Binding HasDocument, Converter={StaticResource BoolToVisibilityConverter}}"
             AutomationProperties.Name="Document toolbar">
-            <Grid>
+            <Grid Visibility="{Binding IsNormalUiVisible, Converter={StaticResource BoolToVisibilityConverter}}">
                 <!-- Left: View Mode Switcher + Formatting + Reading Tools -->
                 <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Left">
                     <!-- View Modes -->
@@ -92,7 +95,8 @@
 
                     <AppBarSeparator />
 
-                    <!-- Auto-Scroll Reading Controls -->
+                    <!-- Reading tools: Outline & Auto-Scroll -->
+                    <Button Content="📑 Outline" Padding="8,4" FontSize="12" Command="{Binding ToggleOutlinePaneCommand}" ToolTipService.ToolTip="Toggle Table of Contents" />
                     <Button Content="{Binding AutoScrollButtonText}" Padding="8,4" FontSize="12" Command="{Binding ToggleAutoScrollCommand}" ToolTipService.ToolTip="Hands-free auto-scrolling for comfortable reading" />
                     <ComboBox
                         x:Name="ScrollSpeedCombo"
@@ -115,6 +119,15 @@
 
                     <!-- Comments Drawer Toggle -->
                     <Button Content="💬 Comments" Padding="8,4" FontSize="12" Command="{Binding ToggleCommentsPaneCommand}" ToolTipService.ToolTip="Open or close document comments drawer" />
+
+                    <AppBarSeparator />
+
+                    <!-- Export Tools -->
+                    <Button Content="🖨️ PDF" Padding="8,4" FontSize="12" Click="ExportPdf_Click" ToolTipService.ToolTip="Export or print document to PDF" />
+                    <Button Content="🌐 HTML" Padding="8,4" FontSize="12" Click="ExportHtml_Click" ToolTipService.ToolTip="Export document to standalone offline HTML" />
+
+                    <!-- Focus Mode F11 -->
+                    <Button Content="{Binding ZenModeButtonText}" Padding="8,4" FontSize="12" Command="{Binding ToggleZenModeCommand}" ToolTipService.ToolTip="Toggle Fullscreen Focus Mode (F11)" />
                 </StackPanel>
 
                 <!-- Right: Zoom controls -->
@@ -187,20 +200,61 @@
             </StackPanel>
         </Border>
 
-        <!-- Dual Pane Workspace + Comments Drawer: Editor (Col 0) + Divider (Col 1) + Preview (Col 2) + Comments (Col 3) -->
+        <!-- Workspace Grid: Outline (Col 0) + Editor (Col 1) + Divider (Col 2) + Preview (Col 3) + Comments (Col 4) -->
         <Grid
             Grid.Row="3"
             Visibility="{Binding HasDocument, Converter={StaticResource BoolToVisibilityConverter}}">
             <Grid.ColumnDefinitions>
+                <ColumnDefinition x:Name="OutlineCol" Width="Auto" />
                 <ColumnDefinition x:Name="EditorCol" Width="*" />
                 <ColumnDefinition x:Name="DividerCol" Width="Auto" />
                 <ColumnDefinition x:Name="PreviewCol" Width="*" />
                 <ColumnDefinition x:Name="CommentsCol" Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <!-- Editor Pane (Column 0) -->
-            <Grid
+            <!-- Table of Contents / Outline Drawer Panel (Column 0) -->
+            <Border
+                x:Name="OutlineDrawer"
                 Grid.Column="0"
+                Width="250"
+                Background="{ThemeResource AppBackgroundBrush}"
+                BorderBrush="{ThemeResource AppBorderBrush}"
+                BorderThickness="0,0,1,0"
+                Padding="12,10"
+                Visibility="{Binding IsOutlinePaneOpen, Converter={StaticResource BoolToVisibilityConverter}}"
+                AutomationProperties.Name="Table of contents drawer">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0" Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                            <TextBlock Text="📑 OUTLINE" FontWeight="Bold" FontSize="12" Foreground="{ThemeResource AppSecondaryTextBrush}" />
+                        </StackPanel>
+                        <Button Grid.Column="1" Content="✕" Width="26" Height="26" Padding="0" FontSize="11" Command="{Binding ToggleOutlinePaneCommand}" ToolTipService.ToolTip="Close Outline" />
+                    </Grid>
+
+                    <ListView Grid.Row="1" ItemsSource="{Binding OutlineItems}" SelectionMode="Single" IsItemClickEnabled="True" ItemClick="OutlineListView_ItemClick">
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="docs:DocumentOutlineItem">
+                                <StackPanel Padding="2,4">
+                                    <TextBlock Text="{Binding DisplayTitle}" FontSize="12" TextTrimming="CharacterEllipsis" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Grid>
+            </Border>
+
+            <!-- Editor Pane (Column 1) -->
+            <Grid
+                Grid.Column="1"
                 Visibility="{Binding IsEditorVisible, Converter={StaticResource BoolToVisibilityConverter}}"
                 Margin="8,8,4,8">
                 <TextBox
@@ -217,16 +271,16 @@
                     AutomationProperties.Name="Markdown editor input" />
             </Grid>
 
-            <!-- Divider line (Column 1) -->
+            <!-- Divider line (Column 2) -->
             <Border
-                Grid.Column="1"
+                Grid.Column="2"
                 Width="1"
                 Background="{ThemeResource AppBorderBrush}"
                 Visibility="{Binding IsSplitMode, Converter={StaticResource BoolToVisibilityConverter}}" />
 
-            <!-- Antigravity Preview Pane (Column 2) -->
+            <!-- Antigravity Preview Pane (Column 3) -->
             <Grid
-                Grid.Column="2"
+                Grid.Column="3"
                 Visibility="{Binding IsPreviewVisible, Converter={StaticResource BoolToVisibilityConverter}}"
                 Margin="4,8,4,8">
                 <WebView2
@@ -236,10 +290,10 @@
                     AutomationProperties.Name="Antigravity markdown viewer" />
             </Grid>
 
-            <!-- Comments Drawer Panel (Column 3) -->
+            <!-- Comments Drawer Panel (Column 4) -->
             <Border
                 x:Name="CommentsDrawer"
-                Grid.Column="3"
+                Grid.Column="4"
                 Width="320"
                 Background="{ThemeResource AppBackgroundBrush}"
                 BorderBrush="{ThemeResource AppBorderBrush}"
@@ -309,7 +363,55 @@
                     </ListView>
                 </Grid>
             </Border>
+
+            <!-- Floating Exit Zen Mode Button (shown only when in Focus Mode) -->
+            <Button
+                Grid.Column="3"
+                Content="✕ Exit Focus Mode (F11)"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                Margin="0,16,24,0"
+                Padding="12,6"
+                FontSize="12"
+                FontWeight="SemiBold"
+                Background="{ThemeResource AppBackgroundBrush}"
+                BorderBrush="{ThemeResource AppBorderBrush}"
+                BorderThickness="1"
+                CornerRadius="16"
+                Command="{Binding ToggleZenModeCommand}"
+                Visibility="{Binding IsZenMode, Converter={StaticResource BoolToVisibilityConverter}}"
+                ToolTipService.ToolTip="Exit Fullscreen Focus Mode" />
         </Grid>
+
+        <!-- Bottom Reading Analytics Status Bar (Row 4) -->
+        <Border
+            Grid.Row="4"
+            Background="{ThemeResource AppBackgroundBrush}"
+            BorderBrush="{ThemeResource AppBorderBrush}"
+            BorderThickness="0,1,0,0"
+            Padding="14,4"
+            Visibility="{Binding IsNormalUiVisible, Converter={StaticResource BoolToVisibilityConverter}}">
+            <Grid Visibility="{Binding HasDocument, Converter={StaticResource BoolToVisibilityConverter}}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <!-- Left stats -->
+                <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding WordCountDisplay}" FontSize="11" Foreground="{ThemeResource AppSecondaryTextBrush}" VerticalAlignment="Center" />
+                    <TextBlock Text="•" FontSize="11" Foreground="{ThemeResource AppSecondaryTextBrush}" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding LineCountDisplay}" FontSize="11" Foreground="{ThemeResource AppSecondaryTextBrush}" VerticalAlignment="Center" />
+                    <TextBlock Text="•" FontSize="11" Foreground="{ThemeResource AppSecondaryTextBrush}" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding ReadingTimeDisplay}" FontSize="11" Foreground="{ThemeResource AppSecondaryTextBrush}" VerticalAlignment="Center" />
+                </StackPanel>
+                <!-- Right quick toggles -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <Button Content="📑 Outline" Padding="6,2" FontSize="11" Command="{Binding ToggleOutlinePaneCommand}" ToolTipService.ToolTip="Table of Contents (Outline)" />
+                    <Button Content="💬 Comments" Padding="6,2" FontSize="11" Command="{Binding ToggleCommentsPaneCommand}" ToolTipService.ToolTip="Document Comments Drawer" />
+                    <Button Content="{Binding ZenModeButtonText}" Padding="6,2" FontSize="11" Command="{Binding ToggleZenModeCommand}" ToolTipService.ToolTip="Toggle Focus Mode (F11)" />
+                </StackPanel>
+            </Grid>
+        </Border>
 
         <!-- Empty / welcome state -->
         <StackPanel

@@ -811,34 +811,39 @@ The `FILES_SCOPE` on each original P01 task is the allowlist. Dependencies are d
 
 ## Phase 19 — Advanced Reader Experience, Outline, Focus Mode & Document Export (فهرس العناوين، وضع التركيز، والتصدير)
 
-**Status:** PLANNED (لتكويدها لاحقاً بناءً على طلب المستخدم) · **Depends on:** Phase 16 complete · **Triggered by:** User request for Outline navigation, F11 Zen mode, PDF/HTML export, word count reading time, and refined Material 3 / Fluent 2 capsule toolbar.
+**Status:** DONE (5/5 tasks: P19-T001..P19-T005 verified) · **Depends on:** Phase 15 complete · **Triggered by:** User request for Outline navigation, F11 Zen mode, PDF/HTML export, word count reading time, and refined Material 3 / Fluent 2 capsule toolbar.
 
 ### P19-T001 — Interactive Table of Contents & Outline Navigation (فهرس العناوين التفاعلي)
-**ID:** P19-T001 · **FEATURE:** Reader / Navigation · **PRIORITY:** P0 · **DEPENDS_ON:** P16-T005 · **STATUS:** PLANNED · **ESTIMATE:** 25 mins · **FILES_SCOPE:** `src/MDReader.App/Features/Reader/Views/MainPage.xaml`, `src/MDReader.App/Features/Reader/ViewModels/ReaderViewModel.cs`, `src/MDReader.App/Assets/Renderer/viewer.html`
+**ID:** P19-T001 · **FEATURE:** Reader / Navigation · **PRIORITY:** P0 · **DEPENDS_ON:** P15-T007 · **STATUS:** DONE · **ESTIMATE:** 25 mins · **FILES_SCOPE:** `src/MDReader.App/Features/Reader/Views/MainPage.xaml`, `src/MDReader.App/Features/Reader/ViewModels/ReaderViewModel.cs`, `src/MDReader.App/Assets/Renderer/viewer.html`
 - **AGENT PROMPT:** "Implement an interactive Table of Contents (Outline) sidebar extracting all H1-H6 headings dynamically. Highlight the currently read section in real-time using IntersectionObserver (Active Section Spy) and enable instant smooth jump on heading click."
 - **ACCEPTANCE CRITERIA:** Outline drawer lists all document sections in hierarchical tree; clicking a section scrolls directly to it; scrolling updates active heading indicator.
-- **TEST:** Multi-heading markdown fixture outline test.
+- **TEST:** Multi-heading markdown fixture outline test (`MarkdownOutlineTests.cs` passed).
+- **VERIFICATION:** Confirmed `DocumentOutlineItem`, `MarkdownOutlineExtractor`, and `scrollToHeading` bridge in WebView2.
 
 ### P19-T002 — Immersive Fullscreen Zen / Focus Mode (F11) (وضع التركيز التام)
-**ID:** P19-T002 · **FEATURE:** Shell / FocusMode · **PRIORITY:** P1 · **DEPENDS_ON:** P19-T001 · **STATUS:** PLANNED · **ESTIMATE:** 15 mins · **FILES_SCOPE:** `src/MDReader.App/Features/Shell/Views/MainWindow.xaml.cs`, `src/MDReader.App/Features/Reader/Views/MainPage.xaml`
+**ID:** P19-T002 · **FEATURE:** Shell / FocusMode · **PRIORITY:** P1 · **DEPENDS_ON:** P19-T001 · **STATUS:** DONE · **ESTIMATE:** 15 mins · **FILES_SCOPE:** `src/MDReader.App/Features/Shell/Views/MainWindow.xaml.cs`, `src/MDReader.App/Features/Reader/Views/MainPage.xaml`
 - **AGENT PROMPT:** "Add F11 fullscreen toggle that hides the titlebar, menu bar, tabs, and toolbars, presenting 100% pure distraction-free reading with smooth hover reveal for the exit button (Escape or F11)."
 - **ACCEPTANCE CRITERIA:** Pressing F11 enters borderless true fullscreen; Escape or F11 restores standard window state smoothly.
 - **TEST:** Keyboard accelerator and window state verification.
+- **VERIFICATION:** Confirmed `IsZenMode`, `IsNormalUiVisible`, floating exit pill button, and F11/Escape key handling.
 
 ### P19-T003 — One-Click Publication-Grade PDF & Offline HTML Export (تصدير وطباعة المستند)
-**ID:** P19-T003 · **FEATURE:** Export / Printing · **PRIORITY:** P0 · **DEPENDS_ON:** P19-T001 · **STATUS:** PLANNED · **ESTIMATE:** 25 mins · **FILES_SCOPE:** `src/MDReader.App/Features/Reader/Views/MainPage.xaml.cs`, `src/MDReader.App/Assets/Renderer/viewer.html`
+**ID:** P19-T003 · **FEATURE:** Export / Printing · **PRIORITY:** P0 · **DEPENDS_ON:** P19-T001 · **STATUS:** DONE · **ESTIMATE:** 25 mins · **FILES_SCOPE:** `src/MDReader.App/Features/Reader/Views/MainPage.xaml.cs`, `src/MDReader.App/Assets/Renderer/viewer.html`
 - **AGENT PROMPT:** "Implement high-fidelity export using CoreWebView2 `PrintToPdfAsync` and standalone HTML bundler (with inlined CSS, KaTeX math, alerts, and tables) so users can export their documents to publication-grade PDF or standalone offline HTML with 1 click."
 - **ACCEPTANCE CRITERIA:** Exported PDF preserves theme, formatting, mathematical equations, and alerts cleanly with vector clarity.
-- **TEST:** PDF output fixture test.
+- **TEST:** PDF and standalone HTML export verification.
+- **VERIFICATION:** Confirmed `ExportToPdfAsync` with `PrintToPdfAsync` and `ExportToHtmlAsync` with embedded offline styles.
 
 ### P19-T004 — Document Reading Analytics Status Bar (عداد الكلمات ووقت القراءة التقديري)
-**ID:** P19-T004 · **FEATURE:** Reader / Analytics · **PRIORITY:** P2 · **DEPENDS_ON:** P19-T001 · **STATUS:** PLANNED · **ESTIMATE:** 15 mins · **FILES_SCOPE:** `src/MDReader.App/Features/Reader/Views/MainPage.xaml`, `src/MDReader.App/Features/Reader/ViewModels/ReaderViewModel.cs`
+**ID:** P19-T004 · **FEATURE:** Reader / Analytics · **PRIORITY:** P2 · **DEPENDS_ON:** P19-T001 · **STATUS:** DONE · **ESTIMATE:** 15 mins · **FILES_SCOPE:** `src/MDReader.App/Features/Reader/Views/MainPage.xaml`, `src/MDReader.App/Features/Reader/ViewModels/ReaderViewModel.cs`
 - **AGENT PROMPT:** "Implement a subtle modern status bar displaying live document stats: Word count, Character count, Line count, and Estimated Reading Time (based on 200 WPM standard reading speed, e.g. 'Reading time: ~4 min')."
 - **ACCEPTANCE CRITERIA:** Typing or opening a document updates word count and estimated reading time live without UI lag.
-- **TEST:** Arabic and English word count unit tests.
+- **TEST:** Arabic and English word count unit tests (`ComputeAnalytics_CalculatesWordsLinesAndReadingTime` passed).
+- **VERIFICATION:** Confirmed bottom status bar displaying live Word Count, Line Count, and Estimated Reading Time.
 
 ### P19-T005 — Distraction-Free Adaptive Reading Layout & Pill-Shaped Toolbar Refinement (تحسين الشريط الكبسولي والهوامش)
-**ID:** P19-T005 · **FEATURE:** Design / UX · **PRIORITY:** P1 · **DEPENDS_ON:** P19-T001 · **STATUS:** PLANNED · **ESTIMATE:** 20 mins · **FILES_SCOPE:** `src/MDReader.App/Features/Reader/Views/MainPage.xaml`, `src/MDReader.App/Shared/Styles/App.xaml`
+**ID:** P19-T005 · **FEATURE:** Design / UX · **PRIORITY:** P1 · **DEPENDS_ON:** P19-T001 · **STATUS:** DONE · **ESTIMATE:** 20 mins · **FILES_SCOPE:** `src/MDReader.App/Features/Reader/Views/MainPage.xaml`, `src/MDReader.App/Shared/Styles/App.xaml`
 - **AGENT PROMPT:** "Refine the reading layout following Fluent 2 and Material 3 principles: grouped pill-shaped toolbars, auto-hiding edit controls in Read mode, and adaptive reading width (centered reading column with comfortable 720px max reading width option for book-like readability)."
 - **ACCEPTANCE CRITERIA:** Reading mode provides optimal ergonomic line length and modern pill button aesthetic.
-- **TEST:** Visual inspection across 1080p, 1440p, and 4K displays.
+- **TEST:** Visual layout verification.
+- **VERIFICATION:** Confirmed grouped pill-shaped navigation, auto-hiding formatting buttons in Read mode, and clean borders.

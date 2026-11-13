@@ -218,6 +218,18 @@ public sealed partial class MainPage : Page
                             _viewModel.SelectedQuoteText = textProp.GetString() ?? string.Empty;
                         }
                     }
+                    else if (type == "activeHeadingChanged")
+                    {
+                        if (_viewModel != null && root.TryGetProperty("id", out var idProp))
+                        {
+                            var id = idProp.GetString();
+                            var match = System.Linq.Enumerable.FirstOrDefault(_viewModel.OutlineItems, o => o.Id == id);
+                            if (match != null)
+                            {
+                                _viewModel.ActiveOutlineItem = match;
+                            }
+                        }
+                    }
                 }
             });
         }
@@ -306,6 +318,101 @@ public sealed partial class MainPage : Page
     private void FindPrevious_Click(object sender, RoutedEventArgs e) => FindPrevious();
     private void FindNext_Click(object sender, RoutedEventArgs e) => FindNext();
     private void CloseFind_Click(object sender, RoutedEventArgs e) => FindBar.Visibility = Visibility.Collapsed;
+
+    private void OutlineListView_ItemClick(object sender, ItemClickEventArgs e)
+    {
+        if (e.ClickedItem is DocumentOutlineItem item && !string.IsNullOrEmpty(item.Id))
+        {
+            if (_isWebViewInitialized && AntigravityViewer.CoreWebView2 != null)
+            {
+                var json = JsonSerializer.Serialize(new
+                {
+                    type = "scrollToHeading",
+                    id = item.Id
+                });
+                AntigravityViewer.CoreWebView2.PostWebMessageAsJson(json);
+            }
+        }
+    }
+
+    private async void ExportPdf_Click(object sender, RoutedEventArgs e)
+    {
+        await ExportToPdfAsync();
+    }
+
+    public async Task ExportToPdfAsync()
+    {
+        if (!_isWebViewInitialized || AntigravityViewer.CoreWebView2 == null)
+            return;
+
+        try
+        {
+            var picker = new Windows.Storage.Pickers.FileSavePicker();
+            picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.DocumentsLibrary;
+            picker.FileTypeChoices.Add("PDF Document", new List<string> { ".pdf" });
+            picker.SuggestedFileName = (_viewModel?.SelectedTab?.Title ?? "Document").Replace(" *", "") + ".pdf";
+
+            var hwnd = Process.GetCurrentProcess().MainWindowHandle;
+            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+
+            var file = await picker.PickSaveFileAsync();
+            if (file != null)
+            {
+                var settings = AntigravityViewer.CoreWebView2.Environment.CreatePrintSettings();
+                settings.ShouldPrintBackgrounds = true;
+                settings.ShouldPrintHeaderAndFooter = false;
+                await AntigravityViewer.CoreWebView2.PrintToPdfAsync(file.Path, settings);
+            }
+        }
+        catch { }
+    }
+
+    private async void ExportHtml_Click(object sender, RoutedEventArgs e)
+    {
+        await ExportToHtmlAsync();
+    }
+
+    public async Task ExportToHtmlAsync()
+    {
+        try
+        {
+            var picker = new Windows.Storage.Pickers.FileSavePicker();
+            picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.DocumentsLibrary;
+            picker.FileTypeChoices.Add("HTML Webpage", new List<string> { ".html", ".htm" });
+            picker.SuggestedFileName = (_viewModel?.SelectedTab?.Title ?? "Document").Replace(" *", "") + ".html";
+
+            var hwnd = Process.GetCurrentProcess().MainWindowHandle;
+            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+
+            var file = await picker.PickSaveFileAsync();
+            if (file != null)
+            {
+                var viewerPath = Path.Combine(AppContext.BaseDirectory, "Assets", "Renderer", "viewer.html");
+                var template = File.Exists(viewerPath) ? File.ReadAllText(viewerPath) : string.Empty;
+                var md = _viewModel?.DocumentContent ?? string.Empty;
+                var jsonEscapedMd = JsonSerializer.Serialize(md);
+                var standalone = template.Replace("parseAntigravityMarkdown(data.markdown || \"\")", $"parseAntigravityMarkdown({jsonEscapedMd})");
+                standalone = standalone.Replace("document.body.setAttribute('data-theme', t);", $"document.body.setAttribute('data-theme', '{(_viewModel?.CurrentTheme ?? "dark").ToLower()}');");
+                await File.WriteAllTextAsync(file.Path, standalone, Encoding.UTF8);
+            }
+        }
+        catch { }
+    }
+
+    protected override void OnKeyDown(KeyRoutedEventArgs e)
+    {
+        base.OnKeyDown(e);
+        if (e.Key == VirtualKey.F11)
+        {
+            _viewModel?.ToggleZenMode();
+            e.Handled = true;
+        }
+        else if (e.Key == VirtualKey.Escape && (_viewModel?.IsZenMode ?? false))
+        {
+            _viewModel.IsZenMode = false;
+            e.Handled = true;
+        }
+    }
 
     private void FindPrevious()
     {

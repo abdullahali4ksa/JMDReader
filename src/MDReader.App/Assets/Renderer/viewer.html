@@ -274,6 +274,12 @@
         /* Task Lists */
         ul.task-list { list-style: none; padding-left: 0; }
         .task-list-item input[type="checkbox"] { margin-right: 0.5em; vertical-align: middle; }
+
+        @media print {
+            body { background: #ffffff !important; color: #000000 !important; padding: 0 !important; }
+            .copy-button { display: none !important; }
+            .table-wrapper { box-shadow: none !important; border: 1px solid #d0d7de !important; }
+        }
     </style>
 </head>
 <body data-theme="dark">
@@ -574,6 +580,31 @@
             }
         });
 
+        let headingObserver = null;
+        function setupHeadingObserver() {
+            if (headingObserver) {
+                headingObserver.disconnect();
+            }
+            const headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
+            if (headings.length === 0) return;
+
+            headingObserver = new IntersectionObserver((entries) => {
+                for (const entry of entries) {
+                    if (entry.isIntersecting && entry.target.id) {
+                        if (window.chrome && window.chrome.webview) {
+                            window.chrome.webview.postMessage({
+                                type: 'activeHeadingChanged',
+                                id: entry.target.id
+                            });
+                        }
+                        break;
+                    }
+                }
+            }, { rootMargin: '0px 0px -70% 0px' });
+
+            headings.forEach(h => headingObserver.observe(h));
+        }
+
         // Bridge listener for messages from WinUI 3 C#
         window.chrome?.webview?.addEventListener('message', event => {
             const data = event.data;
@@ -582,6 +613,7 @@
             if (data.type === 'setContent') {
                 const rendered = parseAntigravityMarkdown(data.markdown || "");
                 document.getElementById('content').innerHTML = rendered;
+                setupHeadingObserver();
                 window.chrome.webview.postMessage({ type: 'rendered' });
             } else if (data.type === 'setTheme') {
                 const t = (data.theme || 'dark').toLowerCase();
@@ -590,6 +622,13 @@
                 document.body.style.zoom = data.zoom;
             } else if (data.type === 'autoScroll') {
                 setAutoScroll(data.enabled, data.intervalSeconds);
+            } else if (data.type === 'scrollToHeading') {
+                const target = document.getElementById(data.id);
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            } else if (data.type === 'printDocument') {
+                window.print();
             }
         });
     </script>

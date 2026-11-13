@@ -62,18 +62,19 @@
             </TabView.TabItemTemplate>
         </TabView>
 
-        <!-- Main Toolbar (View Modes + Formatting + Reading Tools + Export + Zoom) -->
+        <!-- Main Toolbar (View Modes + Formatting + Reading Tools + Export + Zoom + File Path Info) -->
         <Border
             x:Name="MainToolbar"
             Grid.Row="1"
             Background="{ThemeResource AppBackgroundBrush}"
             BorderBrush="{ThemeResource AppBorderBrush}"
             BorderThickness="0,0,0,1"
-            Padding="12,6"
+            Padding="12,5"
             Visibility="{Binding HasDocument, Converter={StaticResource BoolToVisibilityConverter}}"
             AutomationProperties.Name="Document toolbar">
-            <Grid Visibility="{Binding IsNormalUiVisible, Converter={StaticResource BoolToVisibilityConverter}}">
-                <!-- Left: View Mode Switcher + Formatting + Reading Tools -->
+            <StackPanel Spacing="5" Visibility="{Binding IsNormalUiVisible, Converter={StaticResource BoolToVisibilityConverter}}">
+                <Grid>
+                    <!-- Left: View Mode Switcher + Formatting + Reading Tools -->
                 <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Left">
                     <!-- View Modes -->
                     <Button Content="◫ Split" Padding="8,4" FontSize="12" Command="{Binding SwitchViewModeCommand}" CommandParameter="Split" ToolTipService.ToolTip="Split View (Editor + Live Preview)" />
@@ -174,7 +175,50 @@
                         ToolTipService.ToolTip="Reset zoom (Ctrl+0)" />
                 </StackPanel>
             </Grid>
-        </Border>
+
+            <!-- File Path Information Bar (Clickable Information Only, Non-navigational) -->
+            <Border
+                Padding="6,2"
+                Background="{ThemeResource AppSubtleBackgroundBrush}"
+                BorderBrush="{ThemeResource AppBorderBrush}"
+                BorderThickness="1"
+                CornerRadius="4"
+                HorizontalAlignment="Left">
+                <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                    <Button
+                        x:Name="CopyPathButton"
+                        Click="CopyPathButton_Click"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Padding="4,1"
+                        CornerRadius="3"
+                        ToolTipService.ToolTip="انقر لنسخ المسار الكامل للمستند (Click to copy full path)">
+                        <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                            <TextBlock Text="📄" FontSize="11" VerticalAlignment="Center" />
+                            <TextBlock
+                                Text="{Binding CurrentDocumentPathDisplay}"
+                                FontSize="11"
+                                FontFamily="Cascadia Code, Consolas, Segoe UI Variable, sans-serif"
+                                Foreground="{ThemeResource AppTextBrush}"
+                                Opacity="0.8"
+                                TextTrimming="CharacterEllipsis"
+                                MaxWidth="700"
+                                VerticalAlignment="Center" />
+                            <TextBlock Text="📋" FontSize="10" Opacity="0.6" VerticalAlignment="Center" Margin="2,0,0,0" />
+                        </StackPanel>
+                    </Button>
+                    <TextBlock
+                        x:Name="PathCopiedBadge"
+                        Text="✓ تم نسخ المسار"
+                        FontSize="11"
+                        Foreground="{ThemeResource SystemAccentColor}"
+                        FontWeight="SemiBold"
+                        VerticalAlignment="Center"
+                        Visibility="Collapsed" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </Border>
 
         <Border
             x:Name="FindBar"

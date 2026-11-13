@@ -284,6 +284,7 @@ public sealed partial class ReaderViewModel : ObservableObject
                 }
 
                 OnPropertyChanged(nameof(CurrentDocumentPath));
+                OnPropertyChanged(nameof(CurrentDocumentPathDisplay));
                 OnPropertyChanged(nameof(DocumentContent));
                 OnPropertyChanged(nameof(Elements));
                 OnPropertyChanged(nameof(IsEmpty));
@@ -302,6 +303,7 @@ public sealed partial class ReaderViewModel : ObservableObject
         {
             if (SetProperty(ref _currentDocumentPath, value))
             {
+                OnPropertyChanged(nameof(CurrentDocumentPathDisplay));
                 OnPropertyChanged(nameof(IsEmpty));
                 OnPropertyChanged(nameof(HasDocument));
                 OnPropertyChanged(nameof(HasError));
@@ -309,6 +311,10 @@ public sealed partial class ReaderViewModel : ObservableObject
             }
         }
     }
+
+    /// <summary>Gets the display-friendly file path or default title for informational binding.</summary>
+    public string CurrentDocumentPathDisplay =>
+        string.IsNullOrWhiteSpace(_currentDocumentPath) ? "Untitled Document" : _currentDocumentPath;
 
     /// <summary>Gets or sets the raw Markdown text of the active document.</summary>
     public string? DocumentContent

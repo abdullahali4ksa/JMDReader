@@ -31,6 +31,8 @@ dotnet publish src/MDReader.App/MDReader.App.csproj `
     -c $Configuration `
     -r win-x64 `
     --self-contained true `
+    /p:WindowsPackageType=None `
+    /p:WindowsAppSDKSelfContained=true `
     /p:PublishSingleFile=false `
     /p:PublishTrimmed=false `
     -o $OutputDir
@@ -46,6 +48,14 @@ $assetsDest = Join-Path $OutputDir "Assets"
 if (-not (Test-Path (Join-Path $assetsDest "AppIcon.ico"))) {
     Write-Host "Copying Assets folder to $assetsDest..." -ForegroundColor Yellow
     Copy-Item -Path $assetsSrc -Destination $OutputDir -Recurse -Force
+}
+
+# 3b. Ensure resources.pri exists for unpackaged MRTCore resolution
+$priPath = Join-Path $OutputDir "MDReader.App.pri"
+$targetPri = Join-Path $OutputDir "resources.pri"
+if ((Test-Path $priPath) -and (-not (Test-Path $targetPri))) {
+    Write-Host "Creating resources.pri from $priPath for unpackaged MRTCore..." -ForegroundColor Cyan
+    Copy-Item -Path $priPath -Destination $targetPri -Force
 }
 
 # 4. Verify primary executable exists

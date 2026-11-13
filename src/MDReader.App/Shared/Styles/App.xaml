@@ -10,12 +10,14 @@
     <ResourceDictionary.ThemeDictionaries>
         <ResourceDictionary x:Key="Light">
             <SolidColorBrush x:Key="AppBackgroundBrush" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="AppSubtleBackgroundBrush" Color="#F3F4F6" />
             <SolidColorBrush x:Key="AppTextBrush" Color="#1F1F1F" />
             <SolidColorBrush x:Key="AppSecondaryTextBrush" Color="#5F5F5F" />
             <SolidColorBrush x:Key="AppBorderBrush" Color="#D1D5DB" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="Dark">
             <SolidColorBrush x:Key="AppBackgroundBrush" Color="#1E1E1E" />
+            <SolidColorBrush x:Key="AppSubtleBackgroundBrush" Color="#2A2A2A" />
             <SolidColorBrush x:Key="AppTextBrush" Color="#E0E0E0" />
             <SolidColorBrush x:Key="AppSecondaryTextBrush" Color="#A0A0A0" />
             <SolidColorBrush x:Key="AppBorderBrush" Color="#383838" />

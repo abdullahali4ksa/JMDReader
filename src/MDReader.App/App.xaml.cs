@@ -33,6 +33,16 @@ public partial class App : Application
     public App()
     {
         InitializeComponent();
+        UnhandledException += (sender, e) =>
+        {
+            try
+            {
+                var logPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "MDReader", "crash.log");
+                System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(logPath)!);
+                System.IO.File.WriteAllText(logPath, $"[CRASH] {DateTime.Now}: {e.Message}\n{e.Exception}\n{e.Exception?.StackTrace}\nInner: {e.Exception?.InnerException}");
+            }
+            catch { }
+        };
     }
 
     /// <summary>
@@ -41,7 +51,21 @@ public partial class App : Application
     /// <param name="args">Details about the launch request and process.</param>
     protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
     {
-        _window = new MainWindow();
-        _window.Activate();
+        try
+        {
+            _window = new MainWindow();
+            _window.Activate();
+        }
+        catch (Exception ex)
+        {
+            try
+            {
+                var logPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "MDReader", "launch_error.log");
+                System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(logPath)!);
+                System.IO.File.WriteAllText(logPath, $"[LAUNCH ERROR] {DateTime.Now}: {ex.Message}\n{ex}\n{ex.StackTrace}\nInner: {ex.InnerException}");
+            }
+            catch { }
+            throw;
+        }
     }
 }

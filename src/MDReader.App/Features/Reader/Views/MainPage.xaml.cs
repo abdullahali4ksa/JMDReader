@@ -335,6 +335,35 @@ public sealed partial class MainPage : Page
         }
     }
 
+    private void CopyPathButton_Click(object sender, RoutedEventArgs e)
+    {
+        var path = _viewModel?.CurrentDocumentPath;
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            path = _viewModel?.CurrentDocumentPathDisplay ?? "Untitled Document";
+        }
+
+        try
+        {
+            var dataPackage = new Windows.ApplicationModel.DataTransfer.DataPackage();
+            dataPackage.SetText(path);
+            Windows.ApplicationModel.DataTransfer.Clipboard.SetContent(dataPackage);
+
+            PathCopiedBadge.Visibility = Visibility.Visible;
+            var timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(2.0) };
+            timer.Tick += (s, args) =>
+            {
+                PathCopiedBadge.Visibility = Visibility.Collapsed;
+                timer.Stop();
+            };
+            timer.Start();
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Failed to copy document path to clipboard: {ex.Message}");
+        }
+    }
+
     private async void ExportPdf_Click(object sender, RoutedEventArgs e)
     {
         await ExportToPdfAsync();

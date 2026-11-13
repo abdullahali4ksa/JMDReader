@@ -29,30 +29,42 @@
 
         <!-- Menu bar: File, View, Settings -->
         <MenuBar Grid.Row="1" Background="{ThemeResource AppBackgroundBrush}" AutomationProperties.Name="Application menu bar">
-            <MenuBarItem Title="File">
-                <MenuFlyoutItem Text="New  (Ctrl+N)" Command="{Binding NewDocumentCommand}" />
-                <MenuFlyoutItem Text="Open File...  (Ctrl+O)" Command="{Binding OpenDocumentCommand}" />
-                <MenuFlyoutItem Text="Open Folder...  (Ctrl+Shift+O)" Command="{Binding OpenFolderCommand}" />
+            <MenuBarItem Title="{Binding Strings.MenuFile, FallbackValue='File'}">
+                <MenuFlyoutItem Text="{Binding Strings.MenuNew, FallbackValue='New  (Ctrl+N)'}" Command="{Binding NewDocumentCommand}" />
+                <MenuFlyoutItem Text="{Binding Strings.MenuOpenFile, FallbackValue='Open File...  (Ctrl+O)'}" Command="{Binding OpenDocumentCommand}" />
+                <MenuFlyoutItem Text="{Binding Strings.MenuOpenFolder, FallbackValue='Open Folder...  (Ctrl+Shift+O)'}" Command="{Binding OpenFolderCommand}" />
                 <MenuFlyoutSeparator />
-                <MenuFlyoutItem Text="Save  (Ctrl+S)" Command="{Binding SaveDocumentCommand}" />
-                <MenuFlyoutItem Text="Save As...  (Ctrl+Shift+S)" Command="{Binding SaveDocumentAsCommand}" />
+                <MenuFlyoutItem Text="{Binding Strings.MenuSave, FallbackValue='Save  (Ctrl+S)'}" Command="{Binding SaveDocumentCommand}" />
+                <MenuFlyoutItem Text="{Binding Strings.MenuSaveAs, FallbackValue='Save As...  (Ctrl+Shift+S)'}" Command="{Binding SaveDocumentAsCommand}" />
                 <MenuFlyoutSeparator />
-                <MenuFlyoutItem Text="Close Tab  (Ctrl+W)" Command="{Binding CloseCurrentTabCommand}" />
+                <MenuFlyoutItem Text="{Binding Strings.MenuCloseTab, FallbackValue='Close Tab  (Ctrl+W)'}" Command="{Binding CloseCurrentTabCommand}" />
             </MenuBarItem>
-            <MenuBarItem Title="View">
-                <MenuFlyoutItem Text="Toggle Sidebar  (Ctrl+B)" Command="{Binding ToggleWorkspacePaneCommand}" />
+            <MenuBarItem Title="{Binding Strings.MenuView, FallbackValue='View'}">
+                <MenuFlyoutItem Text="{Binding Strings.MenuToggleSidebar, FallbackValue='Toggle Sidebar  (Ctrl+B)'}" Command="{Binding ToggleWorkspacePaneCommand}" />
                 <MenuFlyoutSeparator />
-                <MenuFlyoutItem Text="Refresh  (Ctrl+R)" Command="{Binding RefreshDocumentCommand}" />
-                <MenuFlyoutItem Text="Find  (Ctrl+F)" Click="Find_Click" />
+                <MenuFlyoutItem Text="{Binding Strings.MenuRefresh, FallbackValue='Refresh  (Ctrl+R)'}" Command="{Binding RefreshDocumentCommand}" />
+                <MenuFlyoutItem Text="{Binding Strings.MenuFind, FallbackValue='Find  (Ctrl+F)'}" Click="Find_Click" />
             </MenuBarItem>
-            <MenuBarItem Title="Settings">
-                <MenuFlyoutSubItem Text="🎨 Theme / المظهر">
-                    <MenuFlyoutItem Text="☀️ Light (أبيض)" Command="{Binding SetThemeCommand}" CommandParameter="Light" />
-                    <MenuFlyoutItem Text="🌙 Dark (داكن / أسود)" Command="{Binding SetThemeCommand}" CommandParameter="Dark" />
-                    <MenuFlyoutItem Text="📜 Sepia (رمادي / بيج مريح للقراءة)" Command="{Binding SetThemeCommand}" CommandParameter="Sepia" />
+            <MenuBarItem Title="{Binding Strings.MenuSettings, FallbackValue='Settings'}">
+                <MenuFlyoutSubItem Text="{Binding Strings.MenuTheme, FallbackValue='🎨 Theme / المظهر'}">
+                    <MenuFlyoutItem Text="{Binding Strings.MenuThemeLight, FallbackValue='☀️ Light (أبيض)'}" Command="{Binding SetThemeCommand}" CommandParameter="Light" />
+                    <MenuFlyoutItem Text="{Binding Strings.MenuThemeDark, FallbackValue='🌙 Dark (داكن / أسود)'}" Command="{Binding SetThemeCommand}" CommandParameter="Dark" />
+                    <MenuFlyoutItem Text="{Binding Strings.MenuThemeSepia, FallbackValue='📜 Sepia (رمادي / بيج مريح للقراءة)'}" Command="{Binding SetThemeCommand}" CommandParameter="Sepia" />
+                </MenuFlyoutSubItem>
+                <MenuFlyoutSubItem Text="{Binding Strings.MenuLanguage, FallbackValue='🌐 Language / اللغة'}">
+                    <MenuFlyoutItem Text="العربية (Arabic)" Command="{Binding SetLanguageCommand}" CommandParameter="ar" />
+                    <MenuFlyoutItem Text="English" Command="{Binding SetLanguageCommand}" CommandParameter="en" />
+                    <MenuFlyoutItem Text="中文 (Chinese Simplified)" Command="{Binding SetLanguageCommand}" CommandParameter="zh" />
+                    <MenuFlyoutItem Text="हिन्दी (Hindi)" Command="{Binding SetLanguageCommand}" CommandParameter="hi" />
+                    <MenuFlyoutItem Text="Español (Spanish)" Command="{Binding SetLanguageCommand}" CommandParameter="es" />
+                    <MenuFlyoutItem Text="Français (French)" Command="{Binding SetLanguageCommand}" CommandParameter="fr" />
+                    <MenuFlyoutItem Text="Deutsch (German)" Command="{Binding SetLanguageCommand}" CommandParameter="de" />
+                    <MenuFlyoutItem Text="Русский (Russian)" Command="{Binding SetLanguageCommand}" CommandParameter="ru" />
+                    <MenuFlyoutItem Text="日本語 (Japanese)" Command="{Binding SetLanguageCommand}" CommandParameter="ja" />
+                    <MenuFlyoutItem Text="Português (Portuguese)" Command="{Binding SetLanguageCommand}" CommandParameter="pt" />
                 </MenuFlyoutSubItem>
                 <MenuFlyoutSeparator />
-                <MenuFlyoutItem Text="⌨️ Keyboard Shortcuts  (F1)" Click="KeyboardShortcuts_Click" />
+                <MenuFlyoutItem Text="{Binding Strings.MenuShortcuts, FallbackValue='⌨️ Keyboard Shortcuts  (F1)'}" Click="KeyboardShortcuts_Click" />
             </MenuBarItem>
         </MenuBar>
 

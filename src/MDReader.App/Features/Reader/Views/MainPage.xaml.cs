@@ -184,7 +184,7 @@ public sealed partial class MainPage : Page
             {
                 type = "autoScroll",
                 enabled = _viewModel.IsAutoScrolling,
-                intervalSeconds = _viewModel.ScrollSpeedSeconds
+                speedLevel = _viewModel.ScrollSpeedSeconds
             });
             AntigravityViewer.CoreWebView2.PostWebMessageAsJson(json);
         }
@@ -285,9 +285,44 @@ public sealed partial class MainPage : Page
 
                 var mdContent = _viewModel?.DocumentContent ?? string.Empty;
                 var safeMdJson = JsonSerializer.Serialize(mdContent);
-                var exportedHtml = template.Replace(
-                    "let currentMarkdown = \"\";",
-                    $"let currentMarkdown = {safeMdJson}; window.addEventListener('DOMContentLoaded', () => parseAndRender(currentMarkdown));");
+                var currentTheme = (_viewModel?.CurrentTheme ?? "dark").ToLowerInvariant();
+
+                // 1. Set the active theme
+                var exportedHtml = template.Replace("<body data-theme=\"dark\">", $"<body data-theme=\"{currentTheme}\">");
+
+                // 2. Set document title
+                var docName = Path.GetFileNameWithoutExtension(_viewModel?.CurrentDocumentPath ?? "Document");
+                var escapedTitle = System.Net.WebUtility.HtmlEncode(docName);
+                exportedHtml = exportedHtml.Replace("<title>MDReader Antigravity Viewer</title>", $"<title>{escapedTitle} — MDReader</title>");
+
+                // 3. Inject self-contained bootstrap script right before </body> to render offline without WebView host
+                var bootstrapScript = $@"
+    <script>
+        (function() {{
+            function renderDocument() {{
+                try {{
+                    const md = {safeMdJson};
+                    const contentEl = document.getElementById('content');
+                    if (contentEl && typeof parseAntigravityMarkdown === 'function') {{
+                        contentEl.innerHTML = parseAntigravityMarkdown(md);
+                        if (typeof setupHeadingObserver === 'function') {{
+                            setupHeadingObserver();
+                        }}
+                    }}
+                }} catch (err) {{
+                    console.error('Failed to render exported markdown:', err);
+                }}
+            }}
+
+            if (document.readyState === 'loading') {{
+                document.addEventListener('DOMContentLoaded', renderDocument);
+            }} else {{
+                renderDocument();
+            }}
+        }})();
+    </script>
+</body>";
+                exportedHtml = exportedHtml.Replace("</body>", bootstrapScript);
 
                 await File.WriteAllTextAsync(file.Path, exportedHtml, Encoding.UTF8);
                 Process.Start(new ProcessStartInfo(file.Path) { UseShellExecute = true });

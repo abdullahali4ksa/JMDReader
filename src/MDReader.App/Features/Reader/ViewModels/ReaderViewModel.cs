@@ -6,6 +6,7 @@ using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MDReader.Core.Documents;
+using MDReader.Core.Localization;
 using MDReader.Core.Markdown;
 
 namespace MDReader.App.Features.Reader.ViewModels;
@@ -74,10 +75,25 @@ public sealed partial class ReaderViewModel : ObservableObject
         }
     }
 
+    /// <summary>Access to the global multi-language localization service.</summary>
+    public LocalizationService Strings => LocalizationService.Instance;
+
+    public ReaderViewModel()
+    {
+        LocalizationService.Instance.PropertyChanged += (_, _) =>
+        {
+            OnPropertyChanged(nameof(Strings));
+            OnPropertyChanged(nameof(AnalyticsSummary));
+            OnPropertyChanged(nameof(WordCountDisplay));
+            OnPropertyChanged(nameof(ReadingTimeDisplay));
+            OnPropertyChanged(nameof(LineCountDisplay));
+        };
+    }
+
     public string AnalyticsSummary => _analytics.FormattedSummary;
-    public string WordCountDisplay => $"{_analytics.WordCount:N0} words";
-    public string ReadingTimeDisplay => $"⏱ ~{_analytics.EstimatedReadingMinutes} min read";
-    public string LineCountDisplay => $"{_analytics.LineCount:N0} lines";
+    public string WordCountDisplay => $"{_analytics.WordCount:N0} {Strings.StatusWords}";
+    public string ReadingTimeDisplay => $"⏱ ~{_analytics.EstimatedReadingMinutes} {Strings.StatusMinRead}";
+    public string LineCountDisplay => $"{_analytics.LineCount:N0} {Strings.StatusLines}";
 
     public bool IsZenMode
     {

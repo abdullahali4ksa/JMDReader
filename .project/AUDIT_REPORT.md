@@ -1,8 +1,8 @@
 ﻿# 📋 تقرير الفحص والتدقيق الآلي للكود والمشروع (Codebase Audit Report)
-**تاريخ الفحص:** 2026-11-13 22:25:48
+**تاريخ الفحص:** 2026-11-13 22:58:00
 **الحالة العامة للمشروع:** ✅ **EXCELLENT / ALL CHECKS PASSING**
-**حالة الاختبارات:** ✅ **91 / 91 اختبار ناجح (0 فشل)**
-**حالة التثبيت على النظام:** ✅ **HEALTHY (Installed & Verified)**
+**حالة الاختبارات:** ✅ **97 / 97 اختبار ناجح (0 فشل)**
+**حالة التثبيت على النظام:** ✅ **HEALTHY (Installed & Verified with Master Certificate ABDULLAHALI4KSA)**
 
 ---
 
@@ -10,9 +10,9 @@
 
 | المجلد | إجمالي الملفات | ملفات C# | ملفات XAML | الحجم التقريبي | الحالة |
 |:---|:---:|:---:|:---:|:---:|:---:|
-| src/MDReader.Core | 58 | 25 | 0 | 0.39 MB | ✅ OK |
+| src/MDReader.Core | 60 | 27 | 0 | 0.42 MB | ✅ OK |
 | src/MDReader.App | 2032 | 70 | 18 | 1231.48 MB | ✅ OK |
-| tests/MDReader.Core.Tests | 230 | 19 | 0 | 11.45 MB | ✅ OK |
+| tests/MDReader.Core.Tests | 232 | 21 | 0 | 11.48 MB | ✅ OK |
 | packaging | 6 | 0 | 0 | 0.01 MB | ✅ OK |
 | scripts | 8 | 0 | 0 | 0.02 MB | ✅ OK |
 | .project | 7 | 0 | 0 | 0.12 MB | ✅ OK |
@@ -23,25 +23,43 @@
 ## 🔍 نتائج التحليل والتدقيق الفني (Technical Findings)
 
 1. **محرك العرض (Viewer & Renderer):**
-   - يعمل محرك iewer.html محلياً بدون إنترنت (100% Offline).
+   - يعمل محرك `viewer.html` محلياً بدون إنترنت (100% Offline).
    - تم دعم الجداول (GFM Tables)، التنبيهات (GitHub Alerts)، الرياضيات (LaTeX Math)، والرسوم الهيكلية (Mermaid).
    - شريط العناوين التفاعلي يراقب الأقسام بدقة عبر IntersectionObserver.
 
 2. **التكامل مع النظام والتثبيت (Deployment & Packaging):**
-   - تم حل مشكلة REGDB_E_CLASSNOTREG بنجاح عبر تفعيل النشر المستقل التام <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained> وتضمين Microsoft.ui.xaml.dll و esources.pri.
-   - البرنامج المثبت في C:\Users\ZAACO\AppData\Local\Programs\MDReader\MDReader.App.exe يعمل الآن باستقرار تام.
+   - البرنامج المثبت في `C:\Users\ZAACO\AppData\Local\Programs\MDReader\MDReader.App.exe` موقع بشهادة المطور المعتمدة `ABDULLAHALI4KSA` ويعمل باستقرار تام (PID 24388).
+   - معالج التثبيت Inno Setup موقع رقمياً بـ Authenticode SHA-256.
 
-3. **مسار الملف أعلى المستند (Clickable Path Info):**
-   - تم إضافة شريط معلومات المسار أعلى المستند مع إمكانية النسخ الفوري للحافظة بنقرة واحدة وبدون التنقل أو تغيير الصفحة.
+3. **مسار الملف أعلى المستند (Collapsible Path Bar):**
+   - تم تلبية طلب المستخدم بإخفاء السطر بالكامل (0 ارتفاع) عند النقر على `✕` لاستعادة كامل مساحة القراءة.
+   - تم تزويد شريط الأدوات العلوي بزر `📍` لإعادة إظهار شريط المسار أو إخفائه في أي وقت.
 
-4. **الفحص السطري الشامل (Source Files Audit Matrix):**
-   - يتوفر فحص تفصيلي ملفاً بملف مع التوصيات وعدد الأسطر في [.project/SOURCE_FILES_AUDIT.md](SOURCE_FILES_AUDIT.md).
+4. **تصدير HTML المستقل بدون إنترنت (Standalone Offline HTML Export):**
+   - تم إصلاح تصدير HTML بحقن سكربت bootstrap ذاتي التشغيل يقرأ الماركداون ويستدعي `parseAntigravityMarkdown` محلياً بدون الحاجة إلى WebView2 أو اتصال بالإنترنت.
+   - يتم تصدير الثيم المختار وعنوان المستند تلقائياً.
 
-5. **المرحلة 20 المنجزة (Phase 20 Accomplishments):**
-   - معالجة النصوص الضخمة عبر Debouncing (180ms).
-   - دعم سحب وإفلات ولصق الصور تلقائياً في مجلد images وحفظها محلياً.
-   - البحث والاستبدال المتقدم مع دعم التعبيرات النمطية (Regex) وحساسية الأحرف (Case Matching).
-   - دليل اختصارات لوحة المفاتيح التفاعلي (F1 / Settings Menu).
+5. **دعم تعدد اللغات (Top 10 Global Languages):**
+   - تم بناء `LocalizationService` متكامل يدعم اللغات العشر الأكثر انتشاراً في العالم:
+     1. العربية (ar - الافتراضية RTL)
+     2. الإنجليزية (en)
+     3. الصينية (zh)
+     4. الهندية (hi)
+     5. الإسبانية (es)
+     6. الفرنسية (fr)
+     7. الألمانية (de)
+     8. الروسية (ru)
+     9. اليابانية (ja)
+     10. البرتغالية (pt)
+   - دعم التبديل المباشر من قائمة `Settings -> 🌐 Language / اللغة`.
+
+6. **التحريك الانسيابي المستمر (Continuous Teleprompter Auto-Scroll):**
+   - تحويل القراءة التلقائية إلى شريط انسيابي مستمر فائق النعومة بالاعتماد على `requestAnimationFrame` وحساب البكسلات الجزئية لكل إطار.
+   - التحكم في السرعة عبر مستويات رقمية (1x إلى 5x).
+
+7. **حالة الاختبارات والجدولة:**
+   - 97 / 97 اختباراً وحدوياً ناجحاً بنسبة 100%.
+   - الجدولة الآلية الدورية مفعلة وقائمة لمراقبة صحة المشروع كل ربع ساعة.
 
 ---
 

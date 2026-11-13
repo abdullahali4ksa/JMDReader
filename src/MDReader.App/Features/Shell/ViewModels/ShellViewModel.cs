@@ -10,6 +10,7 @@ using CommunityToolkit.Mvvm.Input;
 using MDReader.App.Features.FileOpen.ViewModels;
 using MDReader.App.Features.Reader.ViewModels;
 using MDReader.Core.Documents;
+using MDReader.Core.Localization;
 
 namespace MDReader.App.Features.Shell.ViewModels;
 
@@ -22,6 +23,9 @@ public sealed partial class ShellViewModel : ObservableObject
     private bool _isWorkspacePaneOpen;
     private readonly ReaderViewModel _readerViewModel;
     private readonly FileOpenViewModel _fileOpenViewModel;
+
+    /// <summary>Access to the global multi-language localization service.</summary>
+    public LocalizationService Strings => LocalizationService.Instance;
 
     /// <summary>Gets the ReaderViewModel instance.</summary>
     public ReaderViewModel Reader => _readerViewModel;
@@ -65,6 +69,19 @@ public sealed partial class ShellViewModel : ObservableObject
                 UpdateTitle();
             }
         };
+
+        LocalizationService.Instance.PropertyChanged += (_, _) =>
+        {
+            OnPropertyChanged(nameof(Strings));
+            UpdateTitle();
+        };
+    }
+
+    [RelayCommand]
+    public void SetLanguage(string langCode)
+    {
+        LocalizationService.Instance.SetLanguage(langCode);
+        OnPropertyChanged(nameof(Strings));
     }
 
     private void UpdateTitle()

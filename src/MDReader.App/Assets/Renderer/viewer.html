@@ -549,25 +549,44 @@
             });
         }
 
-        function setAutoScroll(enabled, intervalSeconds) {
-            if (autoScrollInterval) {
-                clearInterval(autoScrollInterval);
-                autoScrollInterval = null;
+        let isAutoScrolling = false;
+        let autoScrollAnimId = null;
+        let scrollSpeedPxPerFrame = 0.85;
+
+        function autoScrollStep() {
+            if (!isAutoScrolling) return;
+            const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+            if (window.scrollY >= maxScroll - 2) {
+                isAutoScrolling = false;
+                if (autoScrollAnimId) {
+                    cancelAnimationFrame(autoScrollAnimId);
+                    autoScrollAnimId = null;
+                }
+                if (window.chrome && window.chrome.webview) {
+                    window.chrome.webview.postMessage({ type: 'autoScrollEnded' });
+                }
+                return;
             }
-            if (enabled) {
-                const intervalMs = Math.max(500, (intervalSeconds || 2) * 1000);
-                autoScrollInterval = setInterval(() => {
-                    const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-                    if (window.scrollY >= maxScroll - 5) {
-                        clearInterval(autoScrollInterval);
-                        autoScrollInterval = null;
-                        if (window.chrome && window.chrome.webview) {
-                            window.chrome.webview.postMessage({ type: 'autoScrollEnded' });
-                        }
-                        return;
-                    }
-                    window.scrollBy({ top: 90, behavior: 'smooth' });
-                }, intervalMs);
+            window.scrollBy(0, scrollSpeedPxPerFrame);
+            autoScrollAnimId = requestAnimationFrame(autoScrollStep);
+        }
+
+        function setAutoScroll(enabled, speedLevel) {
+            if (autoScrollAnimId) {
+                cancelAnimationFrame(autoScrollAnimId);
+                autoScrollAnimId = null;
+            }
+            isAutoScrolling = !!enabled;
+            if (isAutoScrolling) {
+                const lvl = typeof speedLevel === 'number' && speedLevel > 0 ? speedLevel : 2;
+                // Fluid conveyor-belt teleprompter speeds:
+                // lvl 1: 0.45 px/frame (~27 px/sec) - slow & relaxed
+                // lvl 2: 0.85 px/frame (~51 px/sec) - normal reading pace
+                // lvl 3: 1.40 px/frame (~84 px/sec) - moderate
+                // lvl 4: 2.15 px/frame (~129 px/sec) - fast
+                // lvl 5: 3.25 px/frame (~195 px/sec) - rapid
+                scrollSpeedPxPerFrame = Math.max(0.3, lvl * 0.55);
+                autoScrollAnimId = requestAnimationFrame(autoScrollStep);
             }
         }
 
@@ -621,7 +640,7 @@
             } else if (data.type === 'setZoom') {
                 document.body.style.zoom = data.zoom;
             } else if (data.type === 'autoScroll') {
-                setAutoScroll(data.enabled, data.intervalSeconds);
+                setAutoScroll(data.enabled, data.speedLevel || data.intervalSeconds);
             } else if (data.type === 'scrollToHeading') {
                 const target = document.getElementById(data.id);
                 if (target) {

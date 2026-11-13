@@ -46,10 +46,15 @@ This digital certificate signs all `.exe`, `.dll`, and installer binaries produc
 
 Use these exact parameters when setting up your Partner Center submission:
 
-* **Product Name:** `MDReader`
-* **Package Identity Name:** `birotech.MDReader`
-* **Publisher Common Name:** `CN=birotech, O=birotech, C=SA`
+* **Product Name:** `JMDReader`
+* **Store ID:** `9PC12HBZG0CX`
+* **Package Identity Name:** `birotech.JMDReader`
+* **Publisher ID:** `CN=4B6200B3-DE4E-4F39-A6EA-B5DC049294B2`
 * **Publisher Display Name:** `birotech`
+* **Package Family Name (PFN):** `birotech.JMDReader_4spa8h579ffz6`
+* **Package SID:** `S-1-15-2-3666953499-3037334910-2211531507-11068993-133336404-400195371-198511540`
+* **Store Dev Cert PFX:** `packaging/certs/JMDReader_StoreDev.pfx` (Thumbprint: `4D6109C9BF7EF236605BAE96A681A0814A8E406A`)
+* **Partner Center URL:** `https://partner.microsoft.com/en-US/dashboard/products/9PC12HBZG0CX/overview`
 * **Target Platforms:** Windows 10 (Version 1809+ / Build 17763) & Windows 11 (All builds)
 * **Architecture:** `x64` (Native 64-bit with ARM64 compatibility)
 * **Primary Category:** `Productivity`

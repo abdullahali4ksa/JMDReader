@@ -19,7 +19,7 @@ namespace MDReader.App.Features.Shell.ViewModels;
 /// </summary>
 public sealed partial class ShellViewModel : ObservableObject
 {
-    private string _windowTitle = "MDReader";
+    private string _windowTitle = "JMDReader";
     private bool _isWorkspacePaneOpen;
     private readonly ReaderViewModel _readerViewModel;
     private readonly FileOpenViewModel _fileOpenViewModel;
@@ -88,11 +88,11 @@ public sealed partial class ShellViewModel : ObservableObject
     {
         if (_readerViewModel.SelectedTab != null)
         {
-            WindowTitle = $"{_readerViewModel.SelectedTab.Header} — MDReader";
+            WindowTitle = $"{_readerViewModel.SelectedTab.Header} — JMDReader";
         }
         else
         {
-            WindowTitle = "MDReader";
+            WindowTitle = "JMDReader";
         }
     }
 

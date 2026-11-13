@@ -10,14 +10,14 @@
   IgnorableNamespaces="uap uap10 rescap systemai">
 
   <Identity
-    Name="birotech.MDReader"
-    Publisher="CN=birotech, O=birotech, C=SA"
+    Name="birotech.JMDReader"
+    Publisher="CN=4B6200B3-DE4E-4F39-A6EA-B5DC049294B2"
     Version="1.0.1.0" />
 
   <mp:PhoneIdentity PhoneProductId="3361C559-1964-49C7-82CB-6EF2BEC14BF9" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>MDReader</DisplayName>
+    <DisplayName>JMDReader</DisplayName>
     <PublisherDisplayName>birotech</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
     <uap10:PackageIntegrity>
@@ -39,8 +39,8 @@
       Executable="$targetnametoken$.exe"
       EntryPoint="$targetentrypoint$">
       <uap:VisualElements
-              DisplayName="MDReader"
-        Description="A Markdown reader for Windows"
+        DisplayName="JMDReader"
+        Description="Ultra-fast Markdown reader &amp; editor for Windows"
         BackgroundColor="transparent"
         Square150x150Logo="Assets\Square150x150Logo.png"
         Square44x44Logo="Assets\Square44x44Logo.png">

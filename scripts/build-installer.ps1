@@ -56,7 +56,10 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 # 5. Sign the generated Setup installer
-$installerFile = Join-Path $installerOutputDir "MDReader-Setup-x64.exe"
+$installerFile = Join-Path $installerOutputDir "JMDReader-Setup-x64.exe"
+if (-not (Test-Path $installerFile)) {
+    $installerFile = Join-Path $installerOutputDir "MDReader-Setup-x64.exe"
+}
 if (Test-Path $installerFile) {
     Write-Host "Signing final setup wizard: $installerFile..." -ForegroundColor Cyan
     powershell -ExecutionPolicy Bypass -File scripts/sign-binaries.ps1 -TargetDir $installerOutputDir

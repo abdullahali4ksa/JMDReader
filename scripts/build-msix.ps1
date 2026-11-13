@@ -18,12 +18,12 @@ Write-Host "  MDReader — Native Windows MSIX Package Compiler         " -Foreg
 Write-Host "==========================================================" -ForegroundColor Cyan
 
 # 1. Ensure cert exists
-$cert = Get-ChildItem -Path "Cert:\CurrentUser\My" -CodeSigningCert | Where-Object { $_.Subject -like "*CN=MDReader*" } | Select-Object -First 1
+$cert = Get-ChildItem -Path "Cert:\CurrentUser\My" -CodeSigningCert | Where-Object { $_.Subject -like "*CN=4B6200B3*" -or $_.Subject -like "*CN=birotech*" } | Select-Object -First 1
 
 if (-not $cert) {
-    Write-Host "Certificate not found, creating developer certificate..." -ForegroundColor Yellow
-    powershell -ExecutionPolicy Bypass -File scripts/sign-binaries.ps1
-    $cert = Get-ChildItem -Path "Cert:\CurrentUser\My" -CodeSigningCert | Where-Object { $_.Subject -like "*CN=MDReader*" } | Select-Object -First 1
+    Write-Host "Certificate not found, running setup-store-cert.ps1..." -ForegroundColor Yellow
+    powershell -ExecutionPolicy Bypass -File scripts/setup-store-cert.ps1
+    $cert = Get-ChildItem -Path "Cert:\CurrentUser\My" -CodeSigningCert | Where-Object { $_.Subject -like "*CN=4B6200B3*" } | Select-Object -First 1
 }
 
 $fullOutputDir = (New-Item -ItemType Directory -Path $OutputDir -Force).FullName

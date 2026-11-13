@@ -1,12 +1,12 @@
 ; =====================================================================
-; MDReader — Inno Setup Script
-; Generates standard Windows installer: MDReader-Setup-x64.exe
+; JMDReader — Inno Setup Script
+; Generates standard Windows installer: JMDReader-Setup-x64.exe
 ; =====================================================================
 
-#define MyAppName "MDReader"
+#define MyAppName "JMDReader"
 #define MyAppVersion "1.0.1"
 #define MyAppPublisher "birotech"
-#define MyAppURL "https://github.com/ABDULLAHALI4KSA/MDReader"
+#define MyAppURL "https://github.com/ABDULLAHALI4KSA/JMDReader"
 #define MyAppSupportEmail "Abdullah444ali@outlook.com"
 #define MyAppExeName "MDReader.App.exe"
 #define MyAppId "{{B9A5F148-36D2-475C-9A8E-2B60AC00D413}"
@@ -25,7 +25,7 @@ DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
 OutputDir=..\..\dist\installer
-OutputBaseFilename=MDReader-Setup-x64
+OutputBaseFilename=JMDReader-Setup-x64
 SetupIconFile=..\..\src\MDReader.App\Assets\AppIcon.ico
 UninstallDisplayIcon={app}\Assets\AppIcon.ico
 Compression=lzma2/ultra64
@@ -43,7 +43,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
-Name: "fileassoc"; Description: "Associate Markdown files (.md, .markdown) with MDReader"; GroupDescription: "File Associations:"; Flags: checkedonce
+Name: "fileassoc"; Description: "Associate Markdown files (.md, .markdown) with JMDReader"; GroupDescription: "File Associations:"; Flags: checkedonce
 
 [Files]
 Source: "..\..\dist\win-x64\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs

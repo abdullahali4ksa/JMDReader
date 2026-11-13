@@ -710,3 +710,99 @@ The `FILES_SCOPE` on each original P01 task is the allowlist. Dependencies are d
 - **AGENT PROMPT:** "Overhaul the UI styling with modern Fluent Design 2 / Material 3 principles (pill buttons, cohesive card elevation, subtle borders) and create a high-res modern app icon."
 - **ACCEPTANCE CRITERIA:** Sleek modern visual design; updated modern application icon.
 - **VERIFICATION:** Generated multi-resolution 256x256 `AppIcon.ico` with dark indigo gradient squircle, open book fold, electric indigo 'M' and cyan reading accent arrow, plus updated PNG logos.
+
+---
+
+## Phase 16 — Standard Windows Installer & Code Signing (حزم التثبيت المعتمدة وتوقيع الكود)
+
+**Status:** PLANNED · **Depends on:** Phase 15 complete · **Triggered by:** User request for professional Windows Installer (Next-Next-Install), self-contained deployment, digital code signing, desktop/start menu shortcuts, and file associations (`.md`, `.markdown`).
+
+### P16-T001 — Self-Contained Release Publish Configuration
+**ID:** P16-T001 · **FEATURE:** Deployment / Build · **PRIORITY:** P0 · **DEPENDS_ON:** P15-T007 · **STATUS:** READY · **ESTIMATE:** 20 mins · **FILES_SCOPE:** `src/MDReader.App/Properties/PublishProfiles/win-x64.pubxml`, `scripts/build-release.ps1`
+- **AGENT PROMPT:** "Configure self-contained publish profile for `win-x64` embedding .NET runtime, WebView2 dependencies, assets, and AppIcon so MDReader runs on any clean Windows 10/11 x64 machine without pre-installed prerequisites."
+- **ACCEPTANCE CRITERIA:** `dotnet publish -c Release -r win-x64 --self-contained` produces a standalone executable folder running independently on clean machines.
+- **TEST:** Clean publish folder inspection and execution test.
+
+### P16-T002 — Automated Digital Code Signing Pipeline (Authenticode)
+**ID:** P16-T002 · **FEATURE:** Security / CodeSigning · **PRIORITY:** P0 · **DEPENDS_ON:** P16-T001 · **STATUS:** READY · **ESTIMATE:** 25 mins · **FILES_SCOPE:** `scripts/create-dev-cert.ps1`, `scripts/sign-binaries.ps1`
+- **AGENT PROMPT:** "Create an automated PowerShell script to generate a valid Code Signing certificate (PFX) with SHA256 timestamping (using RFC 3161 timestamp authority), and sign all `.exe` and `.dll` binaries via `signtool.exe` to prevent Windows SmartScreen blocks."
+- **ACCEPTANCE CRITERIA:** Executables have a valid digital signature recognized by Windows File Properties -> Digital Signatures tab.
+- **TEST:** `Get-AuthenticodeSignature` returns `Valid` status.
+
+### P16-T003 — Standard Windows Setup Wizard (`MDReader-Setup-x64.exe`)
+**ID:** P16-T003 · **FEATURE:** Installer / UX · **PRIORITY:** P0 · **DEPENDS_ON:** P16-T002 · **STATUS:** READY · **ESTIMATE:** 30 mins · **FILES_SCOPE:** `packaging/inno/setup.iss`, `scripts/build-installer.ps1`
+- **AGENT PROMPT:** "Build an Inno Setup script to generate a standard professional Windows Setup Wizard (`MDReader-Setup-x64.exe`): Welcome screen, License agreement, Install directory selection (Program Files / Local AppData), Desktop Shortcut checkbox, Start Menu Shortcut, Open with MDReader Context Menu, File associations for `.md` and `.markdown`, Progress bar, and Launch on Finish."
+- **ACCEPTANCE CRITERIA:** Double-clicking `MDReader-Setup-x64.exe` presents standard Next->Next->Install wizard, registers Uninstaller in Windows 'Installed Apps' / Control Panel, and associates `.md` files.
+- **TEST:** Silent and interactive install/uninstall tests.
+
+### P16-T004 — Native Signed Windows MSIX Package (`MDReader.msix`)
+**ID:** P16-T004 · **FEATURE:** MSIX / Packaging · **PRIORITY:** P1 · **DEPENDS_ON:** P16-T002 · **STATUS:** READY · **ESTIMATE:** 25 mins · **FILES_SCOPE:** `src/MDReader.App/Package.appxmanifest`, `scripts/build-msix.ps1`
+- **AGENT PROMPT:** "Package the application into a signed Windows `.msix` container using Windows App SDK tooling, configured for one-click App Installer installation on Windows 10/11."
+- **ACCEPTANCE CRITERIA:** Generated `.msix` installs cleanly with Windows App Installer dialog showing publisher, version, and capabilities.
+- **TEST:** `Add-AppxPackage` automated test.
+
+### P16-T005 — Phase 16 Verification Gate & Clean Windows Matrix
+**ID:** P16-T005 · **FEATURE:** Quality / Verification · **PRIORITY:** P0 · **DEPENDS_ON:** P16-T003, P16-T004 · **STATUS:** READY · **ESTIMATE:** 15 mins · **FILES_SCOPE:** `.project/STATE.json`, `.project/TASKS.md`
+- **AGENT PROMPT:** "Execute full installer verification: test installation path, desktop shortcut launch, double-clicking a sample `.md` file to verify launch in MDReader, and clean uninstall without orphan registry keys."
+- **ACCEPTANCE CRITERIA:** 100% clean install and uninstall verification; all artifacts verified.
+- **TEST:** End-to-end installer execution checklist.
+
+---
+
+## Phase 17 — GitHub Automation & Automated CI/CD Release Pipeline (الأتمتة والنشر على GitHub)
+
+**Status:** PLANNED · **Depends on:** Phase 16 complete · **Triggered by:** User request to publish project on GitHub under user's account with automated builds, releases, and winget package manager support.
+
+### P17-T001 — Git Repository Configuration & Remote Integration
+**ID:** P17-T001 · **FEATURE:** VersionControl / GitHub · **PRIORITY:** P0 · **DEPENDS_ON:** P16-T005 · **STATUS:** READY · **ESTIMATE:** 15 mins · **FILES_SCOPE:** `.git/config`, `README.md`, `.github/`
+- **AGENT PROMPT:** "Guide user to link GitHub repository (or provide PAT / SSH / GitHub CLI token), configure remote origin, prepare comprehensive bilingual README.md with screenshots, badges, and installation guide."
+- **ACCEPTANCE CRITERIA:** Git remote is configured; `git push -u origin master` is verified.
+- **TEST:** `git remote -v` and repository reachability.
+
+### P17-T002 — Automated GitHub Actions CI/CD Release Workflow
+**ID:** P17-T002 · **FEATURE:** CI/CD / DevOps · **PRIORITY:** P0 · **DEPENDS_ON:** P17-T001 · **STATUS:** READY · **ESTIMATE:** 30 mins · **FILES_SCOPE:** `.github/workflows/release.yml`
+- **AGENT PROMPT:** "Create GitHub Actions workflow `.github/workflows/release.yml` running on `windows-latest`. On git tag push (e.g. `v1.0.0`), automatically restores dependencies, builds solution, executes all 74 unit tests, packages `MDReader-Setup-x64.exe` and `MDReader.msix`, signs with repository secret certificate, and hashes SHA-256."
+- **ACCEPTANCE CRITERIA:** GitHub Action workflow runs green with 0 errors and generates release artifacts.
+- **TEST:** Workflow syntax validation via `actionlint` / GitHub Actions run.
+
+### P17-T003 — Automated GitHub Releases with Downloadable Installer Assets
+**ID:** P17-T003 · **FEATURE:** Releases / Distribution · **PRIORITY:** P0 · **DEPENDS_ON:** P17-T002 · **STATUS:** READY · **ESTIMATE:** 20 mins · **FILES_SCOPE:** `.github/workflows/release.yml`, `docs/RELEASE_NOTES.md`
+- **AGENT PROMPT:** "Automate creation of GitHub Releases with formatted markdown changelog, SHA256 checksums, and attached downloadable assets: `MDReader-Setup-x64.exe` (Standard Wizard Installer) and `MDReader-x64.msix` (Windows App Package)."
+- **ACCEPTANCE CRITERIA:** Release published on GitHub with one-click download links for end users.
+- **TEST:** Release asset download and hash verification.
+
+### P17-T004 — Windows Package Manager (Winget) Manifest Generation
+**ID:** P17-T004 · **FEATURE:** Distribution / Winget · **PRIORITY:** P1 · **DEPENDS_ON:** P17-T003 · **STATUS:** READY · **ESTIMATE:** 20 mins · **FILES_SCOPE:** `packaging/winget/MDReader.yaml`
+- **AGENT PROMPT:** "Generate official Winget manifest YAML files for Microsoft community repository (`winget-pkgs`) enabling any Windows user in the world to install MDReader via terminal: `winget install MDReader`."
+- **ACCEPTANCE CRITERIA:** Valid Winget manifest complying with `winget-cli` validation schema.
+- **TEST:** `winget validate packaging/winget/` passes cleanly.
+
+---
+
+## Phase 18 — Microsoft Store (Windows Store) Readiness & Submission (النشر على متجر مايكروسوفت)
+
+**Status:** PLANNED · **Depends on:** Phase 17 complete · **Triggered by:** User request to publish MDReader on the official Microsoft Store for Windows 10 & 11 users.
+
+### P18-T001 — Microsoft Partner Center Package Identity & Manifest Configuration
+**ID:** P18-T001 · **FEATURE:** Store / Manifest · **PRIORITY:** P0 · **DEPENDS_ON:** P17-T004 · **STATUS:** READY · **ESTIMATE:** 20 mins · **FILES_SCOPE:** `src/MDReader.App/Package.appxmanifest`
+- **AGENT PROMPT:** "Configure `Package.appxmanifest` with Microsoft Partner Center reserved app identity (Package Name, Publisher ID `CN=...`, PhoneProductId, Version). Define Windows Store capability declarations and file type associations."
+- **ACCEPTANCE CRITERIA:** Package manifest matches Partner Center app identity without schema or identity mismatch warnings.
+- **TEST:** XML schema validation and MSIX packaging tool check.
+
+### P18-T002 — Store Visual Assets, Logos, and High-Res Store Screenshots
+**ID:** P18-T002 · **FEATURE:** Store / Media · **PRIORITY:** P1 · **DEPENDS_ON:** P18-T001 · **STATUS:** READY · **ESTIMATE:** 25 mins · **FILES_SCOPE:** `docs/store_assets/`, `src/MDReader.App/Assets/`
+- **AGENT PROMPT:** "Produce all mandatory and promotional visual assets required by Microsoft Store: 300x300 App Tile, 150x150 Logo, 44x44 Small Icon, StoreLogo (50x50), Wide 310x150, Splash Screen, and 4 high-resolution 1920x1080 Store showcase screenshots (Light Theme, Dark Theme, Sepia Reading, Dual-Pane Editor, Comments)."
+- **ACCEPTANCE CRITERIA:** All assets match Microsoft Partner Center exact pixel dimensions and format requirements.
+- **TEST:** Automated image dimension inspection script.
+
+### P18-T003 — Windows App Certification Kit (WACK) Compliance Audit
+**ID:** P18-T003 · **FEATURE:** Compliance / WACK · **PRIORITY:** P0 · **DEPENDS_ON:** P18-T001 · **STATUS:** READY · **ESTIMATE:** 20 mins · **FILES_SCOPE:** `reports/wack_report.xml`
+- **AGENT PROMPT:** "Run the official Windows App Certification Kit (`appcert.exe`) on the Store MSIX package to test security, binary analyzer, supported APIs, manifest validation, and clean uninstall. Fix any flagged issues."
+- **ACCEPTANCE CRITERIA:** WACK test outputs PASSED (0 errors, 0 warnings).
+- **TEST:** `appcert.exe test -appxpackagepath ... -reportoutputpath reports/wack_report.xml`.
+
+### P18-T004 — Store Listing Content, Privacy Policy, and Submission Guide
+**ID:** P18-T004 · **FEATURE:** Store / Governance · **PRIORITY:** P0 · **DEPENDS_ON:** P18-T003 · **STATUS:** READY · **ESTIMATE:** 20 mins · **FILES_SCOPE:** `docs/PRIVACY_POLICY.md`, `docs/STORE_LISTING.md`, `docs/MICROSOFT_STORE_SUBMISSION_GUIDE.md`
+- **AGENT PROMPT:** "Create compliant Privacy Policy (`docs/PRIVACY_POLICY.md` highlighting 100% offline local privacy), complete Store listing descriptions in Arabic and English, keywords, age rating questionnaire guide, and step-by-step submission walkthrough for Microsoft Partner Center."
+- **ACCEPTANCE CRITERIA:** All submission materials prepared for immediate copy-paste into Partner Center dashboard.
+- **TEST:** Review against Microsoft Store submission policies.

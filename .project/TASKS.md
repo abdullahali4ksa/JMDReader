@@ -568,3 +568,90 @@ The `FILES_SCOPE` on each original P01 task is the allowlist. Dependencies are d
 - **TEST:** Build/test + manual interaction checklist (zoom in, zoom out, reset, verify ratio display, verify direction preservation).
 - **VERIFICATION:** Confirm ratio value visible in UI; confirm reset action executes without crash; confirm direction preserved for code/url elements.
 - **STATUS:** DONE (confirmed code blocks use FlowDirection.LeftToRight; confirmed external HTTP(S) URLs inherit paragraph direction but URL characters remain LTR via Unicode bidi algorithm; confirmed heading anchors and table cells retain LTR/RTL based on content analysis; confirmed zoom reset restores ZoomRatio to 1.0; documented zoom behavior in ARCHITECTURE.md; build PASS 0 errors; tests PASS 60/60)
+
+---
+
+## Phase 10 — Core Mutation Foundation and Safe File I/O
+
+**Status:** IN_PROGRESS · **Depends on:** Phase 9 complete · **Scope:** Core document modification, atomic file saving, and dirty tracking.
+
+### P10-T001 — Update Blueprint and Architecture for Hybrid Reader + Editor
+**ID:** P10-T001 · **FEATURE:** Architecture / Evolution · **PRIORITY:** P0 · **DEPENDS_ON:** P09-T002 · **STATUS:** DONE · **FILES_SCOPE:** `docs/PRODUCT_BLUEPRINT.md`, `docs/ARCHITECTURE.md`, `docs/ROADMAP.md`, `.project/TASKS.md`
+- **AGENT PROMPT:** "Update `docs/PRODUCT_BLUEPRINT.md` and `docs/ARCHITECTURE.md` to authorize Option (A) Hybrid Architecture (WinUI 3 Shell + Offline WebView2 Engine) and lift Viewer-only constraint for Markdown editing."
+- **ACCEPTANCE CRITERIA:** Blueprint authorizes editing and hybrid offline WebView2; architecture documents the new hybrid boundary; build & tests pass.
+- **TEST:** Documentation consistency check + `dotnet test`.
+- **VERIFICATION:** Verified owner authorization on 2026-11-13; docs updated; all 60 tests passing.
+
+### P10-T002 — Implement Atomic File Saving and Document Session Dirty State in MDReader.Core
+**ID:** P10-T002 · **FEATURE:** Core / Persistence · **PRIORITY:** P0 · **DEPENDS_ON:** P10-T001 · **STATUS:** READY · **ESTIMATE:** 20 mins · **FILES_SCOPE:** `src/MDReader.Core/Documents/MarkdownFileWriter.cs`, `src/MDReader.Core/Documents/DocumentSession.cs`, `tests/MDReader.Core.Tests/MarkdownFileWriterTests.cs`
+- **AGENT PROMPT:** "Implement `MarkdownFileWriter.cs` with atomic file save (`.tmp` write then replace), UTF-8 encoding without BOM, error recovery, and `DocumentSession.cs` for tracking original vs current text and `IsDirty` state. Write xUnit tests in `MarkdownFileWriterTests.cs`."
+- **ACCEPTANCE CRITERIA:** Files can be safely saved; atomic write prevents corruption; Arabic text round-trips with zero data loss; `IsDirty` flags changes correctly; 100% test pass.
+- **TEST:** `dotnet test --filter FullyQualifiedName~MarkdownFileWriterTests`
+- **VERIFICATION:** Builder compiles with 0 errors; Verifier confirms tests pass.
+
+---
+
+## Phase 11 — Multi-Document Tab System and Folder Workspace
+
+**Status:** PLANNED · **Depends on:** Phase 10 complete · **Scope:** WinUI 3 TabView and Folder TreeView.
+
+### P11-T001 — Integrate Multi-Document TabView in WinUI 3
+**ID:** P11-T001 · **FEATURE:** Shell / Tabs · **PRIORITY:** P1 · **DEPENDS_ON:** P10-T002 · **STATUS:** BLOCKED (by P10-T002) · **ESTIMATE:** 25 mins · **FILES_SCOPE:** `src/MDReader.App/Features/Shell/Views/MainWindow.xaml`, `src/MDReader.App/Features/Reader/Views/MainPage.xaml`, `src/MDReader.App/Features/Reader/ViewModels/ReaderViewModel.cs`
+- **AGENT PROMPT:** "Integrate WinUI 3 `TabView` into the reader view. Support opening multiple `.md` files concurrently, tab switching, tab closing with dirty warning if `IsDirty`, and dynamic tab header with `*` indicator."
+- **ACCEPTANCE CRITERIA:** Multiple files can be opened in distinct tabs; closing a modified tab prompts to save; switching tabs preserves document state.
+- **TEST:** `dotnet build` + automated view model unit tests.
+- **VERIFICATION:** Verifier checks tab creation, tab closing, and dirty state headers.
+
+### P11-T002 — Implement Workspace Folder Tree Sidebar
+**ID:** P11-T002 · **FEATURE:** Shell / Workspace · **PRIORITY:** P2 · **DEPENDS_ON:** P11-T001 · **STATUS:** BLOCKED (by P11-T001) · **ESTIMATE:** 20 mins · **FILES_SCOPE:** `src/MDReader.App/Features/Shell/Views/MainWindow.xaml`, `src/MDReader.App/Features/Shell/ViewModels/ShellViewModel.cs`
+- **AGENT PROMPT:** "Add a collapsible sidebar `SplitView` containing a `TreeView` to open a workspace folder, displaying nested `.md` files and opening them in tabs on click."
+- **ACCEPTANCE CRITERIA:** Folder picker opens directory; tree displays folders and `.md` files; clicking a file opens it in a new tab.
+- **TEST:** `dotnet build` + tree item selection verification.
+
+---
+
+## Phase 12 — Antigravity-Grade Offline Rendering Engine
+
+**Status:** PLANNED · **Depends on:** Phase 11 complete · **Scope:** 100% Offline WebView2, Mermaid, KaTeX, Callouts, Syntax Highlighting.
+
+### P12-T001 — Package Offline Rendering Assets and Sandboxed HTML Template
+**ID:** P12-T001 · **FEATURE:** Rendering / Offline Engine · **PRIORITY:** P0 · **DEPENDS_ON:** P11-T002 · **STATUS:** BLOCKED (by P11-T002) · **ESTIMATE:** 20 mins · **FILES_SCOPE:** `src/MDReader.App/Assets/Renderer/`, `src/MDReader.App/MDReader.App.csproj`
+- **AGENT PROMPT:** "Bundle local offline JavaScript/CSS libraries in `Assets/Renderer/` (`markdown-it.min.js`, `katex.min.js`, `katex.min.css`, `mermaid.min.js`, `highlight.min.js`, `github-markdown.css`). Configure project to copy assets to output directory."
+- **ACCEPTANCE CRITERIA:** All assets load locally with 0 external network requests; CSP (Content Security Policy) strictly forbids external origin fetch.
+- **TEST:** `dotnet build` + file presence and integrity check.
+
+### P12-T002 — Render Antigravity Alerts, KaTeX Math, Mermaid Diagrams, and Copyable Code Blocks
+**ID:** P12-T002 · **FEATURE:** Rendering / Visual Fidelity · **PRIORITY:** P0 · **DEPENDS_ON:** P12-T001 · **STATUS:** BLOCKED (by P12-T001) · **ESTIMATE:** 25 mins · **FILES_SCOPE:** `src/MDReader.App/Assets/Renderer/viewer.html`, `src/MDReader.App/Features/Reader/Views/WebView2MarkdownViewer.xaml.cs`
+- **AGENT PROMPT:** "Implement the HTML/JS renderer script to parse GitHub alerts (`[!NOTE]`, `[!TIP]`, `[!IMPORTANT]`, `[!WARNING]`, `[!CAUTION]`), render KaTeX math (`$...$` & `$$...$$`), render Mermaid diagrams (`flowchart`, `sequenceDiagram`, etc.), and attach code block headers with copy buttons."
+- **ACCEPTANCE CRITERIA:** Renders sample document containing alerts, math, mermaid, and code blocks with 100% visual parity with Google Antigravity.
+- **TEST:** Sample fixture rendering verification.
+
+---
+
+## Phase 13 — Live Markdown Editor and Synchronized Split View
+
+**Status:** PLANNED · **Depends on:** Phase 12 complete · **Scope:** Editor, View modes, and synchronized scrolling.
+
+### P13-T001 — Implement Markdown Editor & View Mode Switcher
+**ID:** P13-T001 · **FEATURE:** Editor / ViewModes · **PRIORITY:** P1 · **DEPENDS_ON:** P12-T002 · **STATUS:** BLOCKED (by P12-T002) · **ESTIMATE:** 25 mins · **FILES_SCOPE:** `src/MDReader.App/Features/Reader/Views/EditorPane.xaml`, `src/MDReader.App/Features/Reader/ViewModels/ReaderViewModel.cs`
+- **AGENT PROMPT:** "Implement the editor pane with line numbering and syntax styling. Add View Mode switcher on the toolbar: Split View (Editor + Live Preview), Editor Only, and Preview Only."
+- **ACCEPTANCE CRITERIA:** Typing in the editor immediately updates the live preview (debounced); switching view modes smoothly hides/shows panes.
+- **TEST:** `dotnet test` + manual text edit test.
+
+### P13-T002 — Implement Synchronized Scrolling and Formatting Toolbar
+**ID:** P13-T002 · **FEATURE:** Editor / Productivity · **PRIORITY:** P2 · **DEPENDS_ON:** P13-T001 · **STATUS:** BLOCKED (by P13-T001) · **ESTIMATE:** 20 mins · **FILES_SCOPE:** `src/MDReader.App/Features/Reader/Views/MainPage.xaml`, `src/MDReader.App/Features/Reader/ViewModels/ReaderViewModel.cs`
+- **AGENT PROMPT:** "Implement synchronized vertical scrolling between editor and preview panes. Add a formatting toolbar for Bold (`Ctrl+B`), Italic (`Ctrl+I`), Headings, Code block, Link, and Table."
+- **ACCEPTANCE CRITERIA:** Scrolling either pane proportionally scrolls the counterpart; toolbar buttons insert proper markdown syntax at cursor position.
+- **TEST:** Cursor insertion and scroll-offset calculation tests.
+
+---
+
+## Phase 14 — Performance, RTL Polish, and Final Packaging
+
+**Status:** PLANNED · **Depends on:** Phase 13 complete · **Scope:** Large files, Arabic RTL typing, and MSIX packaging.
+
+### P14-T001 — Arabic RTL Polish, Large File Stress Testing, and Final MSIX Verification
+**ID:** P14-T001 · **FEATURE:** Quality / Release · **PRIORITY:** P0 · **DEPENDS_ON:** P13-T002 · **STATUS:** BLOCKED (by P13-T002) · **ESTIMATE:** 25 mins · **FILES_SCOPE:** `src/MDReader.App/`, `tests/fixtures/`, `artifacts/release/`
+- **AGENT PROMPT:** "Verify bi-directional Arabic/English text in both editor and preview; stress test with 5MB and 10MB markdown fixtures; run all tests (`dotnet test`); generate and sign final MSIX package."
+- **ACCEPTANCE CRITERIA:** 0 crashes, 0 memory leaks; all tests pass; MSIX builds cleanly.
+- **TEST:** `dotnet test` (all tests pass) + MSIX build.

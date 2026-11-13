@@ -1,32 +1,30 @@
 # MDReader Product Blueprint
 
-**Status:** Accepted by the project owner (2026-10-05). This blueprint is the authoritative product plan; implementation is authorized via the Autonomous Developer Loop, task by task, within the file scopes and acceptance criteria defined in `.project/TASKS.md`.
+**Status:** Accepted and authorized by the project owner (Original: 2026-10-05; Evolution Amendment: 2026-11-13). This blueprint is the authoritative product plan; implementation is authorized via the Autonomous Developer Loop, task by task, within the file scopes and acceptance criteria defined in `.project/TASKS.md`.
 **Authority:** This blueprint expands `docs/PRODUCT_SPEC.md` and must remain consistent with `docs/ARCHITECTURE.md`, `docs/UI_DESIGN.md`, `docs/FEATURE_MAP.md`, `docs/ROADMAP.md`, `docs/DECISIONS.md`, `.project/PROJECT.md`, and `.project/STATE.json`.
-**Product:** MDReader — a focused, offline Windows Markdown reader.
+**Product:** MDReader — an Antigravity-grade Windows Markdown Reader & Editor powered by a modern hybrid architecture (WinUI 3 Shell + Offline WebView2 Engine).
 
 ## 1. Product definition
 
-MDReader opens Markdown documents and presents them as readable formatted content in a small, native Windows desktop application. It is for reading and previewing documents, not authoring them. It should start quickly, behave predictably with local files, support Arabic and English, and avoid accounts, cloud services, telemetry, and network dependencies.
+MDReader opens, edits, and renders Markdown documents with the fidelity and rich visual capabilities of Google Antigravity in a fast, native Windows desktop application. It supports reading, live editing, and previewing with GitHub alerts, Mermaid diagrams, KaTeX math formulas, syntax-highlighted code blocks with copy actions, multi-document tabs, and workspace folder browsing. It starts quickly, behaves predictably with local files, supports Arabic and English (RTL/LTR), operates 100% offline, and avoids accounts, cloud services, telemetry, and external network dependencies.
 
 ### Intended users
 
-- People who receive or keep Markdown notes and want to read them without opening a code editor.
-- Developers and technical writers reviewing README, project notes, and documentation.
-- Students and knowledge workers reading local study notes.
-- Arabic/English readers who need correct RTL, LTR, and mixed-direction text.
+- Knowledge workers, developers, and writers seeking an Antigravity-like rich Markdown viewing and editing experience on Windows.
+- Developers reviewing and editing project documentation, READMEs, diagrams, and code snippets.
+- Students and researchers reading and authoring technical notes with math formulas ($E=mc^2$) and Mermaid workflows.
+- Arabic/English readers and authors who require seamless bidirectional text editing and rendering.
 
-Windows 10 20H2 or later is the minimum product target as stated in `PRODUCT_SPEC.md`; Windows 11 is the primary design target. (The older Windows 10 1809 statement in `ARCHITECTURE.md` must be reconciled before implementation.)
+Windows 10 20H2 or later is the minimum product target; Windows 11 is the primary design target.
 
-## 2. Product principles and hard boundaries
+## 2. Product principles and evolution boundaries
 
-1. Viewer only: never edit, save, or overwrite document content.
-2. Local and offline: opening and rendering files must not require a network connection.
-3. Explicit access: access only files/folders selected or dropped by the user; no broad disk scan.
-4. Core/App separation and feature-based MVVM remain mandatory.
-5. Keep the first release small. No database, accounts, cloud sync, telemetry, plugins, or AI provider.
-6. Raw embedded HTML is not rendered. Links and images follow the safe subset in the architecture document.
-7. Current product spec prohibits persistent local product data beyond temporary cache. Recent items therefore exist only in the current process; session restore and persisted preferences are deferred until a documented decision changes that constraint.
-8. Do not begin implementation until the owner reviews this blueprint and the backlog and explicitly starts the autonomous development loop.
+1. **Reader and Editor:** Safe, atomic editing and saving of Markdown files (`Ctrl+S`, Save As, dirty state indicator `*`). Never corrupt user files; use atomic writes (`.tmp` -> replace).
+2. **Local and 100% offline:** All rendering (including Markdown-it, Mermaid, KaTeX, and syntax highlighters) runs strictly from local offline assets bundled in the application. Zero network calls or CDN requests.
+3. **Explicit access:** Access only files and folders explicitly opened or dropped by the user; no background telemetry or broad disk crawling.
+4. **Hybrid Architecture (Option A):** WinUI 3 hosts the native Windows shell, window chrome, `TabView`, workspace folder tree, file I/O, and hotkeys. A local, sandboxed `WebView2` hosts the Antigravity-grade Markdown preview and editor components.
+5. **Core/App separation:** Business logic, atomic file I/O, and document sessions reside in `MDReader.Core`. UI presentation, tabs, and WebView2 hosting reside in `MDReader.App`.
+6. **Arabic & Bi-directional fidelity:** Native per-paragraph and per-block RTL/LTR detection for Arabic and English text, maintaining LTR for code blocks, URLs, and math formulas.
 
 ## 3. Functional scope
 

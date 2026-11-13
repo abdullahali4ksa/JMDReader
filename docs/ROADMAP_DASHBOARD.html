@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MDReader — لوحة متابعة التحول والمهام الذاتية (Multi-Agent Tracker)</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --info: #38bdf8;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: var(--bg); color: var(--text-main); padding: 30px 20px; line-height: 1.6; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        header { margin-bottom: 30px; border-bottom: 1px solid var(--border); padding-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        h1 { font-size: 26px; color: var(--text-main); display: flex; align-items: center; gap: 10px; }
+        .badge { font-size: 13px; padding: 4px 10px; border-radius: 20px; font-weight: 600; }
+        .badge-active { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .stat-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+        .stat-title { font-size: 13px; color: var(--text-muted); margin-bottom: 8px; }
+        .stat-value { font-size: 26px; font-weight: 700; color: #fff; }
+        .progress-bar-container { background: #334155; border-radius: 8px; height: 10px; overflow: hidden; margin-top: 10px; }
+        .progress-bar-fill { background: linear-gradient(90deg, #10b981, #38bdf8); height: 100%; width: 45%; border-radius: 8px; transition: width 0.4s; }
+        
+        .section-title { font-size: 18px; margin: 24px 0 16px 0; color: #e2e8f0; display: flex; align-items: center; gap: 8px; }
+        .task-table { width: 100%; border-collapse: collapse; background: var(--card-bg); border-radius: 12px; overflow: hidden; border: 1px solid var(--border); margin-bottom: 30px; }
+        .task-table th, .task-table td { padding: 14px 18px; text-align: right; border-bottom: 1px solid var(--border); }
+        .task-table th { background: #162032; color: #94a3b8; font-size: 13px; text-transform: uppercase; }
+        .status-pill { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; }
+        .status-done { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+        .status-ready { background: rgba(56, 189, 248, 0.2); color: #38bdf8; }
+        .status-blocked { background: rgba(148, 163, 184, 0.15); color: #94a3b8; }
+        
+        .code-box { background: #090d16; padding: 8px 12px; border-radius: 6px; font-family: Consolas, monospace; font-size: 12px; direction: ltr; text-align: left; color: #38bdf8; word-break: break-all; }
+        .agent-note { background: rgba(79, 70, 229, 0.15); border: 1px solid rgba(79, 70, 229, 0.4); padding: 16px; border-radius: 10px; margin-bottom: 25px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <div>
+            <h1>MDReader — بيئة التطوير الذاتية والوكلاء المتعددين 🚀</h1>
+            <p style="color: var(--text-muted); font-size: 14px; margin-top: 4px;">
+                تحول شامل إلى قارئ ومحرر متكامل بمعمارية WinUI 3 + Offline WebView2 بمستوى Google Antigravity
+            </p>
+        </div>
+        <span class="badge badge-active">الحالة: قيد التشغيل التلقائي</span>
+    </header>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-title">المرحلة الحالية</div>
+            <div class="stat-value">Phase 10 & 11</div>
+            <div style="color: #38bdf8; font-size: 12px; margin-top: 4px;">Core Mutation & Tabs</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-title">الاختبارات الآلية (Unit Tests)</div>
+            <div class="stat-value">66 / 66</div>
+            <div style="color: #10b981; font-size: 12px; margin-top: 4px;">100% ناجحة بدون أخطاء</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-title">نسبة الإنجاز الإجمالية للتحول</div>
+            <div class="stat-value">35%</div>
+            <div class="progress-bar-container">
+                <div class="progress-bar-fill" style="width: 35%;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="agent-note">
+        <strong>⚡ تعليمات دورة الوكلاء (Autonomous Multi-Agent Loop):</strong>
+        <p style="font-size: 13px; color: #cbd5e1; margin-top: 6px;">
+            يعمل الوكيل المطور (Builder) على إنجاز الكود والاختبار، بينما يقوم وكيل الفحص (Verifier) بتأكيد سلامة البناء (0 warnings/errors) وتأكيد اجتياز كافة الاختبارات عبر <code>dotnet test</code>، ثم يُحدّث سجل <code>.project/State.json</code> ويتحرك ذاتياً للمهمة التالية عند إعطاء أمر الاستمرار أو وفق جدول المهام.
+        </p>
+    </div>
+
+    <div class="section-title">📋 جدول المهام وحالة التنفيذ التفاعلية</div>
+    <table class="task-table">
+        <thead>
+            <tr>
+                <th>المعرف</th>
+                <th>المهمة والوصف</th>
+                <th>الحالة</th>
+                <th>التقدير</th>
+                <th>البرومبت وأمر الاختبار</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>P10-T001</strong></td>
+                <td>تحديث الـ Blueprint والمعمارية الهجينة</td>
+                <td><span class="status-pill status-done">✓ مكتملة (DONE)</span></td>
+                <td>15 د</td>
+                <td><div class="code-box">Verified in docs/PRODUCT_BLUEPRINT.md</div></td>
+            </tr>
+            <tr>
+                <td><strong>P10-T002</strong></td>
+                <td>محرك الحفظ الذري وتتبع التعديل (MarkdownFileWriter)</td>
+                <td><span class="status-pill status-done">✓ مكتملة (DONE)</span></td>
+                <td>20 د</td>
+                <td><div class="code-box">dotnet test --filter FullyQualifiedName~MarkdownFileWriterTests</div></td>
+            </tr>
+            <tr>
+                <td><strong>P11-T001</strong></td>
+                <td>دمج نظام التبويبات المتعددة (TabView)</td>
+                <td><span class="status-pill status-ready">⚡ جاهزة للبدء (READY)</span></td>
+                <td>25 د</td>
+                <td><div class="code-box">Integrate WinUI 3 TabView in MainWindow & ReaderViewModel</div></td>
+            </tr>
+            <tr>
+                <td><strong>P11-T002</strong></td>
+                <td>شريط مستعرض المجلدات والملفات (Folder TreeView)</td>
+                <td><span class="status-pill status-blocked">مجدولة (QUEUED)</span></td>
+                <td>20 د</td>
+                <td><div class="code-box">Add SplitView with TreeView for folder browsing</div></td>
+            </tr>
+            <tr>
+                <td><strong>P12-T001</strong></td>
+                <td>حزم أصول العرض أوفلاين (Mermaid, KaTeX, Markdown-it)</td>
+                <td><span class="status-pill status-blocked">مجدولة (QUEUED)</span></td>
+                <td>20 د</td>
+                <td><div class="code-box">Bundle local scripts in Assets/Renderer/ with zero CDN</div></td>
+            </tr>
+            <tr>
+                <td><strong>P12-T002</strong></td>
+                <td>تصيير تنبيهات Antigravity والمعادلات والرسوم وزر النسخ</td>
+                <td><span class="status-pill status-blocked">مجدولة (QUEUED)</span></td>
+                <td>25 د</td>
+                <td><div class="code-box">Implement viewer.html script with KaTeX, Mermaid & Alerts</div></td>
+            </tr>
+            <tr>
+                <td><strong>P13-T001</strong></td>
+                <td>بناء محرر النصوص وأنماط العرض (Split / Editor / Preview)</td>
+                <td><span class="status-pill status-blocked">مجدولة (QUEUED)</span></td>
+                <td>25 د</td>
+                <td><div class="code-box">Build EditorPane with view mode toggle toolbar</div></td>
+            </tr>
+            <tr>
+                <td><strong>P13-T002</strong></td>
+                <td>تزامن التمرير وشريط التنسيق السريع (Scroll Sync)</td>
+                <td><span class="status-pill status-blocked">مجدولة (QUEUED)</span></td>
+                <td>20 د</td>
+                <td><div class="code-box">Bidirectional scroll sync via postMessage bridge</div></td>
+            </tr>
+            <tr>
+                <td><strong>P14-T001</strong></td>
+                <td>فحص الأداء والعربية الشامل وحزم MSIX</td>
+                <td><span class="status-pill status-blocked">مجدولة (QUEUED)</span></td>
+                <td>25 د</td>
+                <td><div class="code-box">dotnet test + MSIX package build</div></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

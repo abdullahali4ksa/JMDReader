@@ -64,6 +64,31 @@
                 "reveal": "always",
                 "panel": "new"
             }
+        },
+        {
+            "label": "run",
+            "command": "dotnet",
+            "type": "shell",
+            "args": [
+                "run",
+                "--project",
+                "src/MDReader.App"
+            ],
+            "options": {
+                "environmentVariables": {
+                    "DOTNET_ROOT": "C:\\Users\\ZAACO\\.dotnet",
+                    "PATH": "C:\\Users\\ZAACO\\.dotnet;${env:PATH}"
+                }
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": []
         }
     ]
 }

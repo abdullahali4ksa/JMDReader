@@ -61,7 +61,7 @@ public sealed class FolderNodeViewModel : ObservableObject
             foreach (var file in dirInfo.GetFiles())
             {
                 var ext = file.Extension.ToLowerInvariant();
-                if (ext == ".md" || ext == ".markdown")
+                if (MDReader.Core.Documents.MarkdownFileReader.IsSupportedExtension(ext))
                 {
                     parentNode.Children.Add(new FolderNodeViewModel
                     {

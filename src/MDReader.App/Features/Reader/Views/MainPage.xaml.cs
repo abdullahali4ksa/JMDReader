@@ -141,6 +141,7 @@ public sealed partial class MainPage : Page
         {
             var content = _viewModel?.DocumentContent ?? string.Empty;
             var currentPath = _viewModel?.SelectedTab?.FilePath ?? string.Empty;
+            var isTxt = currentPath.EndsWith(".txt", StringComparison.OrdinalIgnoreCase);
             var isJson = currentPath.EndsWith(".json", StringComparison.OrdinalIgnoreCase) ||
                          currentPath.EndsWith(".jsonc", StringComparison.OrdinalIgnoreCase) ||
                          currentPath.EndsWith(".jsonl", StringComparison.OrdinalIgnoreCase);
@@ -160,7 +161,8 @@ public sealed partial class MainPage : Page
                 type = "setContent",
                 content = content,
                 markdown = content,
-                json = content
+                json = content,
+                isText = isTxt
             });
             AntigravityViewer.CoreWebView2.PostWebMessageAsJson(json);
         }
@@ -544,18 +546,26 @@ public sealed partial class MainPage : Page
 
     private void FindTextBox_KeyDown(object sender, KeyRoutedEventArgs e)
     {
-        if (e.Key == VirtualKey.Enter)
+        try
         {
-            if (InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Shift).HasFlag(VirtualKeyStates.Down))
-                FindPrevious();
-            else
-                FindNext();
-            e.Handled = true;
+            if (e.Key == VirtualKey.Enter)
+            {
+                var shiftState = InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Shift);
+                if ((shiftState & Windows.UI.Core.CoreVirtualKeyStates.Down) == Windows.UI.Core.CoreVirtualKeyStates.Down)
+                    FindPrevious();
+                else
+                    FindNext();
+                e.Handled = true;
+            }
+            else if (e.Key == VirtualKey.Escape)
+            {
+                CloseFind();
+                e.Handled = true;
+            }
         }
-        else if (e.Key == VirtualKey.Escape)
+        catch (Exception ex)
         {
-            CloseFind();
-            e.Handled = true;
+            Debug.WriteLine($"[FindTextBox_KeyDown] Error: {ex}");
         }
     }
 
@@ -718,27 +728,37 @@ public sealed partial class MainPage : Page
 
     private async void MarkdownEditorTextBox_KeyDown(object sender, KeyRoutedEventArgs e)
     {
-        if (e.Key == VirtualKey.V && InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Control).HasFlag(VirtualKeyStates.Down))
+        try
         {
-            var clipboard = Clipboard.GetContent();
-            if (clipboard.Contains(StandardDataFormats.Bitmap))
+            var ctrlState = InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Control);
+            var isCtrlDown = (ctrlState & Windows.UI.Core.CoreVirtualKeyStates.Down) == Windows.UI.Core.CoreVirtualKeyStates.Down;
+
+            if (e.Key == VirtualKey.V && isCtrlDown)
             {
-                e.Handled = true;
-                await InsertClipboardBitmapAsync(clipboard);
-            }
-            else if (clipboard.Contains(StandardDataFormats.StorageItems))
-            {
-                var items = await clipboard.GetStorageItemsAsync();
-                foreach (var item in items)
+                var clipboard = Clipboard.GetContent();
+                if (clipboard.Contains(StandardDataFormats.Bitmap))
                 {
-                    if (item is StorageFile file && MarkdownEditorUtilities.IsImageFile(file.FileType))
+                    e.Handled = true;
+                    await InsertClipboardBitmapAsync(clipboard);
+                }
+                else if (clipboard.Contains(StandardDataFormats.StorageItems))
+                {
+                    var items = await clipboard.GetStorageItemsAsync();
+                    foreach (var item in items)
                     {
-                        e.Handled = true;
-                        await InsertImageFileAsync(file);
-                        return;
+                        if (item is StorageFile file && MarkdownEditorUtilities.IsImageFile(file.FileType))
+                        {
+                            e.Handled = true;
+                            await InsertImageFileAsync(file);
+                            return;
+                        }
                     }
                 }
             }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[MarkdownEditorTextBox_KeyDown] Error: {ex}");
         }
     }
 

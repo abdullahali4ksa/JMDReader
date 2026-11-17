@@ -47,8 +47,8 @@ public static class MarkdownFileWriter
             return SaveResult.Failure(filePath ?? string.Empty, "File path cannot be empty.");
 
         var extension = Path.GetExtension(filePath).ToLowerInvariant();
-        if (extension != ".md" && extension != ".markdown")
-            return SaveResult.Failure(filePath, $"Unsupported file extension '{extension}'. Only .md and .markdown are allowed.");
+        if (!MarkdownFileReader.IsSupportedExtension(extension))
+            return SaveResult.Failure(filePath, $"Unsupported file extension '{extension}'. Supported extensions: .md, .markdown, .json, .jsonc, .jsonl, .txt");
 
         string? tempFilePath = null;
         try

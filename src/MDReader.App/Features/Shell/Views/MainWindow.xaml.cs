@@ -238,17 +238,17 @@ public sealed partial class MainWindow : Window
         e.DragUIOverride.IsContentVisible = true;
     }
 
-    private void RootGrid_Drop(object sender, DragEventArgs e)
+    private async void RootGrid_Drop(object sender, DragEventArgs e)
     {
         if (e.DataView.AvailableFormats.Contains(Windows.ApplicationModel.DataTransfer.StandardDataFormats.StorageItems))
         {
             try
             {
-                var items = e.DataView.GetStorageItemsAsync().AsTask().Result;
+                var items = await e.DataView.GetStorageItemsAsync();
                 if (items.Count > 0)
                 {
                     var file = items[0];
-                    if (file.IsOfType(Windows.Storage.StorageItemTypes.File) && (file.Name.EndsWith(".md", System.StringComparison.OrdinalIgnoreCase) || file.Name.EndsWith(".markdown", System.StringComparison.OrdinalIgnoreCase)))
+                    if (file.IsOfType(Windows.Storage.StorageItemTypes.File) && MDReader.Core.Documents.MarkdownFileReader.IsSupportedExtension(file.Name))
                     {
                         _shellViewModel.OpenDocument(file.Path);
                     }

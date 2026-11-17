@@ -66,6 +66,13 @@
               <uap:FileType>.jsonl</uap:FileType>
             </uap:SupportedFileTypes>
           </uap:FileTypeAssociation>
+          <uap:FileTypeAssociation Name="text">
+            <uap:DisplayName>Plain Text Document</uap:DisplayName>
+            <uap:Logo>Assets\StoreLogo.png</uap:Logo>
+            <uap:SupportedFileTypes>
+              <uap:FileType>.txt</uap:FileType>
+            </uap:SupportedFileTypes>
+          </uap:FileTypeAssociation>
         </uap:Extension>
       </Extensions>
     </Application>

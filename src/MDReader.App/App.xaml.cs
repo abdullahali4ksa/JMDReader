@@ -1,4 +1,4 @@
-﻿using Windows.ApplicationModel;
+using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
@@ -36,6 +36,7 @@ public partial class App : Application
         InitializeComponent();
         UnhandledException += (sender, e) =>
         {
+            e.Handled = true;
             try
             {
                 var logPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "MDReader", "crash.log");

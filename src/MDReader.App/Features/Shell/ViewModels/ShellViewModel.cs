@@ -200,6 +200,8 @@ public sealed partial class ShellViewModel : ObservableObject
             var savePicker = new Windows.Storage.Pickers.FileSavePicker();
             savePicker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.DocumentsLibrary;
             savePicker.FileTypeChoices.Add("Markdown Document", new List<string>() { ".md", ".markdown" });
+            savePicker.FileTypeChoices.Add("JSON Document", new List<string>() { ".json", ".jsonc", ".jsonl" });
+            savePicker.FileTypeChoices.Add("Plain Text Document", new List<string>() { ".txt" });
             savePicker.SuggestedFileName = _readerViewModel.SelectedTab.Title.Replace(" *", "");
 
             WinRT.Interop.InitializeWithWindow.Initialize(savePicker, WindowHandle);

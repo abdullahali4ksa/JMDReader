@@ -50,6 +50,10 @@ public sealed partial class FileOpenViewModel : ObservableObject
         var picker = new FileOpenPicker();
         picker.FileTypeFilter.Add(".md");
         picker.FileTypeFilter.Add(".markdown");
+        picker.FileTypeFilter.Add(".json");
+        picker.FileTypeFilter.Add(".jsonc");
+        picker.FileTypeFilter.Add(".jsonl");
+        picker.FileTypeFilter.Add(".txt");
         picker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
         AttachWindowHandle(picker, hwnd);
         var file = await picker.PickSingleFileAsync();

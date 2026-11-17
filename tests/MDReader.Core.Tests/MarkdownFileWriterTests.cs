@@ -75,11 +75,26 @@ public sealed class MarkdownFileWriterTests : IDisposable
     [Fact]
     public void WriteFile_UnsupportedExtension_ReturnsFailure()
     {
-        var filePath = Path.Combine(_tempDirectory, "document.txt");
+        var filePath = Path.Combine(_tempDirectory, "document.docx");
         var result = MarkdownFileWriter.WriteFile(filePath, "test");
 
         Assert.False(result.IsSuccess);
         Assert.Contains("Unsupported file extension", result.ErrorMessage);
+    }
+
+    [Fact]
+    public void WriteFile_JsonAndTxtFiles_Succeeds()
+    {
+        var jsonPath = Path.Combine(_tempDirectory, "data.json");
+        var txtPath = Path.Combine(_tempDirectory, "notes.txt");
+
+        var jsonRes = MarkdownFileWriter.WriteFile(jsonPath, "{\"app\":\"MDReader\"}");
+        var txtRes = MarkdownFileWriter.WriteFile(txtPath, "Simple note line");
+
+        Assert.True(jsonRes.IsSuccess);
+        Assert.True(txtRes.IsSuccess);
+        Assert.Equal("{\"app\":\"MDReader\"}", File.ReadAllText(jsonPath));
+        Assert.Equal("Simple note line", File.ReadAllText(txtPath));
     }
 
     [Fact]

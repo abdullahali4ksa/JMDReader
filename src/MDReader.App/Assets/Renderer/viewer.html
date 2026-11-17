@@ -774,7 +774,12 @@
 
             if (data.type === 'setContent') {
                 clearSearchHighlights();
-                const rendered = parseAntigravityMarkdown(data.markdown || "");
+                let rendered;
+                if (data.isText) {
+                    rendered = `<div class="plain-text-container" style="white-space: pre-wrap; word-break: break-word; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI Variable', 'Segoe UI', Cascadia Code, Consolas, monospace; font-size: 14px; line-height: 1.6; padding: 4px 0;">${escapeHtml(data.markdown || "")}</div>`;
+                } else {
+                    rendered = parseAntigravityMarkdown(data.markdown || "");
+                }
                 document.getElementById('content').innerHTML = rendered;
                 setupHeadingObserver();
                 window.chrome.webview.postMessage({ type: 'rendered' });

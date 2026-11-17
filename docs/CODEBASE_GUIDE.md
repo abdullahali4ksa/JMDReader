@@ -155,3 +155,20 @@ sequenceDiagram
    * **الأدوات العامة الثابتة:** التكبير والتصغير (Zoom)، تبديل الثيم، نسخ النص، وضع التركيز الشامل (Zen Mode)، وإظهار/إخفاء مسار الملف.
    * **أدوات الماركداون (تظهر عند فتح ملف .md):** أزرار الخط الغامق والمائل والعناوين والأكواد ومخططات Mermaid.
    * **أدوات الـ JSON (تظهر عند فتح ملف .json):** أزرار تجميل وتنسيق الكود (`✨ Beautify`)، ضغط الكود (`⚡ Minify`)، تحويل إلى جدول ماركداون (`📊 To Table`)، وتوسيع وطي الشجرة (`⊞ / ⊟`).
+
+---
+
+## 7. سياسة صياغة المهام والبرومبتات الصارمة (Dual-Line Policy & Security Prompt Mandate)
+
+كل مهمة برمجية جديدة تُسجل في المشروع (سواء في `.project/TASKS.md` أو على منصة `Linear.app` أو في أي توجيه أو برومبت لأي وكيل ذكاء اصطناعي أو مبرمج بشري) **يجب** أن تتضمن إلزامياً سطرين رئيسيين في بدايتها:
+
+1. **سطر سياسة التطوير (Development Policy Reference):**
+   ```text
+   POLICY_REF: docs/DEVELOPMENT_RULES.md (Architecture, MVVM, Clean UI, Intuitive Iconography §12, Microsoft Store Standards)
+   ```
+2. **سطر أمان وحماية الكود (Code Security & Resilience Reference):**
+   ```text
+   SECURITY_REF: docs/DEVELOPMENT_RULES.md §11 (Zero-Crash Mandate, Protected Async Void, Safe Try/Catch, Non-Locking I/O, ReDoS Timeout)
+   ```
+
+هذا الربط الصارم يضمن أن أي مبرمج أو وكيل برمجيات ينفذ المهمة يلتزم تلقائياً بعمارة MVVM النظيفة، ومفاهيم الحماية الشاملة، ومنع الانهيار والإغلاق المفاجئ وتجمد الواجهة نهائياً.

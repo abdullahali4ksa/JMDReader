@@ -1002,12 +1002,14 @@ The `FILES_SCOPE` on each original P01 task is the allowlist. Dependencies are d
 
 ---
 
-## Phase 25 — UI Iconography, Help Center, Learning Guides & Split-View Sync (الأيقونات التفاعلية ودليل المساعدة وشروح MD و JSON ومزامنة العرض)
+## Phase 25 — UI Iconography, Help Center, Learning Guides, Split-View Sync & Recent Files (الأيقونات التفاعلية ودليل المساعدة وشروح MD و JSON ومزامنة العرض والملفات الأخيرة)
 
-**Status:** IN_PROGRESS · **Depends on:** Phase 24 · **Linear Issues:** JMD-15, JMD-16, JMD-17, JMD-18, JMD-19
+**Status:** IN_PROGRESS · **Depends on:** Phase 24 · **Linear Issues:** JMD-15, JMD-16, JMD-17, JMD-18, JMD-19, JMD-20
 
 ### P25-T001 — Split-View Real-Time Scroll Sync & Visual Edit Marker (Linear: JMD-15)
 **ID:** P25-T001 · **FEATURE:** Reader / Sync · **PRIORITY:** P1 · **LINEAR_ID:** JMD-15 · **STATUS:** PLANNED · **ESTIMATE:** 35 mins · **FILES_SCOPE:** `src/MDReader.App/Features/Reader/Views/MainPage.xaml.cs`, `src/MDReader.App/Assets/Renderer/viewer.html`
+- **POLICY_REF:** `docs/DEVELOPMENT_RULES.md (Architecture, MVVM, Clean UI, Intuitive Iconography §12, Microsoft Store Standards)`
+- **SECURITY_REF:** `docs/DEVELOPMENT_RULES.md §11 (Zero-Crash Mandate, Protected Async Void, Safe Try/Catch, Non-Locking I/O, ReDoS Timeout)`
 - **GOAL:** Synchronize editor caret position with preview scroll position in Split View. Automatically scroll the preview to the line or heading being actively edited and briefly pulse-highlight the edited block (`.edit-highlight-pulse`) so the user immediately sees where the modification is reflected.
 - **ACCEPTANCE CRITERIA:** Editing in left pane scrolls right pane to matching block and briefly highlights it; debounced to maintain 60 FPS.
 
@@ -1034,3 +1036,10 @@ The `FILES_SCOPE` on each original P01 task is the allowlist. Dependencies are d
 - **GOAL:** Establish strict policy for intuitive icons and comprehensive bilingual tooltips supporting mouse hover and touch long-press (`ToolTipService.ToolTip`). Unify toolbar controls: show JSON tools (Beautify, Minify, To Table, Expand/Collapse) when viewing JSON, and Markdown formatting tools when viewing Markdown.
 - **ACCEPTANCE CRITERIA:** Every icon has a bilingual explanatory tooltip; toolbar adapts cleanly between Markdown and JSON documents.
 - **VERIFICATION:** Confirmed `DEVELOPMENT_RULES.md` (Section 12), `CODEBASE_GUIDE.md` (Section 6), adaptive `IsMarkdownFormattingVisible` / `IsCurrentDocumentJson` bindings, and comprehensive bilingual tooltips across all buttons.
+
+### P25-T006 — Recent Documents & Quick Reopen on Launch (Linear: JMD-20)
+**ID:** P25-T006 · **FEATURE:** Shell / RecentFiles · **PRIORITY:** P1 · **LINEAR_ID:** JMD-20 · **STATUS:** PLANNED · **ESTIMATE:** 30 mins · **FILES_SCOPE:** `src/MDReader.Core/Recent/`, `src/MDReader.App/Features/Shell/ViewModels/RecentFilesViewModel.cs`, `src/MDReader.App/Features/Reader/Views/MainPage.xaml`, `src/MDReader.App/Features/Shell/Views/MainWindow.xaml`
+- **POLICY_REF:** `docs/DEVELOPMENT_RULES.md (Architecture, MVVM, Clean UI, Intuitive Iconography §12, Microsoft Store Standards)`
+- **SECURITY_REF:** `docs/DEVELOPMENT_RULES.md §11 (Zero-Crash Mandate, Protected Async Void, Safe Try/Catch, Non-Locking I/O, ReDoS Timeout)`
+- **GOAL:** Maintain a secure, privacy-respecting local Most Recently Used (MRU) list (`%LOCALAPPDATA%\MDReader\recent_history.json`). Display recent files cards on startup / empty state, populate `File -> Open Recent` in the menu bar, allow pinning favorite files (📌), and pre-validate `File.Exists` to ensure zero crash if files are moved or deleted.
+- **ACCEPTANCE CRITERIA:** Recent files persist across restarts; opening a file adds it to the top; pin/unpin works; clearing history cleans the file; opening missing file shows gentle warning without crash.

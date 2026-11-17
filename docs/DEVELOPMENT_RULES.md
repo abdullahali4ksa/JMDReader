@@ -247,6 +247,26 @@ To ensure JMDReader is universally accessible, easy to use, and self-explanatory
 
 ---
 
+## 13. Mandatory Dual-Line Policy & Security Prompt Mandate (إلزامية سطر سياسة التطوير وسطر حماية الكود في كل مهمة وبرومبت)
+
+To guarantee consistent code quality, commercial readiness, and rock-solid resilience across all development cycles, **every single future task description, issue ticket (in Linear & TASKS.md), AI agent prompt, and implementation instruction MUST explicitly include two mandatory reference headers:**
+
+1. **Line 1 — Development Policy Reference (مرجعية سياسة التطوير):**
+   ```text
+   POLICY_REF: docs/DEVELOPMENT_RULES.md (Architecture, MVVM, Clean UI, Intuitive Iconography §12, Microsoft Store Standards)
+   ```
+   *Enforces clean separation of concerns, zero business logic in code-behinds, adaptive toolbars, intuitive iconography with bilingual hover/touch tooltips, and strict layer decoupling.*
+
+2. **Line 2 — Code Security & Resilience Reference (مرجعية أمان وحماية الكود):**
+   ```text
+   SECURITY_REF: docs/DEVELOPMENT_RULES.md §11 (Zero-Crash Mandate, Protected Async Void, Safe Try/Catch, Non-Locking I/O, ReDoS Timeout)
+   ```
+   *Enforces the Zero-Crash contract: all async void event handlers wrapped in try/catch, unobserved exceptions logged to crash.log, non-blocking asynchronous file I/O with FileShare.ReadWrite, safe WebView2 interop boundaries, and UI debounce protection.*
+
+Any proposed feature, backlog item, or agent prompt lacking these two lines must be rejected or updated immediately to include them before any coding or planning starts.
+
+---
+
 ## Developer Setup Checklist
 
 Before writing code, ensure:

@@ -94,6 +94,8 @@ public sealed partial class MainPage : Page
             _viewModel = readerViewModel;
             DataContext = readerViewModel;
             _viewModel.PropertyChanged += OnViewModelPropertyChanged;
+            _viewModel.RequestExpandAllJson += OnRequestExpandAllJson;
+            _viewModel.RequestCollapseAllJson += OnRequestCollapseAllJson;
             UpdateViewModeColumns();
             ApplyTheme();
             UpdateWebViewContent(immediate: true);
@@ -104,7 +106,35 @@ public sealed partial class MainPage : Page
     {
         base.OnNavigatedFrom(e);
         if (_viewModel is not null)
+        {
             _viewModel.PropertyChanged -= OnViewModelPropertyChanged;
+            _viewModel.RequestExpandAllJson -= OnRequestExpandAllJson;
+            _viewModel.RequestCollapseAllJson -= OnRequestCollapseAllJson;
+        }
+    }
+
+    private void OnRequestExpandAllJson()
+    {
+        try
+        {
+            if (_isWebViewInitialized && AntigravityViewer?.CoreWebView2 != null)
+            {
+                AntigravityViewer.CoreWebView2.PostWebMessageAsJson(JsonSerializer.Serialize(new { type = "expandAll" }));
+            }
+        }
+        catch { }
+    }
+
+    private void OnRequestCollapseAllJson()
+    {
+        try
+        {
+            if (_isWebViewInitialized && AntigravityViewer?.CoreWebView2 != null)
+            {
+                AntigravityViewer.CoreWebView2.PostWebMessageAsJson(JsonSerializer.Serialize(new { type = "collapseAll" }));
+            }
+        }
+        catch { }
     }
 
     private async Task InitializeWebViewAsync()
@@ -522,8 +552,8 @@ public sealed partial class MainPage : Page
         {
             try
             {
-                var json = JsonSerializer.Serialize(new { type = "clearSearch" });
-                AntigravityViewer.CoreWebView2.PostWebMessageAsJson(json);
+                AntigravityViewer.CoreWebView2.PostWebMessageAsJson(JsonSerializer.Serialize(new { type = "clearSearch" }));
+                AntigravityViewer.CoreWebView2.PostWebMessageAsJson(JsonSerializer.Serialize(new { type = "search", query = "" }));
             }
             catch { }
         }
@@ -540,6 +570,111 @@ public sealed partial class MainPage : Page
         {
             _viewModel?.CloseTab(tab);
         }
+    }
+
+    private void TabContextMenu_Pin_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            if (sender is FrameworkElement { Tag: DocumentTabViewModel tab })
+            {
+                _viewModel?.TogglePinTab(tab);
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[TabContextMenu_Pin_Click] Error: {ex}");
+        }
+    }
+
+    private void TabContextMenu_Favorite_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            if (sender is FrameworkElement { Tag: DocumentTabViewModel tab } && !string.IsNullOrEmpty(tab.FilePath))
+            {
+                UserPreferencesService.Instance.RecentFiles.Add(tab.FilePath, isPinned: true);
+                _viewModel?.RefreshRecentFiles();
+                ShowInAppToast("⭐ Added to Favorites / تم حفظ الملف في المفضلة");
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[TabContextMenu_Favorite_Click] Error: {ex}");
+        }
+    }
+
+    private void TabContextMenu_Close_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            if (sender is FrameworkElement { Tag: DocumentTabViewModel tab })
+            {
+                _viewModel?.CloseTab(tab);
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[TabContextMenu_Close_Click] Error: {ex}");
+        }
+    }
+
+    private void TabContextMenu_CloseRight_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            if (sender is FrameworkElement { Tag: DocumentTabViewModel tab })
+            {
+                _viewModel?.CloseTabsToRight(tab);
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[TabContextMenu_CloseRight_Click] Error: {ex}");
+        }
+    }
+
+    private void TabContextMenu_CloseOthers_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            if (sender is FrameworkElement { Tag: DocumentTabViewModel tab })
+            {
+                _viewModel?.CloseOtherTabs(tab);
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[TabContextMenu_CloseOthers_Click] Error: {ex}");
+        }
+    }
+
+    private void TabContextMenu_CloseAll_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            _viewModel?.CloseAllTabs();
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[TabContextMenu_CloseAll_Click] Error: {ex}");
+        }
+    }
+
+    private void ShowInAppToast(string message)
+    {
+        try
+        {
+            FindStatusText.Text = message;
+            var timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(3) };
+            timer.Tick += (s, e) =>
+            {
+                timer.Stop();
+                if (FindStatusText.Text == message) FindStatusText.Text = string.Empty;
+            };
+            timer.Start();
+        }
+        catch { }
     }
 
     private void DocumentTabs_TabDragStarting(TabView sender, TabViewTabDragStartingEventArgs args)
@@ -631,12 +766,25 @@ public sealed partial class MainPage : Page
             {
                 try
                 {
-                    var json = JsonSerializer.Serialize(new { type = "clearSearch" });
-                    AntigravityViewer.CoreWebView2.PostWebMessageAsJson(json);
+                    AntigravityViewer.CoreWebView2.PostWebMessageAsJson(JsonSerializer.Serialize(new { type = "clearSearch" }));
+                    AntigravityViewer.CoreWebView2.PostWebMessageAsJson(JsonSerializer.Serialize(new { type = "search", query = "" }));
                 }
                 catch { }
             }
             return;
+        }
+
+        if (_viewModel?.SelectedTab?.IsJsonDocument == true)
+        {
+            if (_isWebViewInitialized && AntigravityViewer?.CoreWebView2 != null)
+            {
+                try
+                {
+                    var json = JsonSerializer.Serialize(new { type = "search", query = query });
+                    AntigravityViewer.CoreWebView2.PostWebMessageAsJson(json);
+                }
+                catch { }
+            }
         }
 
         bool matchCase = MatchCaseToggle?.IsChecked == true;
@@ -649,7 +797,7 @@ public sealed partial class MainPage : Page
         {
             FindStatusText.Text = "No matches";
             FindPreviewText.Text = string.Empty;
-            if (_isWebViewInitialized && AntigravityViewer?.CoreWebView2 != null)
+            if (_isWebViewInitialized && AntigravityViewer?.CoreWebView2 != null && _viewModel?.SelectedTab?.IsJsonDocument != true)
             {
                 try
                 {
@@ -977,6 +1125,11 @@ public sealed partial class MainPage : Page
 
     private void FindPrevious()
     {
+        if (_viewModel?.SelectedTab?.IsJsonDocument == true && _isWebViewInitialized && AntigravityViewer?.CoreWebView2 != null)
+        {
+            try { AntigravityViewer.CoreWebView2.PostWebMessageAsJson(JsonSerializer.Serialize(new { type = "findPrevious" })); } catch { }
+        }
+
         if (_findMatches.Count == 0) return;
         _currentFindIndex = (_currentFindIndex - 1 + _findMatches.Count) % _findMatches.Count;
         UpdateFindResult();
@@ -984,6 +1137,11 @@ public sealed partial class MainPage : Page
 
     private void FindNext()
     {
+        if (_viewModel?.SelectedTab?.IsJsonDocument == true && _isWebViewInitialized && AntigravityViewer?.CoreWebView2 != null)
+        {
+            try { AntigravityViewer.CoreWebView2.PostWebMessageAsJson(JsonSerializer.Serialize(new { type = "findNext" })); } catch { }
+        }
+
         if (_findMatches.Count == 0) return;
         _currentFindIndex = (_currentFindIndex + 1) % _findMatches.Count;
         UpdateFindResult();

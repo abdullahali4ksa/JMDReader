@@ -1076,3 +1076,27 @@ The `FILES_SCOPE` on each original P01 task is the allowlist. Dependencies are d
 - **GOAL:** Add Dark Slate (Charcoal `#1e2227`) theme for low-contrast eye comfort, and implement "System / حسب النظام" theme option that automatically follows Windows dark/light mode in real time.
 - **ACCEPTANCE CRITERIA:** Dark Slate theme applies across WinUI shell, markdown renderer, and JSON viewer; System theme switches dynamically when OS theme changes.
 - **VERIFICATION:** Confirmed `[data-theme="darkslate"]` in `viewer.html` and `json_viewer.html`, dynamic `UISettings.ColorValuesChanged` listener in `MainPage.xaml.cs`, and `System` / `DarkSlate` options in `MainWindow.xaml`.
+
+### P25-T011 — Tab Context Menu & Favorites / Pinning Lifecycle (Linear: JMD-25)
+**ID:** P25-T011 · **FEATURE:** Shell / TabManagement · **PRIORITY:** P0 · **LINEAR_ID:** JMD-25 · **STATUS:** DONE · **ESTIMATE:** 30 mins · **FILES_SCOPE:** `src/MDReader.App/Features/Reader/Views/MainPage.xaml`, `src/MDReader.App/Features/Reader/Views/MainPage.xaml.cs`, `src/MDReader.App/Features/Reader/ViewModels/DocumentTabViewModel.cs`, `src/MDReader.App/Features/Reader/ViewModels/ReaderViewModel.cs`
+- **POLICY_REF:** `docs/DEVELOPMENT_RULES.md (Architecture, MVVM, Clean UI, Intuitive Iconography §12, Microsoft Store Standards)`
+- **SECURITY_REF:** `docs/DEVELOPMENT_RULES.md §11 (Zero-Crash Mandate, Protected Async Void, Safe Try/Catch, Non-Locking I/O, ReDoS Timeout)`
+- **GOAL:** Provide comprehensive right-click and touch long-press context menu on open tabs: Pin to Favorites (📌), Add to Favorites, Close Tab, Close Tabs to the Right, Close Other Tabs, and Close All Tabs.
+- **ACCEPTANCE CRITERIA:** Right-clicking or long-pressing tab displays Fluent context menu; pinning keeps tab locked with 📌 glyph and prevents accidental close; Close to the Right / Close Others / Close All accurately closes target non-pinned tabs safely with unsaved changes checks.
+- **VERIFICATION:** Confirmed `TabViewItem.ContextFlyout` with `PinMenuText`, `TogglePinTab`, `CloseTabsToRight`, `CloseOtherTabs`, and `CloseAllTabs` handlers in `MainPage.xaml.cs` and `ReaderViewModel.cs`.
+
+### P25-T012 — Unified JSON Iconography, Shared Search & Delightful UX (Linear: JMD-26)
+**ID:** P25-T012 · **FEATURE:** Reader / JsonUx · **PRIORITY:** P0 · **LINEAR_ID:** JMD-26 · **STATUS:** DONE · **ESTIMATE:** 30 mins · **FILES_SCOPE:** `src/MDReader.App/Assets/Renderer/json_viewer.html`, `src/MDReader.App/Features/Reader/Views/MainPage.xaml`, `src/MDReader.App/Features/Reader/Views/MainPage.xaml.cs`
+- **POLICY_REF:** `docs/DEVELOPMENT_RULES.md (Architecture, MVVM, Clean UI, Intuitive Iconography §12, Microsoft Store Standards)`
+- **SECURITY_REF:** `docs/DEVELOPMENT_RULES.md §11 (Zero-Crash Mandate, Protected Async Void, Safe Try/Catch, Non-Locking I/O, ReDoS Timeout)`
+- **GOAL:** Eliminate amateur/makeshift glyphs (田, 日, T, #) in JSON viewer, replace with sleek Fluent badges and icons, eliminate toolbar duplication between app toolbar and viewer toolbar, unify search so top Find bar (Ctrl+F) connects seamlessly with JSON viewer with match badges and jump navigation.
+- **ACCEPTANCE CRITERIA:** Clean, unified toolbar appearance; modern, elegant tree node type badges; delightful shared search experience across Markdown and JSON documents.
+- **VERIFICATION:** Confirmed modernized `json_viewer.html` with acrylic toolbar, refined `.type-pill` badges (`abc`, `123`, `✓/✕`, `∅ null`, `{ }`, `[ ]`), match count badges, match navigation, and shared search synchronization with `FindBar` (`Ctrl+F`).
+
+### P25-T013 — Bilingual Architecture, Menu Localization & Language Persistence (Linear: JMD-27)
+**ID:** P25-T013 · **FEATURE:** Localization / Shell · **PRIORITY:** P0 · **LINEAR_ID:** JMD-27 · **STATUS:** DONE · **ESTIMATE:** 25 mins · **FILES_SCOPE:** `docs/DEVELOPMENT_RULES.md`, `src/MDReader.App/Features/Settings/Services/UserPreferencesService.cs`, `src/MDReader.App/Features/Shell/Views/MainWindow.xaml`, `src/MDReader.App/Features/Shell/Views/MainWindow.xaml.cs`, `src/MDReader.Core/Localization/LocalizationService.cs`
+- **POLICY_REF:** `docs/DEVELOPMENT_RULES.md (Architecture, MVVM, Clean UI, Intuitive Iconography §12, Microsoft Store Standards)`
+- **SECURITY_REF:** `docs/DEVELOPMENT_RULES.md §11 (Zero-Crash Mandate, Protected Async Void, Safe Try/Catch, Non-Locking I/O, ReDoS Timeout)`
+- **GOAL:** Establish strict policy for bilingual and multilingual support across the entire app; resolve inconsistent top menu bar titles (File, View, Settings vs Help/مساعدة) to be completely bilingual or localized; persist language selection in `preferences.json` so user's choice survives app restarts.
+- **ACCEPTANCE CRITERIA:** Menus dual-labeled or fully reactive without orphan English labels; user language preference persists across app restart; status bar and dialogs bilingual.
+- **VERIFICATION:** Confirmed Sections 14, 15, and 16 in `DEVELOPMENT_RULES.md`, persistent `PreferredLanguage` in `UserPreferencesService.cs`, fully bilingual dual-labeled MenuBar in `MainWindow.xaml`, and bilingual reading metrics in `ReaderViewModel.cs`.

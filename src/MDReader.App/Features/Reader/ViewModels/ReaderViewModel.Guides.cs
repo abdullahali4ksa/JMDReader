@@ -22,6 +22,21 @@ public sealed partial class ReaderViewModel
     /// </summary>
     public bool IsMarkdownFormattingVisible => IsEditorVisible && IsCurrentDocumentMarkdown;
 
+    public event System.Action? RequestExpandAllJson;
+    public event System.Action? RequestCollapseAllJson;
+
+    [RelayCommand]
+    public void ExpandAllJson()
+    {
+        RequestExpandAllJson?.Invoke();
+    }
+
+    [RelayCommand]
+    public void CollapseAllJson()
+    {
+        RequestCollapseAllJson?.Invoke();
+    }
+
     [RelayCommand]
     public void BeautifyJson()
     {

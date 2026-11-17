@@ -55,11 +55,47 @@
                 <DataTemplate x:DataType="viewModels:DocumentTabViewModel">
                     <TabViewItem
                         Header="{Binding Header}"
-                        IsClosable="True"
+                        IsClosable="{Binding CanClose}"
                         AutomationProperties.Name="{Binding Header}">
                         <TabViewItem.IconSource>
-                            <FontIconSource Glyph="&#xE8A5;" />
+                            <FontIconSource Glyph="{Binding TabGlyph}" />
                         </TabViewItem.IconSource>
+                        <TabViewItem.ContextFlyout>
+                            <MenuFlyout>
+                                <MenuFlyoutItem Text="{Binding PinMenuText}" Click="TabContextMenu_Pin_Click" Tag="{Binding}">
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="&#xE840;" />
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                                <MenuFlyoutItem Text="⭐ Add to Favorites / إضافة إلى المفضلة" Click="TabContextMenu_Favorite_Click" Tag="{Binding}">
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="&#xE734;" />
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                                <MenuFlyoutSeparator />
+                                <MenuFlyoutItem Text="❌ Close Tab / إغلاق التاب (Ctrl+W)" Click="TabContextMenu_Close_Click" Tag="{Binding}">
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="&#xE711;" />
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                                <MenuFlyoutItem Text="➡️ Close Tabs to the Right / إغلاق التابات لليمين" Click="TabContextMenu_CloseRight_Click" Tag="{Binding}">
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="&#xE76C;" />
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                                <MenuFlyoutItem Text="👥 Close Other Tabs / إغلاق التابات الأخرى" Click="TabContextMenu_CloseOthers_Click" Tag="{Binding}">
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="&#xE8D4;" />
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                                <MenuFlyoutSeparator />
+                                <MenuFlyoutItem Text="🚫 Close All Tabs / إغلاق جميع التابات" Click="TabContextMenu_CloseAll_Click" Tag="{Binding}">
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="&#xE74D;" />
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                            </MenuFlyout>
+                        </TabViewItem.ContextFlyout>
                     </TabViewItem>
                 </DataTemplate>
             </TabView.TabItemTemplate>
@@ -110,7 +146,9 @@
                             <!-- JSON Tools Group (Pill cluster, visible when viewing JSON files) -->
                             <Border Background="{ThemeResource AppBackgroundBrush}" BorderBrush="{ThemeResource AppBorderBrush}" BorderThickness="1" CornerRadius="6" Padding="2" Visibility="{Binding IsCurrentDocumentJson, Converter={StaticResource BoolToVisibilityConverter}}">
                                 <StackPanel Orientation="Horizontal" Spacing="2">
-                                    <Button Content="✨" Width="28" Height="28" Padding="0" FontSize="12" Command="{Binding BeautifyJsonCommand}" ToolTipService.ToolTip="✨ Beautify JSON / تنسيق وتجميل الكود (2 Spaces)" />
+                                    <Button Content="⊞" Width="28" Height="28" Padding="0" FontSize="13" Command="{Binding ExpandAllJsonCommand}" ToolTipService.ToolTip="⊞ Expand All / توسيع كافة الفروع" />
+                                    <Button Content="⊟" Width="28" Height="28" Padding="0" FontSize="13" Command="{Binding CollapseAllJsonCommand}" ToolTipService.ToolTip="⊟ Collapse All / طي كافة الفروع" />
+                                    <Button Content="✨" Width="28" Height="28" Padding="0" FontSize="12" Command="{Binding BeautifyJsonCommand}" ToolTipService.ToolTip="✨ Format JSON / تنسيق وتجميل الكود (2 Spaces)" />
                                     <Button Content="⚡" Width="28" Height="28" Padding="0" FontSize="12" Command="{Binding MinifyJsonCommand}" ToolTipService.ToolTip="⚡ Minify JSON / ضغط وتصغير الكود (سطر واحد)" />
                                     <Button Content="📊" Width="28" Height="28" Padding="0" FontSize="12" Command="{Binding ConvertJsonToTableCommand}" ToolTipService.ToolTip="📊 Convert to Markdown Table &amp; Copy / تحويل لجدول ماركداون ونسخه" />
                                 </StackPanel>
@@ -594,8 +632,8 @@
                     Padding="14">
                     <StackPanel Spacing="8">
                         <Grid>
-                            <TextBlock Text="🕒 RECENT DOCUMENTS / الملفات المشاهدة مؤخراً" FontWeight="Bold" FontSize="11" Foreground="{ThemeResource AppSecondaryTextBrush}" VerticalAlignment="Center" />
-                            <Button Content="Clear / مسح" Click="ClearRecentFiles_Click" HorizontalAlignment="Right" Padding="6,2" FontSize="10" Background="Transparent" BorderThickness="0" />
+                            <TextBlock Text="⭐ FAVORITES &amp; RECENT / المفضلة والملفات المشاهدة مؤخراً" FontWeight="Bold" FontSize="11" Foreground="{ThemeResource AppSecondaryTextBrush}" VerticalAlignment="Center" />
+                            <Button Content="Clear / مسح" Click="ClearRecentFiles_Click" HorizontalAlignment="Right" Padding="6,2" FontSize="10" Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Clear recent history / مسح السجل" />
                         </Grid>
 
                         <ListView

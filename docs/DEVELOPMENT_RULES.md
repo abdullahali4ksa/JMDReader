@@ -267,6 +267,65 @@ Any proposed feature, backlog item, or agent prompt lacking these two lines must
 
 ---
 
+## 14. Full Bilingual Architecture, Localization & Language Persistence (سياسة دعم تعدد اللغات وثنائية الواجهة وحفظ تفضيل المستخدم)
+
+To ensure JMDReader delivers a world-class experience for Arabic and international users:
+
+1. **Strict Zero-Orphan English Rule in Menus (حظر التسميات الإنجليزية المنفردة):**
+   - No top-level menu item or sub-menu may ever be left in English only while others are bilingual.
+   - All main menus must be clearly dual-labeled and culturally intuitive:
+     - `📁 File / ملف`
+     - `👁️ View / عرض`
+     - `⚙️ Settings / إعدادات`
+     - `❓ Help / مساعدة`
+2. **Persistent Language Selection (حفظ لغة المستخدم):**
+   - The user's chosen language MUST be serialized into `UserPreferencesService` (`preferences.json`) upon selection and reloaded immediately on launch.
+   - Dynamic language switching must immediately refresh all UI bindings without requiring an app restart.
+3. **Bilingual Metrics & Status Bar (ثنائية شريط الحالة):**
+   - Reading metrics (word counts, line numbers, reading time) must support bilingual or locale-appropriate formatting (`١,٤٨٧ كلمة / 1,487 words • ٥٢٩ سطراً / 529 lines`).
+4. **Bidirectional (RTL / LTR) Respect:**
+   - Arabic text, markdown headings, lists, and JSON string values must render with natural RTL alignment (`dir="rtl"`) and modern Arabic system fonts (`Segoe UI Variable`, `Segoe UI`, `Cairo`, `Tahoma`).
+
+---
+
+## 15. Tab Context Menu, Pinning & Favorites Lifecycle (إدارة التابات والمفضلة بالنقر الأيمن واللمس المطول)
+
+To provide effortless window and document management matching premium developer tools:
+
+1. **Universal Tab Context Menu (قائمة سياق التاب):**
+   - Right-clicking (mouse) or long-pressing (touch) on any open `TabViewItem` MUST surface a comprehensive Fluent context menu with:
+     * `📌 Pin Tab / تثبيت التاب في المفضلة`: Locks the tab to prevent accidental closing (`IsClosable=false`), places a persistent pin badge (`📌`), and keeps pinned tabs organized.
+     * `⭐ Add to Favorites / إضافة للمفضلة`: Persists the file in the favorites list.
+     * `❌ Close Tab / إغلاق التاب (Ctrl+W)`: Safely closes the active tab (with unsaved changes prompt).
+     * `➡️ Close Tabs to the Right / إغلاق التابات لليمين`: Closes all non-pinned tabs to the right.
+     * `👥 Close Other Tabs / إغلاق التابات الأخرى`: Closes all open tabs except the current and pinned tabs.
+     * `🚫 Close All Tabs / إغلاق جميع التابات`: Closes all tabs safely.
+2. **Safety & Draft Preservation:**
+   - Tab batch closures (`Close to the Right`, `Close Others`, `Close All`) must preserve uncommitted drafts via `DraftManager` before removing tabs from memory.
+
+---
+
+## 16. Unified Modern Iconography & Delightful Shared Search (توحيد الأيقونات وتجربة البحث المشتركة)
+
+1. **Elimination of Clunky/Esoteric Glyphs:**
+   - Raw Asian glyphs (such as `田` or `日`) or harsh ASCII letters (`T`, `#`) are strictly forbidden as makeshift icons.
+   - All actions must use elegant Fluent symbols (Segoe Fluent Icons, SymbolIcon, or polished SVG vector icons).
+   - In the JSON tree viewer, node types must render as sleek, rounded pill badges with theme-aware syntax colors:
+     - String: soft green badge `""` or `abc`.
+     - Number: soft amber/orange badge `123` or `#`.
+     - Boolean: soft purple badge `✓ true` / `✕ false`.
+     - Null: subtle italic gray badge `∅ null`.
+     - Object: `{ }` with key count badge.
+     - Array: `[ ]` with item count badge.
+2. **Single Unified Search Experience (البحث المشترك الموحد):**
+   - The primary search bar (`Ctrl+F`) serves as the universal search interface.
+   - When viewing Markdown: searches and highlights matches in the Markdown document.
+   - When viewing JSON: transmits queries instantaneously to the JSON tree engine, expanding matching paths, displaying a live match count badge (e.g. `3 results / ٣ نتائج`), and supporting Up/Down match cycling.
+3. **No Redundant / Clashing Toolbars:**
+   - Common productivity operations (Beautify, Minify, Table View, Copy, Export, Expand/Collapse) must feel unified with the application rather than looking like an unstyled external web page.
+
+---
+
 ## Developer Setup Checklist
 
 Before writing code, ensure:

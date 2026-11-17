@@ -9,7 +9,7 @@
             --bg-color: #ffffff;
             --text-color: #1f2328;
             --border-color: #d0d7de;
-            --toolbar-bg: #f6f8fa;
+            --toolbar-bg: rgba(246, 248, 250, 0.92);
             --badge-bg: #eaeef2;
             --badge-text: #57606a;
             --hover-bg: rgba(0, 0, 0, 0.04);
@@ -20,13 +20,16 @@
             --null-color: #6e7781;
             --highlight-bg: #fff8c5;
             --highlight-active: #ff9800;
+            --highlight-active-text: #ffffff;
+            --input-bg: #ffffff;
+            --pill-shadow: 0 1px 2px rgba(0,0,0,0.06);
         }
 
         body[data-theme="dark"] {
             --bg-color: #0d1117;
             --text-color: #e6edf3;
             --border-color: #30363d;
-            --toolbar-bg: #161b22;
+            --toolbar-bg: rgba(22, 27, 34, 0.92);
             --badge-bg: #21262d;
             --badge-text: #8b949e;
             --hover-bg: rgba(255, 255, 255, 0.06);
@@ -37,13 +40,16 @@
             --null-color: #8b949e;
             --highlight-bg: #383200;
             --highlight-active: #ff9800;
+            --highlight-active-text: #000000;
+            --input-bg: #0d1117;
+            --pill-shadow: 0 1px 2px rgba(0,0,0,0.3);
         }
 
         body[data-theme="darkslate"], body[data-theme="dark_slate"] {
             --bg-color: #1e2227;
             --text-color: #abb2bf;
             --border-color: #282c34;
-            --toolbar-bg: #21252b;
+            --toolbar-bg: rgba(33, 37, 43, 0.92);
             --badge-bg: #282c34;
             --badge-text: #828997;
             --hover-bg: rgba(255, 255, 255, 0.05);
@@ -54,13 +60,16 @@
             --null-color: #5c6370;
             --highlight-bg: #3e4451;
             --highlight-active: #e5c07b;
+            --highlight-active-text: #1e2227;
+            --input-bg: #1e2227;
+            --pill-shadow: 0 1px 2px rgba(0,0,0,0.3);
         }
 
         body[data-theme="sepia"] {
             --bg-color: #fbf0d9;
             --text-color: #433422;
             --border-color: #e2d3b5;
-            --toolbar-bg: #f3e5c8;
+            --toolbar-bg: rgba(243, 229, 200, 0.92);
             --badge-bg: #ebdac0;
             --badge-text: #6b583f;
             --hover-bg: rgba(100, 70, 30, 0.07);
@@ -71,6 +80,9 @@
             --null-color: #78716c;
             --highlight-bg: #fef08a;
             --highlight-active: #ea580c;
+            --highlight-active-text: #ffffff;
+            --input-bg: #fbf0d9;
+            --pill-shadow: 0 1px 2px rgba(0,0,0,0.06);
         }
 
         * {
@@ -84,32 +96,46 @@
             padding: 0;
             background-color: var(--bg-color);
             color: var(--text-color);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI Variable", "Segoe UI", Cascadia Code, Consolas, monospace;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI Variable", "Segoe UI", Cascadia Code, Consolas, sans-serif;
             font-size: 13px;
             line-height: 1.5;
             overflow-x: hidden;
         }
 
-        /* Top sticky controls toolbar */
+        /* Top acrylic controls toolbar */
         #toolbar {
             position: sticky;
             top: 0;
             z-index: 100;
             display: flex;
+            flex-wrap: wrap;
             align-items: center;
             gap: 6px;
             padding: 8px 16px;
             background: var(--toolbar-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--border-color);
             font-size: 12px;
         }
 
-        .btn {
+        .btn-group {
+            display: inline-flex;
+            align-items: center;
             background: var(--bg-color);
-            color: var(--text-color);
             border: 1px solid var(--border-color);
-            border-radius: 5px;
-            padding: 4px 10px;
+            border-radius: 6px;
+            padding: 2px;
+            gap: 2px;
+            box-shadow: var(--pill-shadow);
+        }
+
+        .btn {
+            background: transparent;
+            color: var(--text-color);
+            border: none;
+            border-radius: 4px;
+            padding: 4px 8px;
             font-size: 11px;
             cursor: pointer;
             font-weight: 500;
@@ -117,34 +143,91 @@
             align-items: center;
             gap: 4px;
             transition: all 0.15s ease;
+            white-space: nowrap;
         }
 
         .btn:hover {
             background: var(--hover-bg);
+            color: var(--key-color);
+        }
+
+        /* Delightful modern search box */
+        .search-box-wrapper {
+            flex: 1;
+            min-width: 240px;
+            max-width: 440px;
+            display: inline-flex;
+            align-items: center;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2px 10px;
+            gap: 6px;
+            box-shadow: var(--pill-shadow);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .search-box-wrapper:focus-within {
             border-color: var(--key-color);
+            box-shadow: 0 0 0 2px rgba(9, 105, 218, 0.2);
+        }
+
+        .search-icon {
+            font-size: 12px;
+            opacity: 0.65;
+            user-select: none;
         }
 
         #filterInput {
             flex: 1;
-            max-width: 320px;
-            background: var(--bg-color);
+            background: transparent;
             color: var(--text-color);
-            border: 1px solid var(--border-color);
-            border-radius: 5px;
-            padding: 4px 10px;
-            font-size: 11px;
+            border: none;
             outline: none;
-            transition: border-color 0.15s;
+            font-size: 11.5px;
+            padding: 3px 0;
+            font-family: inherit;
         }
 
-        #filterInput:focus {
-            border-color: var(--key-color);
+        .match-badge {
+            font-size: 10px;
+            background: var(--badge-bg);
+            color: var(--badge-text);
+            padding: 1px 6px;
+            border-radius: 10px;
+            font-weight: 600;
+            user-select: none;
+            white-space: nowrap;
+        }
+
+        .search-nav-btn, .search-clear-btn {
+            background: transparent;
+            border: none;
+            color: var(--badge-text);
+            cursor: pointer;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-size: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+        }
+
+        .search-nav-btn:hover, .search-clear-btn:hover {
+            color: var(--key-color);
+            background: var(--hover-bg);
         }
 
         #statsBadge {
             margin-left: auto;
             color: var(--badge-text);
             font-size: 11px;
+            font-weight: 500;
+            padding: 3px 8px;
+            border-radius: 12px;
+            background: var(--badge-bg);
+            user-select: none;
         }
 
         #copiedToast {
@@ -153,14 +236,14 @@
             right: 24px;
             background: #10b981;
             color: #ffffff;
-            padding: 6px 14px;
-            border-radius: 6px;
+            padding: 7px 16px;
+            border-radius: 8px;
             font-size: 12px;
             font-weight: 600;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.2);
             opacity: 0;
             transform: translateY(10px);
-            transition: all 0.2s ease;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
             pointer-events: none;
             z-index: 999;
         }
@@ -172,25 +255,25 @@
 
         /* Tree Container */
         #treeContainer {
-            padding: 16px 20px 40px 20px;
+            padding: 16px 20px 48px 20px;
             overflow-x: auto;
         }
 
         .tree-node {
             display: flex;
             flex-direction: column;
-            margin: 1px 0;
+            margin: 2px 0;
         }
 
         .node-row {
             display: inline-flex;
             align-items: center;
-            padding: 2px 6px;
-            border-radius: 4px;
+            padding: 3px 8px;
+            border-radius: 5px;
             cursor: pointer;
             width: fit-content;
             max-width: 100%;
-            transition: background-color 0.1s;
+            transition: background-color 0.12s ease;
         }
 
         .node-row:hover {
@@ -198,15 +281,17 @@
         }
 
         .chevron {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             width: 16px;
             height: 16px;
-            text-align: center;
-            font-size: 9px;
+            font-size: 10px;
             color: var(--badge-text);
             transition: transform 0.15s ease;
             cursor: pointer;
-            margin-right: 2px;
+            margin-right: 4px;
+            user-select: none;
         }
 
         .chevron.collapsed {
@@ -218,14 +303,54 @@
             cursor: default;
         }
 
-        .type-glyph {
-            display: inline-block;
-            padding: 0 4px;
+        /* Beautiful modern type badges */
+        .type-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 1px 5px;
             font-size: 10px;
             font-weight: 700;
             margin-right: 6px;
-            opacity: 0.65;
-            border-radius: 3px;
+            border-radius: 4px;
+            user-select: none;
+            letter-spacing: 0.3px;
+        }
+
+        .pill-string {
+            background: rgba(16, 185, 129, 0.12);
+            color: var(--string-color);
+            border: 1px solid rgba(16, 185, 129, 0.28);
+        }
+
+        .pill-number {
+            background: rgba(245, 158, 11, 0.12);
+            color: var(--number-color);
+            border: 1px solid rgba(245, 158, 11, 0.28);
+        }
+
+        .pill-boolean {
+            background: rgba(139, 92, 246, 0.12);
+            color: var(--boolean-color);
+            border: 1px solid rgba(139, 92, 246, 0.28);
+        }
+
+        .pill-null {
+            background: rgba(100, 116, 139, 0.12);
+            color: var(--null-color);
+            font-style: italic;
+            border: 1px solid rgba(100, 116, 139, 0.28);
+        }
+
+        .pill-object {
+            background: rgba(9, 105, 218, 0.12);
+            color: var(--key-color);
+            border: 1px solid rgba(9, 105, 218, 0.28);
+        }
+
+        .pill-array {
+            background: rgba(236, 72, 153, 0.12);
+            color: #ec4899;
+            border: 1px solid rgba(236, 72, 153, 0.28);
         }
 
         .node-key {
@@ -239,19 +364,20 @@
             margin-right: 6px;
         }
 
-        .node-value.string { color: var(--string-color); }
-        .node-value.number { color: var(--number-color); }
+        .node-value.string { color: var(--string-color); word-break: break-all; }
+        .node-value.number { color: var(--number-color); font-weight: 600; }
         .node-value.boolean { color: var(--boolean-color); font-weight: 600; }
-        .node-value.null { color: var(--null-color); font-style: italic; }
+        .node-value.null { color: var(--null-color); font-style: italic; font-weight: 600; }
 
         .summary-badge {
             font-size: 10px;
             background: var(--badge-bg);
             color: var(--badge-text);
-            padding: 1px 6px;
+            padding: 1px 7px;
             border-radius: 10px;
             margin-left: 6px;
             font-weight: 500;
+            user-select: none;
         }
 
         .actions-pill {
@@ -270,8 +396,9 @@
             color: var(--badge-text);
             border: 1px solid var(--border-color);
             border-radius: 3px;
-            padding: 0 5px;
+            padding: 1px 6px;
             cursor: pointer;
+            transition: all 0.15s;
         }
 
         .mini-btn:hover {
@@ -282,7 +409,7 @@
         .children-block {
             margin-left: 20px;
             border-left: 1px dashed var(--border-color);
-            padding-left: 6px;
+            padding-left: 8px;
             display: flex;
             flex-direction: column;
         }
@@ -291,10 +418,20 @@
             display: none;
         }
 
+        /* Matching highlight styles */
         .match-highlight {
             background-color: var(--highlight-bg) !important;
-            border-radius: 2px;
-            padding: 0 2px;
+            border-radius: 3px;
+            padding: 1px 4px;
+            box-shadow: 0 0 0 1px rgba(255, 152, 0, 0.4);
+        }
+
+        .match-active {
+            background-color: var(--highlight-active) !important;
+            color: var(--highlight-active-text) !important;
+            border-radius: 3px;
+            padding: 1px 4px;
+            box-shadow: 0 0 8px rgba(255, 152, 0, 0.8);
             font-weight: 700;
         }
     </style>
@@ -302,14 +439,49 @@
 <body data-theme="dark">
 
     <div id="toolbar">
-        <button class="btn" id="expandAllBtn" title="Expand All / توسيع الكل">⊞ Expand</button>
-        <button class="btn" id="collapseAllBtn" title="Collapse All / طي الكل">⊟ Collapse</button>
-        <button class="btn" id="beautifyBtn" title="Beautify & Copy (2 Spaces) / تنسيق وتجميل">✨ Beautify</button>
-        <button class="btn" id="minifyBtn" title="Minify & Copy / ضغط وتصغير">⚡ Minify</button>
-        <button class="btn" id="toMdTableBtn" title="Convert Array to Markdown Table / تحويل لجدول ماركداون">📊 To Table</button>
-        <button class="btn" id="exportHtmlBtn" title="Export Offline HTML / تصدير كصفحة ويب مستقلة">💾 Export</button>
-        <input type="text" id="filterInput" placeholder="🔍 Search or JSONPath (e.g. $.store or text)..." />
-        <button class="btn" id="copyRawBtn" title="Copy Raw JSON / نسخ المحتوى الخام">📋 Raw</button>
+        <!-- Tree View Expansion -->
+        <div class="btn-group">
+            <button class="btn" id="expandAllBtn" title="Expand All / توسيع كافة الفروع">
+                <span>⊞</span> Expand All / توسيع
+            </button>
+            <button class="btn" id="collapseAllBtn" title="Collapse All / طي كافة الفروع">
+                <span>⊟</span> Collapse All / طي
+            </button>
+        </div>
+
+        <!-- Formatting & Productivity -->
+        <div class="btn-group">
+            <button class="btn" id="beautifyBtn" title="Format & Beautify (2 Spaces) / تنسيق وتجميل الكود">
+                <span>✨</span> Format / تنسيق
+            </button>
+            <button class="btn" id="minifyBtn" title="Minify & Compact / ضغط وتصغير الكود">
+                <span>⚡</span> Minify / ضغط
+            </button>
+            <button class="btn" id="toMdTableBtn" title="Convert Array to Markdown Table / تحويل لجدول ماركداون ونسخه">
+                <span>📊</span> Table / جدول
+            </button>
+        </div>
+
+        <!-- Export & Copy -->
+        <div class="btn-group">
+            <button class="btn" id="exportHtmlBtn" title="Export Offline HTML / تصدير كصفحة ويب مستقلة دون إنترنت">
+                <span>💾</span> Export / تصدير
+            </button>
+            <button class="btn" id="copyRawBtn" title="Copy Full Raw JSON / نسخ المحتوى الخام كاملاً">
+                <span>📋</span> Copy / نسخ
+            </button>
+        </div>
+
+        <!-- Delightful Shared Search Box -->
+        <div class="search-box-wrapper" title="بحث فوري أو استعلام JSONPath (Ctrl+F)">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="filterInput" placeholder="بحث فوري أو مسار (e.g. $.store or text)..." />
+            <span id="matchCounter" class="match-badge">0 results</span>
+            <button id="prevMatchBtn" class="search-nav-btn" title="السابق / Previous match (Shift+Enter)">▲</button>
+            <button id="nextMatchBtn" class="search-nav-btn" title="التالي / Next match (Enter)">▼</button>
+            <button id="clearSearchBtn" class="search-clear-btn" title="مسح البحث / Clear search (Esc)">✕</button>
+        </div>
+
         <span id="statsBadge">0 items</span>
     </div>
 
@@ -319,17 +491,19 @@
     <script>
         let rawData = null;
         let totalCount = 0;
+        let matchingNodes = [];
+        let activeMatchIndex = -1;
 
         function showToast(msg) {
             const toast = document.getElementById('copiedToast');
             toast.textContent = msg || "✓ Copied to clipboard!";
             toast.classList.add('visible');
-            setTimeout(() => toast.classList.remove('visible'), 1800);
+            setTimeout(() => toast.classList.remove('visible'), 2000);
         }
 
         function copyText(text, label) {
             navigator.clipboard.writeText(text).then(() => {
-                showToast(label ? `✓ Copied ${label}` : "✓ Copied!");
+                showToast(label ? `✓ Copied ${label} / تم النسخ` : "✓ Copied / تم النسخ!");
             });
         }
 
@@ -351,16 +525,34 @@
             chevron.textContent = isContainer ? '▼' : '•';
             row.appendChild(chevron);
 
-            // Type glyph
-            const glyph = document.createElement('span');
-            glyph.className = 'type-glyph';
-            if (isObject) glyph.textContent = '{}';
-            else if (isArray) glyph.textContent = '[]';
-            else if (typeof value === 'string') glyph.textContent = 'T';
-            else if (typeof value === 'number') glyph.textContent = '#';
-            else if (typeof value === 'boolean') glyph.textContent = '✓';
-            else glyph.textContent = '∅';
-            row.appendChild(glyph);
+            // Refined Type Pill Badge
+            const pill = document.createElement('span');
+            if (isObject) {
+                pill.className = 'type-pill pill-object';
+                pill.textContent = '{ }';
+                pill.title = 'Object / كائن';
+            } else if (isArray) {
+                pill.className = 'type-pill pill-array';
+                pill.textContent = '[ ]';
+                pill.title = 'Array / مصفوفة';
+            } else if (typeof value === 'string') {
+                pill.className = 'type-pill pill-string';
+                pill.textContent = 'abc';
+                pill.title = 'String / نص';
+            } else if (typeof value === 'number') {
+                pill.className = 'type-pill pill-number';
+                pill.textContent = '123';
+                pill.title = 'Number / رقم';
+            } else if (typeof value === 'boolean') {
+                pill.className = 'type-pill pill-boolean';
+                pill.textContent = value ? '✓ true' : '✕ false';
+                pill.title = 'Boolean / قيمة منطقية';
+            } else {
+                pill.className = 'type-pill pill-null';
+                pill.textContent = '∅ null';
+                pill.title = 'Null / فارغ';
+            }
+            row.appendChild(pill);
 
             // Key
             if (key !== '') {
@@ -381,7 +573,7 @@
                 totalCount += count;
                 const summary = document.createElement('span');
                 summary.className = 'summary-badge';
-                summary.textContent = isArray ? `[ ${count} items ]` : `{ ${count} keys }`;
+                summary.textContent = isArray ? `[ ${count} items / عناصر ]` : `{ ${count} keys / مفاتيح }`;
                 row.appendChild(summary);
             } else {
                 totalCount++;
@@ -393,13 +585,13 @@
                 row.appendChild(valElem);
             }
 
-            // Action buttons on hover
+            // Hover actions
             const actions = document.createElement('span');
             actions.className = 'actions-pill';
 
             const copyPathBtn = document.createElement('button');
             copyPathBtn.className = 'mini-btn';
-            copyPathBtn.textContent = 'Path';
+            copyPathBtn.textContent = 'JSONPath';
             copyPathBtn.title = `Copy JSONPath: ${path}`;
             copyPathBtn.onclick = (e) => {
                 e.stopPropagation();
@@ -409,66 +601,72 @@
 
             const copyValBtn = document.createElement('button');
             copyValBtn.className = 'mini-btn';
-            copyValBtn.textContent = 'Value';
+            copyValBtn.textContent = 'Copy';
             copyValBtn.title = 'Copy value';
             copyValBtn.onclick = (e) => {
                 e.stopPropagation();
-                copyText(isContainer ? JSON.stringify(value, null, 2) : String(value), 'Value');
+                const copyPayload = isContainer ? JSON.stringify(value, null, 2) : String(value);
+                copyText(copyPayload, 'Value');
             };
             actions.appendChild(copyValBtn);
 
             row.appendChild(actions);
             container.appendChild(row);
 
-            // Child elements
             if (isContainer) {
                 const childrenBlock = document.createElement('div');
                 childrenBlock.className = 'children-block';
 
                 if (isArray) {
-                    value.forEach((item, idx) => {
-                        childrenBlock.appendChild(createNodeElement(`[${idx}]`, item, `${path}[${idx}]`, depth + 1));
+                    value.forEach((item, index) => {
+                        const childPath = `${path}[${index}]`;
+                        childrenBlock.appendChild(createNodeElement(String(index), item, childPath, depth + 1));
                     });
                 } else {
-                    Object.keys(value).forEach(k => {
-                        const childPath = path === '$' ? `$.${k}` : `${path}.${k}`;
-                        childrenBlock.appendChild(createNodeElement(k, value[k], childPath, depth + 1));
+                    Object.entries(value).forEach(([k, v]) => {
+                        const childPath = path ? `${path}.${k}` : `$.${k}`;
+                        childrenBlock.appendChild(createNodeElement(k, v, childPath, depth + 1));
                     });
                 }
 
                 container.appendChild(childrenBlock);
 
-                // Click to toggle
-                row.onclick = () => {
-                    const isHidden = childrenBlock.classList.toggle('hidden');
-                    chevron.classList.toggle('collapsed', isHidden);
+                row.onclick = (e) => {
+                    e.stopPropagation();
+                    const isCollapsed = childrenBlock.classList.toggle('hidden');
+                    chevron.classList.toggle('collapsed', isCollapsed);
                 };
             }
 
             return container;
         }
 
-        function renderJsonTree(jsonStr) {
+        function renderJsonTree(data) {
             const container = document.getElementById('treeContainer');
             container.innerHTML = '';
             totalCount = 0;
+            matchingNodes = [];
+            activeMatchIndex = -1;
 
-            try {
-                rawData = typeof jsonStr === 'string' ? JSON.parse(jsonStr) : jsonStr;
-                const rootElem = createNodeElement('', rawData, '$', 0);
-                container.appendChild(rootElem);
-                document.getElementById('statsBadge').textContent = `${totalCount} items`;
-            } catch (err) {
-                container.innerHTML = `
-                    <div style="color: #ef4444; padding: 20px; font-weight: 600;">
-                        ⚠️ Invalid JSON Syntax: ${err.message}
-                    </div>
-                `;
-                document.getElementById('statsBadge').textContent = "Error";
+            if (typeof data === 'string') {
+                try {
+                    rawData = JSON.parse(data);
+                } catch (e) {
+                    container.innerHTML = `<div style="color: #ef4444; padding: 24px; font-size: 14px; font-weight: 600;">⚠️ JSON Syntax Error / خطأ في صياغة الجيسون: ${e.message}</div>`;
+                    document.getElementById('statsBadge').textContent = 'Error';
+                    return;
+                }
+            } else {
+                rawData = data;
             }
+
+            const rootElement = createNodeElement('', rawData, '$', 0);
+            container.appendChild(rootElement);
+
+            document.getElementById('statsBadge').textContent = `${totalCount.toLocaleString()} items / عنصر`;
         }
 
-        // Toolbar Events
+        // Expand / Collapse
         document.getElementById('expandAllBtn').onclick = () => {
             document.querySelectorAll('.children-block').forEach(b => b.classList.remove('hidden'));
             document.querySelectorAll('.chevron').forEach(c => c.classList.remove('collapsed'));
@@ -476,81 +674,52 @@
 
         document.getElementById('collapseAllBtn').onclick = () => {
             document.querySelectorAll('.children-block').forEach(b => b.classList.add('hidden'));
-            document.querySelectorAll('.chevron:not(.leaf)').forEach(c => c.classList.add('collapsed'));
+            document.querySelectorAll('.chevron').forEach(c => c.classList.add('collapsed'));
         };
 
+        // Beautify & Minify
         document.getElementById('beautifyBtn').onclick = () => {
-            if (rawData !== null) {
-                const pretty = JSON.stringify(rawData, null, 2);
-                copyText(pretty, "Beautified JSON");
-            }
+            if (!rawData) return;
+            const pretty = JSON.stringify(rawData, null, 2);
+            copyText(pretty, 'Formatted JSON (2 spaces)');
         };
 
         document.getElementById('minifyBtn').onclick = () => {
-            if (rawData !== null) {
-                const min = JSON.stringify(rawData);
-                copyText(min, "Minified JSON");
-            }
+            if (!rawData) return;
+            const min = JSON.stringify(rawData);
+            copyText(min, 'Minified JSON');
         };
 
+        // Markdown Table Generator
         document.getElementById('toMdTableBtn').onclick = () => {
-            if (rawData !== null) {
-                const table = generateMarkdownTable(rawData);
-                copyText(table, "Markdown Table");
+            if (!rawData) return;
+            let arr = Array.isArray(rawData) ? rawData : (typeof rawData === 'object' ? Object.values(rawData) : null);
+            if (!arr || arr.length === 0 || typeof arr[0] !== 'object') {
+                showToast("⚠️ Needs an array of objects to create table!");
+                return;
             }
+
+            const keys = Array.from(new Set(arr.flatMap(o => Object.keys(o || {}))));
+            const header = `| ${keys.join(' | ')} |`;
+            const separator = `| ${keys.map(() => '---').join(' | ')} |`;
+            const rows = arr.map(row => `| ${keys.map(k => String(row[k] !== undefined ? row[k] : '')).join(' | ')} |`).join('\n');
+            const mdTable = `${header}\n${separator}\n${rows}`;
+
+            copyText(mdTable, 'Markdown Table');
         };
 
-        document.getElementById('exportHtmlBtn').onclick = () => {
-            if (rawData !== null) {
-                exportStandaloneHtml();
-            }
-        };
-
+        // Copy Raw
         document.getElementById('copyRawBtn').onclick = () => {
-            if (rawData !== null) copyText(JSON.stringify(rawData, null, 2), "Raw JSON");
+            if (!rawData) return;
+            copyText(JSON.stringify(rawData, null, 2), 'Full JSON');
         };
 
-        function generateMarkdownTable(data) {
-            let rows = [];
-            if (Array.isArray(data)) {
-                rows = data.filter(d => d && typeof d === 'object');
-            } else if (typeof data === 'object' && data !== null) {
-                rows = [data];
-            }
-            if (rows.length === 0) return '<!-- Notice: JSON must contain array of objects -->';
-
-            const headers = [];
-            const headerSet = new Set();
-            rows.forEach(r => {
-                Object.keys(r).forEach(k => {
-                    if (!headerSet.has(k)) {
-                        headerSet.add(k);
-                        headers.push(k);
-                    }
-                });
-            });
-
-            if (headers.length === 0) return '<!-- No properties found -->';
-
-            let md = '| ' + headers.map(h => String(h).replace(/\|/g, '\\|')).join(' | ') + ' |\n';
-            md += '|' + headers.map(() => '---|').join('') + '\n';
-            rows.forEach(r => {
-                md += '| ' + headers.map(h => {
-                    let val = r[h];
-                    if (val === undefined || val === null) val = '';
-                    else if (typeof val === 'object') val = JSON.stringify(val);
-                    else val = String(val);
-                    return val.replace(/\|/g, '\\|').replace(/[\r\n]+/g, ' ');
-                }).join(' | ') + ' |\n';
-            });
-            return md;
-        }
-
-        function exportStandaloneHtml() {
+        // Export Standalone HTML
+        document.getElementById('exportHtmlBtn').onclick = () => {
+            if (!rawData) return;
             const currentTheme = document.body.getAttribute('data-theme') || 'dark';
             const pageClone = document.documentElement.cloneNode(true);
 
-            // Insert initialization script with embedded data into the clone
             const scriptTag = pageClone.querySelector('script');
             const dataScript = document.createElement('script');
             dataScript.textContent = `\nwindow.addEventListener('DOMContentLoaded', () => {\n    document.body.setAttribute('data-theme', '${currentTheme}');\n    renderJsonTree(${JSON.stringify(rawData)});\n});\n`;
@@ -566,28 +735,61 @@
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            showToast("✓ Standalone HTML Exported!");
+            showToast("✓ Standalone HTML Exported / تم تصدير الصفحة!");
+        };
+
+        // Search & Match Navigation Logic
+        function updateMatchCounter() {
+            const counter = document.getElementById('matchCounter');
+            if (matchingNodes.length === 0) {
+                counter.textContent = document.getElementById('filterInput').value.trim() ? '0 results / لا نتائج' : '0 results';
+            } else {
+                counter.textContent = `${activeMatchIndex + 1} of ${matchingNodes.length} / ${activeMatchIndex + 1} من ${matchingNodes.length}`;
+            }
         }
 
-        document.getElementById('filterInput').oninput = (e) => {
-            const query = e.target.value.trim();
+        function highlightActiveMatch() {
+            document.querySelectorAll('.match-active').forEach(el => el.classList.remove('match-active'));
+            if (activeMatchIndex >= 0 && activeMatchIndex < matchingNodes.length) {
+                const targetRow = matchingNodes[activeMatchIndex];
+                targetRow.classList.add('match-active');
+                targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            updateMatchCounter();
+        }
+
+        function cycleMatch(delta) {
+            if (matchingNodes.length === 0) return;
+            activeMatchIndex = (activeMatchIndex + delta + matchingNodes.length) % matchingNodes.length;
+            highlightActiveMatch();
+        }
+
+        function performSearch(query) {
+            const input = document.getElementById('filterInput');
+            if (input.value !== query) input.value = query;
+
+            matchingNodes = [];
+            activeMatchIndex = -1;
+
+            const trimmed = query.trim();
             const nodes = document.querySelectorAll('.tree-node');
 
-            if (!query) {
+            if (!trimmed) {
                 nodes.forEach(n => {
                     n.style.display = '';
-                    n.querySelector('.node-row')?.classList.remove('match-highlight');
+                    const r = n.querySelector('.node-row');
+                    r?.classList.remove('match-highlight', 'match-active');
                 });
+                updateMatchCounter();
                 return;
             }
 
-            const isJsonPath = query.startsWith('$');
+            const isJsonPath = trimmed.startsWith('$');
             let pathRegex = null;
 
             if (isJsonPath) {
                 try {
-                    // Convert basic JSONPath to RegExp (e.g. $..title or $.items[*].name)
-                    let regexStr = query
+                    let regexStr = trimmed
                         .replace(/\./g, '\\.')
                         .replace(/\[\*\]/g, '\\[\\d+\\]')
                         .replace(/\\\.\\\./g, '.*\\.');
@@ -597,7 +799,7 @@
                 }
             }
 
-            const lowerQuery = query.toLowerCase();
+            const lowerQuery = trimmed.toLowerCase();
 
             nodes.forEach(n => {
                 const row = n.querySelector('.node-row');
@@ -614,8 +816,10 @@
 
                 n.style.display = match ? '' : 'none';
                 row.classList.toggle('match-highlight', match);
+                row.classList.remove('match-active');
 
                 if (match) {
+                    matchingNodes.push(row);
                     // Open ancestors
                     let parent = n.parentElement;
                     while (parent && parent.id !== 'treeContainer') {
@@ -628,6 +832,34 @@
                     }
                 }
             });
+
+            if (matchingNodes.length > 0) {
+                activeMatchIndex = 0;
+                highlightActiveMatch();
+            } else {
+                updateMatchCounter();
+            }
+        }
+
+        document.getElementById('filterInput').addEventListener('input', (e) => {
+            performSearch(e.target.value);
+        });
+
+        document.getElementById('filterInput').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                cycleMatch(e.shiftKey ? -1 : 1);
+            } else if (e.key === 'Escape') {
+                document.getElementById('clearSearchBtn').click();
+            }
+        });
+
+        document.getElementById('prevMatchBtn').onclick = () => cycleMatch(-1);
+        document.getElementById('nextMatchBtn').onclick = () => cycleMatch(1);
+        document.getElementById('clearSearchBtn').onclick = () => {
+            document.getElementById('filterInput').value = '';
+            performSearch('');
+            document.getElementById('filterInput').focus();
         };
 
         // Bridge listener for messages from WinUI 3 C#
@@ -644,6 +876,12 @@
                 document.getElementById('expandAllBtn').click();
             } else if (data.type === 'collapseAll') {
                 document.getElementById('collapseAllBtn').click();
+            } else if (data.type === 'search' || data.type === 'filter') {
+                performSearch(data.query || '');
+            } else if (data.type === 'findNext') {
+                cycleMatch(1);
+            } else if (data.type === 'findPrevious') {
+                cycleMatch(-1);
             }
         });
     </script>

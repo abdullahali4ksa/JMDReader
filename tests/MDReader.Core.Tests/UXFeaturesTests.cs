@@ -133,4 +133,40 @@ Here is a second paragraph in English to verify bilingual word counting, line co
         Assert.NotEmpty(stats.ReadingTimeDisplay);
         Assert.NotEmpty(stats.SpeakingTimeDisplay);
     }
+
+    [Fact]
+    public void LocalizationService_LanguageRoundtripAndBilingualMetrics()
+    {
+        var service = MDReader.Core.Localization.LocalizationService.Instance;
+        service.SetLanguage("ar");
+        Assert.Equal("ar", service.CurrentLanguage);
+        Assert.True(service.IsRtl);
+        Assert.Equal("ملف", service.MenuFile);
+        Assert.Equal("عرض", service.MenuView);
+        Assert.Equal("كلمة", service.StatusWords);
+
+        service.SetLanguage("en");
+        Assert.Equal("en", service.CurrentLanguage);
+        Assert.False(service.IsRtl);
+        Assert.Equal("File", service.MenuFile);
+        Assert.Equal("View", service.MenuView);
+        Assert.Equal("words", service.StatusWords);
+
+        // Reset to default
+        service.SetLanguage("ar");
+    }
+
+    [Fact]
+    public void RecentFileManager_FavoritesManagement()
+    {
+        var manager = new RecentFileManager();
+        manager.AddRecentFile("D:\\fav1.md", isPinned: true);
+        manager.AddRecentFile("D:\\normal.md", isPinned: false);
+
+        var list = manager.GetRecentFiles();
+        Assert.Equal(2, list.Count);
+        Assert.Equal("D:\\fav1.md", list[0].Path);
+        Assert.True(list[0].IsPinned);
+        Assert.Equal("📌", list[0].PinGlyph);
+    }
 }

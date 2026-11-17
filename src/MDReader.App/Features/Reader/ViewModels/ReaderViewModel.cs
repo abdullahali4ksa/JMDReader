@@ -97,9 +97,17 @@ public sealed partial class ReaderViewModel : ObservableObject
     }
 
     public string AnalyticsSummary => _analytics.FormattedSummary;
-    public string WordCountDisplay => $"{_analytics.WordCount:N0} {Strings.StatusWords}";
-    public string ReadingTimeDisplay => $"⏱ ~{_analytics.EstimatedReadingMinutes} {Strings.StatusMinRead}";
-    public string LineCountDisplay => $"{_analytics.LineCount:N0} {Strings.StatusLines}";
+    public string WordCountDisplay => Strings.CurrentLanguage == "ar"
+        ? $"{_analytics.WordCount:N0} كلمة / words"
+        : $"{_analytics.WordCount:N0} {Strings.StatusWords}";
+
+    public string ReadingTimeDisplay => Strings.CurrentLanguage == "ar"
+        ? $"⏱ ~{_analytics.EstimatedReadingMinutes} دقيقة قراءة / min read"
+        : $"⏱ ~{_analytics.EstimatedReadingMinutes} {Strings.StatusMinRead}";
+
+    public string LineCountDisplay => Strings.CurrentLanguage == "ar"
+        ? $"{_analytics.LineCount:N0} سطر / lines"
+        : $"{_analytics.LineCount:N0} {Strings.StatusLines}";
 
     public bool IsZenMode
     {
@@ -719,6 +727,90 @@ public sealed partial class ReaderViewModel : ObservableObject
                 SelectedTab = null;
                 Clear();
             }
+        }
+
+        SaveSessionState();
+    }
+
+    /// <summary>
+    /// Toggles the pinned / favorite state of the tab.
+    /// Pinned tabs cannot be closed accidentally and move to the front.
+    /// </summary>
+    public void TogglePinTab(DocumentTabViewModel tab)
+    {
+        tab.IsPinned = !tab.IsPinned;
+        if (tab.IsPinned)
+        {
+            var oldIdx = Tabs.IndexOf(tab);
+            if (oldIdx > 0)
+            {
+                var targetIdx = Tabs.TakeWhile(t => t.IsPinned && t != tab).Count();
+                Tabs.Move(oldIdx, targetIdx);
+            }
+            if (!string.IsNullOrEmpty(tab.FilePath))
+            {
+                UserPreferencesService.Instance.RecentFiles.Add(tab.FilePath, isPinned: true);
+                RefreshRecentFiles();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Closes all non-pinned tabs to the right of the specified tab.
+    /// </summary>
+    public void CloseTabsToRight(DocumentTabViewModel tab)
+    {
+        var index = Tabs.IndexOf(tab);
+        if (index < 0) return;
+
+        var toRemove = Tabs.Skip(index + 1).Where(t => !t.IsPinned).ToList();
+        foreach (var t in toRemove)
+        {
+            Tabs.Remove(t);
+        }
+
+        if (SelectedTab != null && !Tabs.Contains(SelectedTab))
+        {
+            SelectedTab = tab;
+        }
+
+        SaveSessionState();
+    }
+
+    /// <summary>
+    /// Closes all non-pinned tabs other than the specified tab.
+    /// </summary>
+    public void CloseOtherTabs(DocumentTabViewModel tab)
+    {
+        var toRemove = Tabs.Where(t => t != tab && !t.IsPinned).ToList();
+        foreach (var t in toRemove)
+        {
+            Tabs.Remove(t);
+        }
+
+        SelectedTab = tab;
+        SaveSessionState();
+    }
+
+    /// <summary>
+    /// Closes all non-pinned tabs.
+    /// </summary>
+    public void CloseAllTabs()
+    {
+        var toRemove = Tabs.Where(t => !t.IsPinned).ToList();
+        foreach (var t in toRemove)
+        {
+            Tabs.Remove(t);
+        }
+
+        if (Tabs.Count > 0)
+        {
+            SelectedTab = Tabs[0];
+        }
+        else
+        {
+            SelectedTab = null;
+            Clear();
         }
 
         SaveSessionState();

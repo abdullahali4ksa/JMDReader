@@ -81,6 +81,12 @@ public sealed partial class ShellViewModel : ObservableObject
     public void SetLanguage(string langCode)
     {
         LocalizationService.Instance.SetLanguage(langCode);
+        try
+        {
+            MDReader.App.Features.Settings.Services.UserPreferencesService.Instance.PreferredLanguage = langCode;
+            MDReader.App.Features.Settings.Services.UserPreferencesService.Instance.Save();
+        }
+        catch { }
         OnPropertyChanged(nameof(Strings));
     }
 

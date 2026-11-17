@@ -23,6 +23,7 @@ public sealed class UserPreferencesService
     public bool RestoreSession { get; set; } = true;
     public bool TypewriterMode { get; set; } = false;
     public string PreferredTheme { get; set; } = "System";
+    public string PreferredLanguage { get; set; } = "ar";
 
     public string DraftsDirectory => Path.Combine(_storageDir, "drafts");
     public string SessionFilePath => Path.Combine(_storageDir, "last_session.json");
@@ -71,6 +72,11 @@ public sealed class UserPreferencesService
                     TypewriterMode = model.TypewriterMode;
                     if (!string.IsNullOrWhiteSpace(model.PreferredTheme))
                         PreferredTheme = model.PreferredTheme;
+                    if (!string.IsNullOrWhiteSpace(model.PreferredLanguage))
+                    {
+                        PreferredLanguage = model.PreferredLanguage;
+                        MDReader.Core.Localization.LocalizationService.Instance.SetLanguage(PreferredLanguage);
+                    }
                 }
             }
         }
@@ -84,12 +90,15 @@ public sealed class UserPreferencesService
             EnsureDirectories();
             RecentFiles.SaveToFile(_recentFilePath);
 
+            PreferredLanguage = MDReader.Core.Localization.LocalizationService.Instance.CurrentLanguage;
+
             var model = new PreferencesModel
             {
                 AutoSaveDrafts = AutoSaveDrafts,
                 RestoreSession = RestoreSession,
                 TypewriterMode = TypewriterMode,
-                PreferredTheme = PreferredTheme
+                PreferredTheme = PreferredTheme,
+                PreferredLanguage = PreferredLanguage
             };
 
             var json = JsonSerializer.Serialize(model, new JsonSerializerOptions { WriteIndented = true });
@@ -110,5 +119,6 @@ public sealed class UserPreferencesService
         public bool RestoreSession { get; set; } = true;
         public bool TypewriterMode { get; set; } = false;
         public string PreferredTheme { get; set; } = "System";
+        public string PreferredLanguage { get; set; } = "ar";
     }
 }

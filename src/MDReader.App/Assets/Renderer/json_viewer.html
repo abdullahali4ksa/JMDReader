@@ -285,10 +285,14 @@
 <body data-theme="dark">
 
     <div id="toolbar">
-        <button class="btn" id="expandAllBtn" title="Expand All / توسيع الكل">⊞ Expand All</button>
-        <button class="btn" id="collapseAllBtn" title="Collapse All / طي الكل">⊟ Collapse All</button>
-        <input type="text" id="filterInput" placeholder="🔍 Search keys or values..." />
-        <button class="btn" id="copyRawBtn" title="Copy Raw JSON / نسخ المحتوى الخام">📋 Copy JSON</button>
+        <button class="btn" id="expandAllBtn" title="Expand All / توسيع الكل">⊞ Expand</button>
+        <button class="btn" id="collapseAllBtn" title="Collapse All / طي الكل">⊟ Collapse</button>
+        <button class="btn" id="beautifyBtn" title="Beautify & Copy (2 Spaces) / تنسيق وتجميل">✨ Beautify</button>
+        <button class="btn" id="minifyBtn" title="Minify & Copy / ضغط وتصغير">⚡ Minify</button>
+        <button class="btn" id="toMdTableBtn" title="Convert Array to Markdown Table / تحويل لجدول ماركداون">📊 To Table</button>
+        <button class="btn" id="exportHtmlBtn" title="Export Offline HTML / تصدير كصفحة ويب مستقلة">💾 Export</button>
+        <input type="text" id="filterInput" placeholder="🔍 Search or JSONPath (e.g. $.store or text)..." />
+        <button class="btn" id="copyRawBtn" title="Copy Raw JSON / نسخ المحتوى الخام">📋 Raw</button>
         <span id="statsBadge">0 items</span>
     </div>
 
@@ -458,12 +462,98 @@
             document.querySelectorAll('.chevron:not(.leaf)').forEach(c => c.classList.add('collapsed'));
         };
 
-        document.getElementById('copyRawBtn').onclick = () => {
-            if (rawData) copyText(JSON.stringify(rawData, null, 2), "Raw JSON");
+        document.getElementById('beautifyBtn').onclick = () => {
+            if (rawData !== null) {
+                const pretty = JSON.stringify(rawData, null, 2);
+                copyText(pretty, "Beautified JSON");
+            }
         };
 
+        document.getElementById('minifyBtn').onclick = () => {
+            if (rawData !== null) {
+                const min = JSON.stringify(rawData);
+                copyText(min, "Minified JSON");
+            }
+        };
+
+        document.getElementById('toMdTableBtn').onclick = () => {
+            if (rawData !== null) {
+                const table = generateMarkdownTable(rawData);
+                copyText(table, "Markdown Table");
+            }
+        };
+
+        document.getElementById('exportHtmlBtn').onclick = () => {
+            if (rawData !== null) {
+                exportStandaloneHtml();
+            }
+        };
+
+        document.getElementById('copyRawBtn').onclick = () => {
+            if (rawData !== null) copyText(JSON.stringify(rawData, null, 2), "Raw JSON");
+        };
+
+        function generateMarkdownTable(data) {
+            let rows = [];
+            if (Array.isArray(data)) {
+                rows = data.filter(d => d && typeof d === 'object');
+            } else if (typeof data === 'object' && data !== null) {
+                rows = [data];
+            }
+            if (rows.length === 0) return '<!-- Notice: JSON must contain array of objects -->';
+
+            const headers = [];
+            const headerSet = new Set();
+            rows.forEach(r => {
+                Object.keys(r).forEach(k => {
+                    if (!headerSet.has(k)) {
+                        headerSet.add(k);
+                        headers.push(k);
+                    }
+                });
+            });
+
+            if (headers.length === 0) return '<!-- No properties found -->';
+
+            let md = '| ' + headers.map(h => String(h).replace(/\|/g, '\\|')).join(' | ') + ' |\n';
+            md += '|' + headers.map(() => '---|').join('') + '\n';
+            rows.forEach(r => {
+                md += '| ' + headers.map(h => {
+                    let val = r[h];
+                    if (val === undefined || val === null) val = '';
+                    else if (typeof val === 'object') val = JSON.stringify(val);
+                    else val = String(val);
+                    return val.replace(/\|/g, '\\|').replace(/[\r\n]+/g, ' ');
+                }).join(' | ') + ' |\n';
+            });
+            return md;
+        }
+
+        function exportStandaloneHtml() {
+            const currentTheme = document.body.getAttribute('data-theme') || 'dark';
+            const pageClone = document.documentElement.cloneNode(true);
+
+            // Insert initialization script with embedded data into the clone
+            const scriptTag = pageClone.querySelector('script');
+            const dataScript = document.createElement('script');
+            dataScript.textContent = `\nwindow.addEventListener('DOMContentLoaded', () => {\n    document.body.setAttribute('data-theme', '${currentTheme}');\n    renderJsonTree(${JSON.stringify(rawData)});\n});\n`;
+            scriptTag.parentNode.insertBefore(dataScript, scriptTag);
+
+            const htmlContent = "<!DOCTYPE html>\n" + pageClone.outerHTML;
+            const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'jmdreader_json_report.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast("✓ Standalone HTML Exported!");
+        }
+
         document.getElementById('filterInput').oninput = (e) => {
-            const query = e.target.value.toLowerCase().trim();
+            const query = e.target.value.trim();
             const nodes = document.querySelectorAll('.tree-node');
 
             if (!query) {
@@ -474,10 +564,40 @@
                 return;
             }
 
+            const isJsonPath = query.startsWith('$');
+            let pathRegex = null;
+
+            if (isJsonPath) {
+                try {
+                    // Convert basic JSONPath to RegExp (e.g. $..title or $.items[*].name)
+                    let regexStr = query
+                        .replace(/\./g, '\\.')
+                        .replace(/\[\*\]/g, '\\[\\d+\\]')
+                        .replace(/\\\.\\\./g, '.*\\.');
+                    pathRegex = new RegExp(regexStr + '$', 'i');
+                } catch {
+                    pathRegex = null;
+                }
+            }
+
+            const lowerQuery = query.toLowerCase();
+
             nodes.forEach(n => {
-                const text = n.querySelector('.node-row')?.textContent?.toLowerCase() || '';
-                const match = text.includes(query);
+                const row = n.querySelector('.node-row');
+                if (!row) return;
+
+                let match = false;
+                if (isJsonPath && pathRegex) {
+                    const nodePath = row.getAttribute('data-path') || '';
+                    match = pathRegex.test(nodePath);
+                } else {
+                    const text = row.textContent?.toLowerCase() || '';
+                    match = text.includes(lowerQuery);
+                }
+
                 n.style.display = match ? '' : 'none';
+                row.classList.toggle('match-highlight', match);
+
                 if (match) {
                     // Open ancestors
                     let parent = n.parentElement;

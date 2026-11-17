@@ -43,7 +43,17 @@ public sealed partial class MainPage : Page
             _renderDebounceTimer.Stop();
             ExecuteUpdateWebViewContent();
         };
-        Loaded += async (s, e) => await InitializeWebViewAsync();
+        Loaded += async (s, e) =>
+        {
+            try
+            {
+                await InitializeWebViewAsync();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[MainPage] Loaded InitializeWebViewAsync failed: {ex}");
+            }
+        };
     }
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -73,7 +83,13 @@ public sealed partial class MainPage : Page
 
         try
         {
-            await AntigravityViewer.EnsureCoreWebView2Async();
+            var localFolder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            var userDataFolder = Path.Combine(localFolder, "JMDReader", "WebView2Data");
+            Directory.CreateDirectory(userDataFolder);
+
+            var environment = await CoreWebView2Environment.CreateWithOptionsAsync(null, userDataFolder, null);
+            await AntigravityViewer.EnsureCoreWebView2Async(environment);
+
             var assetsFolder = Path.Combine(AppContext.BaseDirectory, "Assets", "Renderer");
             AntigravityViewer.CoreWebView2.SetVirtualHostNameToFolderMapping(
                 "appassets.local",
@@ -91,9 +107,10 @@ public sealed partial class MainPage : Page
 
             AntigravityViewer.Source = new Uri("https://appassets.local/viewer.html");
         }
-        catch
+        catch (Exception ex)
         {
-            // Gracefully handle environments without WebView2 runtime
+            // Gracefully handle environments without WebView2 runtime or sandbox restrictions
+            Debug.WriteLine($"[MainPage] WebView2 initialization error: {ex}");
         }
     }
 

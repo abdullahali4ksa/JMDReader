@@ -4,7 +4,7 @@
 ; =====================================================================
 
 #define MyAppName "JMDReader"
-#define MyAppVersion "1.0.1"
+#define MyAppVersion "1.0.2"
 #define MyAppPublisher "birotech"
 #define MyAppURL "https://github.com/ABDULLAHALI4KSA/JMDReader"
 #define MyAppSupportEmail "Abdullah444ali@outlook.com"

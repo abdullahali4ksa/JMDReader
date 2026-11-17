@@ -12,7 +12,7 @@
   <Identity
     Name="birotech.JMDReader"
     Publisher="CN=4B6200B3-DE4E-4F39-A6EA-B5DC049294B2"
-    Version="1.0.1.0" />
+    Version="1.0.2.0" />
 
   <mp:PhoneIdentity PhoneProductId="3361C559-1964-49C7-82CB-6EF2BEC14BF9" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 

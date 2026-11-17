@@ -146,8 +146,7 @@
                                 </StackPanel>
                             </Border>
 
-                            <!-- Find, Path Toggle & Zen Mode -->
-                            <Button Content="🔍" Width="30" Height="28" Padding="0" FontSize="13" Click="FindButton_Click" ToolTipService.ToolTip="Find and Replace / البحث والاستبدال (Ctrl+F / Ctrl+H)" />
+                            <!-- Path Toggle & Zen Mode -->
                             <Button Content="📍" Width="30" Height="28" Padding="0" FontSize="13" Command="{Binding TogglePathBarVisibilityCommand}" ToolTipService.ToolTip="{Binding Strings.TooltipShowPath, FallbackValue='Toggle File Path / إظهار أو إخفاء مسار الملف'}" />
                             <Button Content="⛶" Width="30" Height="28" Padding="0" FontSize="13" Command="{Binding ToggleZenModeCommand}" ToolTipService.ToolTip="{Binding Strings.TooltipFocus, FallbackValue='Focus Mode (F11)'}" />
                         </StackPanel>
@@ -270,30 +269,30 @@
             <StackPanel Spacing="6">
                 <!-- Search row -->
                 <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
-                    <TextBlock Text="Find:" VerticalAlignment="Center" FontWeight="SemiBold" Width="60" />
+                    <TextBlock Text="🔍" VerticalAlignment="Center" FontSize="13" Width="20" Opacity="0.75" />
                     <TextBox x:Name="FindTextBox" Width="240"
                         PlaceholderText="Search in document..."
                         TextChanged="FindTextBox_TextChanged"
                         KeyDown="FindTextBox_KeyDown"
                         AutomationProperties.Name="Search text" />
-                    <ToggleButton x:Name="MatchCaseToggle" Content="Aa" Click="FindOption_Changed" ToolTipService.ToolTip="Match Case (حساس لحالة الأحرف)" Width="32" Height="32" Padding="0" />
-                    <ToggleButton x:Name="RegexToggle" Content=".*" Click="FindOption_Changed" ToolTipService.ToolTip="Regular Expression (تعبيرات نمطية)" Width="32" Height="32" Padding="0" />
-                    <Button Content="▲ Prev" Click="FindPrevious_Click" ToolTipService.ToolTip="Previous match (Shift+Enter)" />
-                    <Button Content="▼ Next" Click="FindNext_Click" ToolTipService.ToolTip="Next match (Enter)" />
-                    <TextBlock x:Name="FindStatusText" VerticalAlignment="Center" MinWidth="80" Foreground="{ThemeResource AppSecondaryTextBrush}" />
-                    <TextBlock x:Name="FindPreviewText" VerticalAlignment="Center" MaxWidth="320" TextTrimming="CharacterEllipsis" Foreground="{ThemeResource AppSecondaryTextBrush}" />
-                    <Button Content="✕" Width="28" Height="28" Padding="0" Click="CloseFind_Click" ToolTipService.ToolTip="Close (Esc)" />
+                    <ToggleButton x:Name="MatchCaseToggle" Content="Aa" Click="FindOption_Changed" ToolTipService.ToolTip="Match Case (حساس لحالة الأحرف)" Width="30" Height="28" Padding="0" FontSize="11" />
+                    <ToggleButton x:Name="RegexToggle" Content=".*" Click="FindOption_Changed" ToolTipService.ToolTip="Regular Expression (تعبيرات نمطية)" Width="30" Height="28" Padding="0" FontSize="11" />
+                    <Button Content="▲" Width="30" Height="28" Padding="0" FontSize="11" Click="FindPrevious_Click" ToolTipService.ToolTip="Previous match / النتيجة السابقة (Shift+Enter)" />
+                    <Button Content="▼" Width="30" Height="28" Padding="0" FontSize="11" Click="FindNext_Click" ToolTipService.ToolTip="Next match / النتيجة التالية (Enter)" />
+                    <TextBlock x:Name="FindStatusText" VerticalAlignment="Center" MinWidth="70" Foreground="{ThemeResource AppSecondaryTextBrush}" FontSize="12" />
+                    <TextBlock x:Name="FindPreviewText" VerticalAlignment="Center" MaxWidth="320" TextTrimming="CharacterEllipsis" Foreground="{ThemeResource AppSecondaryTextBrush}" FontSize="12" />
+                    <Button Content="✕" Width="26" Height="26" Padding="0" FontSize="11" Click="CloseFind_Click" ToolTipService.ToolTip="Close / إغلاق (Esc)" />
                 </StackPanel>
                 <!-- Replace row -->
                 <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
-                    <TextBlock Text="Replace:" VerticalAlignment="Center" FontWeight="SemiBold" Width="60" />
+                    <TextBlock Text="🔄" VerticalAlignment="Center" FontSize="13" Width="20" Opacity="0.75" />
                     <TextBox x:Name="ReplaceTextBox" Width="240"
                         PlaceholderText="Replace with..."
                         KeyDown="ReplaceTextBox_KeyDown"
                         AutomationProperties.Name="Replace text" />
-                    <Button Content="Replace" Click="Replace_Click" ToolTipService.ToolTip="Replace current match" />
-                    <Button Content="Replace All" Click="ReplaceAll_Click" ToolTipService.ToolTip="Replace all matches across the document" />
-                    <TextBlock x:Name="ReplaceStatusText" VerticalAlignment="Center" Foreground="{ThemeResource AppSecondaryTextBrush}" Margin="8,0,0,0" />
+                    <Button Content="🔂" Width="30" Height="28" Padding="0" FontSize="12" Click="Replace_Click" ToolTipService.ToolTip="Replace Current Match / استبدال النتيجة الحالية" />
+                    <Button Content="🔁" Width="30" Height="28" Padding="0" FontSize="12" Click="ReplaceAll_Click" ToolTipService.ToolTip="Replace All Matches / استبدال الكل في المستند" />
+                    <TextBlock x:Name="ReplaceStatusText" VerticalAlignment="Center" Foreground="{ThemeResource AppSecondaryTextBrush}" Margin="8,0,0,0" FontSize="12" />
                 </StackPanel>
             </StackPanel>
         </Border>
@@ -366,6 +365,8 @@
                     Padding="16"
                     BorderBrush="{ThemeResource AppBorderBrush}"
                     Background="{ThemeResource AppBackgroundBrush}"
+                    SelectionHighlightColor="#FFFFD600"
+                    SelectionHighlightColorWhenNotFocused="#FFFFD600"
                     AllowDrop="True"
                     DragOver="MarkdownEditorTextBox_DragOver"
                     Drop="MarkdownEditorTextBox_Drop"

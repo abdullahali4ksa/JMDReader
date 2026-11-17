@@ -140,6 +140,7 @@ public sealed partial class MainWindow : Window
         RootGrid.KeyboardAccelerators.Add(accelerator);
     }
     private void Find_Click(object sender, RoutedEventArgs e) => (RootFrame.Content as MainPage)?.ShowFind();
+    private void Replace_Click(object sender, RoutedEventArgs e) => (RootFrame.Content as MainPage)?.ShowReplace();
 
     private async void KeyboardShortcuts_Click(object sender, RoutedEventArgs e)
     {

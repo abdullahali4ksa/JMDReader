@@ -78,19 +78,22 @@
         }
 
         mark.find-highlight {
-            background-color: #ffeb3b;
-            color: #000000;
-            border-radius: 2px;
-            padding: 1px 3px;
-            box-shadow: 0 0 2px rgba(0,0,0,0.2);
-            font-weight: 500;
+            background-color: #ffeb3b !important;
+            color: #000000 !important;
+            border-radius: 2px !important;
+            padding: 1px 3px !important;
+            margin: 0 !important;
+            box-shadow: 0 0 2px rgba(0,0,0,0.4) !important;
+            font-weight: 600 !important;
+            display: inline !important;
         }
 
         mark.find-highlight.active-match {
             background-color: #ff9800 !important;
             color: #ffffff !important;
-            font-weight: 700;
-            outline: 2px solid #e65100;
+            font-weight: 700 !important;
+            outline: 2px solid #e65100 !important;
+            box-shadow: 0 0 8px rgba(255, 152, 0, 0.9) !important;
         }
 
         body {
@@ -655,6 +658,7 @@
 
         let currentHighlights = [];
         let currentActiveHighlightIndex = -1;
+        let lastHighlightQuery = "";
 
         function clearSearchHighlights() {
             const marks = document.querySelectorAll('mark.find-highlight');
@@ -667,6 +671,7 @@
             });
             currentHighlights = [];
             currentActiveHighlightIndex = -1;
+            lastHighlightQuery = "";
         }
 
         function highlightSearchTerm(query, activeIndex) {
@@ -675,23 +680,32 @@
                 return;
             }
 
-            // If query is identical and we already highlighted, simply update the active match class
-            if (currentHighlights.length > 0 && currentActiveHighlightIndex !== activeIndex) {
+            const content = document.getElementById('content');
+            if (!content) return;
+
+            // If query is identical and existing highlight elements are still valid in the DOM:
+            const areHighlightsValid = currentHighlights.length > 0 &&
+                                       document.body.contains(currentHighlights[0]) &&
+                                       lastHighlightQuery.toLowerCase() === query.toLowerCase();
+
+            if (areHighlightsValid) {
                 if (currentActiveHighlightIndex >= 0 && currentActiveHighlightIndex < currentHighlights.length) {
                     currentHighlights[currentActiveHighlightIndex].classList.remove('active-match');
                 }
-                currentActiveHighlightIndex = activeIndex;
-                if (activeIndex >= 0 && activeIndex < currentHighlights.length) {
-                    const activeMark = currentHighlights[activeIndex];
+                const count = currentHighlights.length;
+                const safeIndex = ((activeIndex % count) + count) % count;
+                currentActiveHighlightIndex = safeIndex;
+                const activeMark = currentHighlights[safeIndex];
+                if (activeMark) {
                     activeMark.classList.add('active-match');
                     activeMark.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }
                 return;
             }
 
+            // Full rebuild of highlights
             clearSearchHighlights();
-            const content = document.getElementById('content');
-            if (!content) return;
+            lastHighlightQuery = query;
 
             const walker = document.createTreeWalker(content, NodeFilter.SHOW_TEXT, null, false);
             const nodes = [];
@@ -722,16 +736,9 @@
 
                         const mark = document.createElement('mark');
                         mark.className = 'find-highlight';
-                        if (matchCount === activeIndex) {
-                            mark.classList.add('active-match');
-                        }
                         mark.textContent = text.substring(pos, pos + query.length);
                         frag.appendChild(mark);
                         currentHighlights.push(mark);
-
-                        if (matchCount === activeIndex) {
-                            setTimeout(() => mark.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
-                        }
 
                         matchCount++;
                         lastIdx = pos + query.length;
@@ -745,7 +752,19 @@
                     parent.replaceChild(frag, node);
                 }
             }
-            currentActiveHighlightIndex = activeIndex;
+
+            if (currentHighlights.length > 0) {
+                const count = currentHighlights.length;
+                const safeIndex = ((activeIndex % count) + count) % count;
+                currentActiveHighlightIndex = safeIndex;
+                const activeMark = currentHighlights[safeIndex];
+                if (activeMark) {
+                    activeMark.classList.add('active-match');
+                    setTimeout(() => {
+                        activeMark.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 40);
+                }
+            }
         }
 
         // Bridge listener for messages from WinUI 3 C#
@@ -754,6 +773,7 @@
             if (!data) return;
 
             if (data.type === 'setContent') {
+                clearSearchHighlights();
                 const rendered = parseAntigravityMarkdown(data.markdown || "");
                 document.getElementById('content').innerHTML = rendered;
                 setupHeadingObserver();
@@ -771,7 +791,7 @@
                     target.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
             } else if (data.type === 'highlightSearch') {
-                highlightSearchTerm(data.query, data.activeIndex || 0);
+                highlightSearchTerm(data.query, data.activeIndex ?? 0);
             } else if (data.type === 'clearSearch') {
                 clearSearchHighlights();
             } else if (data.type === 'printDocument') {

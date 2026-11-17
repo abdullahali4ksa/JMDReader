@@ -43,7 +43,9 @@
                 <MenuFlyoutItem Text="{Binding Strings.MenuToggleSidebar, FallbackValue='Toggle Sidebar  (Ctrl+B)'}" Command="{Binding ToggleWorkspacePaneCommand}" />
                 <MenuFlyoutSeparator />
                 <MenuFlyoutItem Text="{Binding Strings.MenuRefresh, FallbackValue='Refresh  (Ctrl+R)'}" Command="{Binding RefreshDocumentCommand}" />
-                <MenuFlyoutItem Text="{Binding Strings.MenuFind, FallbackValue='Find  (Ctrl+F)'}" Click="Find_Click" />
+                <MenuFlyoutSeparator />
+                <MenuFlyoutItem Text="{Binding Strings.MenuFind, FallbackValue='Find...  (Ctrl+F)'}" Click="Find_Click" />
+                <MenuFlyoutItem Text="Replace...  (Ctrl+H)" Click="Replace_Click" />
             </MenuBarItem>
             <MenuBarItem Title="{Binding Strings.MenuSettings, FallbackValue='Settings'}">
                 <MenuFlyoutSubItem Text="{Binding Strings.MenuTheme, FallbackValue='🎨 Theme / المظهر'}">
@@ -91,8 +93,8 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <TextBlock Text="WORKSPACE" FontWeight="Bold" FontSize="11" Foreground="{ThemeResource AppSecondaryTextBrush}" VerticalAlignment="Center" />
-                        <Button Grid.Column="1" Content="📁 Open" Margin="6,0,4,0" Padding="6,3" FontSize="11" Command="{Binding OpenFolderCommand}" ToolTipService.ToolTip="Open workspace folder" />
-                        <Button Grid.Column="2" Content="✕" Width="26" Height="26" Padding="0" FontSize="11" Command="{Binding ToggleWorkspacePaneCommand}" ToolTipService.ToolTip="Close workspace sidebar (Ctrl+B)" />
+                        <Button Grid.Column="1" Content="📁" Width="26" Height="26" Margin="6,0,4,0" Padding="0" FontSize="11" Command="{Binding OpenFolderCommand}" ToolTipService.ToolTip="Open workspace folder / فتح مجلد العمل (Ctrl+Shift+O)" />
+                        <Button Grid.Column="2" Content="✕" Width="26" Height="26" Padding="0" FontSize="11" Command="{Binding ToggleWorkspacePaneCommand}" ToolTipService.ToolTip="Close workspace sidebar / إغلاق (Ctrl+B)" />
                     </Grid>
                     <TreeView
                         x:Name="WorkspaceTreeView"

@@ -891,3 +891,33 @@ The `FILES_SCOPE` on each original P01 task is the allowlist. Dependencies are d
 - **ACCEPTANCE CRITERIA:** Pressing F1 or selecting Keyboard Shortcuts in the Settings menu opens an elegant Fluent dialog listing all commands.
 - **TEST:** F1 accelerator and dialog invocation.
 - **VERIFICATION:** Confirmed `ShowKeyboardShortcutsDialogAsync` and MenuFlyoutItem under Settings.
+
+---
+
+## Phase 21 — Store Hardening, Native Arm64 & In-Document Reader Productivity (الإصدار v1.0.2 وحزم المتجر المتعددة)
+
+**Status:** DONE (4/4 tasks: P21-T001..P21-T004 verified) · **Depends on:** Phase 20 complete · **Linear Project:** `JMDReader birotech` (`https://linear.app/jmdreader`) · **Store Submission:** `1152921505702400334`
+
+### P21-T001 — Native Arm64 (AArch64) MSIX Package & Multi-Architecture Build Pipeline (Linear: JMD-5)
+**ID:** P21-T001 · **FEATURE:** Store / Packaging · **PRIORITY:** P0 · **LINEAR_ID:** JMD-5 · **STATUS:** DONE · **ESTIMATE:** 20 mins · **FILES_SCOPE:** `scripts/build-msix.ps1`, `src/MDReader.App/Package.appxmanifest`
+- **GOAL:** Provide native 64-bit Arm (AArch64) support alongside x64 for Microsoft Store submission v1.0.2, enabling zero-emulation optimal performance on Windows on Arm and Copilot+ PCs.
+- **ACCEPTANCE CRITERIA:** `scripts/build-msix.ps1 -Architecture all` compiles and signs both `win-x64` and `win-arm64` MSIX packages with the official Store developer certificate.
+- **VERIFICATION:** Both `MDReader.App_1.0.2.0_x64.msix` and `MDReader.App_1.0.2.0_arm64.msix` generated and verified.
+
+### P21-T002 — In-Document Find & Replace with Live Visual Highlighting in Reader (Linear: JMD-6)
+**ID:** P21-T002 · **FEATURE:** Search / Reader · **PRIORITY:** P0 · **LINEAR_ID:** JMD-6 · **STATUS:** DONE · **ESTIMATE:** 25 mins · **FILES_SCOPE:** `src/MDReader.App/Features/Reader/Views/MainPage.xaml`, `src/MDReader.App/Features/Reader/Views/MainPage.xaml.cs`, `src/MDReader.App/Assets/Renderer/viewer.html`, `src/MDReader.App/Features/Shell/Views/MainWindow.xaml.cs`
+- **GOAL:** Connect the Find & Replace bar directly to the active rendered document in WebView2. Highlight all matches in yellow (`mark.find-highlight`), highlight active match in orange (`active-match`), smooth auto-scroll to current match, support Next/Previous navigation, single and replace-all, and bind `Ctrl+F` and `Ctrl+H`.
+- **ACCEPTANCE CRITERIA:** Searching immediately highlights matches in the reading view; navigating matches scrolls the viewport; closing search clears highlights cleanly without affecting DOM or math/code elements.
+- **VERIFICATION:** Confirmed `TreeWalker` highlighting in `viewer.html` and JSON message bridge `highlightSearch` / `clearSearch` in `MainPage.xaml.cs`.
+
+### P21-T003 — Comprehensive Document Text & Code Block Copying (Linear: JMD-7)
+**ID:** P21-T003 · **FEATURE:** Reader / Clipboard · **PRIORITY:** P1 · **LINEAR_ID:** JMD-7 · **STATUS:** DONE · **ESTIMATE:** 15 mins · **FILES_SCOPE:** `src/MDReader.App/Features/Reader/Views/MainPage.xaml`, `src/MDReader.App/Features/Reader/Views/MainPage.xaml.cs`, `src/MDReader.App/Assets/Renderer/viewer.html`
+- **GOAL:** Enable seamless text selection and copying across both reading and editing views. Add `user-select: text` to all DOM elements in `viewer.html`, provide a prominent "📋 Copy Document" button in the top toolbar with visual badge feedback, and support code block copy buttons.
+- **ACCEPTANCE CRITERIA:** User can select any text with mouse/keyboard, copy snippets, copy entire document markdown via toolbar button or `Ctrl+C`.
+- **VERIFICATION:** Confirmed `CopyDocument_Click` in `MainPage.xaml.cs` and `user-select` rules in `viewer.html`.
+
+### P21-T004 — Dual Task Registration & Store Development Governance Policy
+**ID:** P21-T004 · **FEATURE:** Policy / Governance · **PRIORITY:** P0 · **STATUS:** DONE · **ESTIMATE:** 15 mins · **FILES_SCOPE:** `docs/DEVELOPMENT_RULES.md`, `docs/STORE_POLICY.md`
+- **GOAL:** Enshrine policy that every new development or task must be registered in both `.project/TASKS.md` and Linear.app (`linear.app/jmdreader`). Incorporate complete Microsoft Store packaging constraints (Publisher `CN=4B6200B3-DE4E-4F39-A6EA-B5DC049294B2`, PFN `birotech.JMDReader_4spa8h579ffz6`, WebView2 LocalAppData cache isolation, zero telemetry, 100% offline).
+- **ACCEPTANCE CRITERIA:** `DEVELOPMENT_RULES.md` and `STORE_POLICY.md` updated with strict policies.
+- **VERIFICATION:** Confirmed policy documentation in both files.

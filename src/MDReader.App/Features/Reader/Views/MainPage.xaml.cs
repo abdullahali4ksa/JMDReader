@@ -411,6 +411,47 @@ public sealed partial class MainPage : Page
         FindBar.Visibility = Visibility.Visible;
         FindTextBox.Focus(FocusState.Programmatic);
         FindTextBox.SelectAll();
+        if (!string.IsNullOrWhiteSpace(FindTextBox.Text))
+        {
+            RunFindQuery();
+        }
+    }
+
+    public void ShowReplace()
+    {
+        FindBar.Visibility = Visibility.Visible;
+        ReplaceTextBox.Focus(FocusState.Programmatic);
+        ReplaceTextBox.SelectAll();
+        if (!string.IsNullOrWhiteSpace(FindTextBox.Text))
+        {
+            RunFindQuery();
+        }
+    }
+
+    private void FindButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (FindBar.Visibility == Visibility.Visible)
+        {
+            CloseFind();
+        }
+        else
+        {
+            ShowFind();
+        }
+    }
+
+    private void CloseFind()
+    {
+        FindBar.Visibility = Visibility.Collapsed;
+        if (_isWebViewInitialized && AntigravityViewer?.CoreWebView2 != null)
+        {
+            try
+            {
+                var json = JsonSerializer.Serialize(new { type = "clearSearch" });
+                AntigravityViewer.CoreWebView2.PostWebMessageAsJson(json);
+            }
+            catch { }
+        }
     }
 
     private void DocumentTabs_AddTabButtonClick(TabView sender, object args)
@@ -446,6 +487,15 @@ public sealed partial class MainPage : Page
         {
             FindStatusText.Text = string.Empty;
             FindPreviewText.Text = string.Empty;
+            if (_isWebViewInitialized && AntigravityViewer?.CoreWebView2 != null)
+            {
+                try
+                {
+                    var json = JsonSerializer.Serialize(new { type = "clearSearch" });
+                    AntigravityViewer.CoreWebView2.PostWebMessageAsJson(json);
+                }
+                catch { }
+            }
             return;
         }
 
@@ -459,6 +509,15 @@ public sealed partial class MainPage : Page
         {
             FindStatusText.Text = "No matches";
             FindPreviewText.Text = string.Empty;
+            if (_isWebViewInitialized && AntigravityViewer?.CoreWebView2 != null)
+            {
+                try
+                {
+                    var json = JsonSerializer.Serialize(new { type = "clearSearch" });
+                    AntigravityViewer.CoreWebView2.PostWebMessageAsJson(json);
+                }
+                catch { }
+            }
             return;
         }
 
@@ -478,7 +537,7 @@ public sealed partial class MainPage : Page
         }
         else if (e.Key == VirtualKey.Escape)
         {
-            FindBar.Visibility = Visibility.Collapsed;
+            CloseFind();
             e.Handled = true;
         }
     }
@@ -539,7 +598,38 @@ public sealed partial class MainPage : Page
 
     private void FindPrevious_Click(object sender, RoutedEventArgs e) => FindPrevious();
     private void FindNext_Click(object sender, RoutedEventArgs e) => FindNext();
-    private void CloseFind_Click(object sender, RoutedEventArgs e) => FindBar.Visibility = Visibility.Collapsed;
+    private void CloseFind_Click(object sender, RoutedEventArgs e) => CloseFind();
+
+    private void CopyDocument_Click(object sender, RoutedEventArgs e)
+    {
+        var content = _viewModel?.DocumentContent ?? string.Empty;
+        if (string.IsNullOrEmpty(content)) return;
+
+        try
+        {
+            var dataPackage = new DataPackage();
+            dataPackage.SetText(content);
+            Clipboard.SetContent(dataPackage);
+
+            if (PathCopiedBadge != null)
+            {
+                PathCopiedBadge.Text = "✓ Document copied / تم نسخ النص";
+                PathCopiedBadge.Visibility = Visibility.Visible;
+                var timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
+                timer.Tick += (s, args) =>
+                {
+                    timer.Stop();
+                    PathCopiedBadge.Visibility = Visibility.Collapsed;
+                    PathCopiedBadge.Text = "✓ تم نسخ المسار";
+                };
+                timer.Start();
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[MainPage] CopyDocument error: {ex}");
+        }
+    }
 
     private void OutlineListView_ItemClick(object sender, ItemClickEventArgs e)
     {
@@ -747,6 +837,22 @@ public sealed partial class MainPage : Page
         if (MarkdownEditorTextBox != null && match.Index + match.Length <= content.Length)
         {
             MarkdownEditorTextBox.Select(match.Index, match.Length);
+        }
+
+        if (_isWebViewInitialized && AntigravityViewer?.CoreWebView2 != null)
+        {
+            try
+            {
+                var query = FindTextBox.Text;
+                var json = JsonSerializer.Serialize(new
+                {
+                    type = "highlightSearch",
+                    query = query,
+                    activeIndex = _currentFindIndex
+                });
+                AntigravityViewer.CoreWebView2.PostWebMessageAsJson(json);
+            }
+            catch { }
         }
     }
 

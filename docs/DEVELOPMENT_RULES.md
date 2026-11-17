@@ -90,14 +90,49 @@ Before adding any NuGet package:
 - Do not override system theme behavior without a documented, tested reason.
 - Do not bundle a custom window frame that breaks Windows snap, taskbar thumbnail previews, or system title bar behavior.
 
-## 12. Maintain MSIX / Microsoft Store Compatibility
+## 12. Maintain MSIX / Microsoft Store Compatibility & Policies
 
-- Keep the project compatible with MSIX packaging at all times.
-- Ensure the app manifest declares supported architectures (x64) and supported OSes (Windows 10 1809+).
-- Keep the minimum OS target at or above Windows 10 version 1809 (build 17763) as required by the Windows App SDK.
-- Do not use Win32 APIs or patterns that are blocked by the Microsoft Store certification process (e.g., `LoadLibrary` for arbitrary code, registry writes to HKLM, processes with `SeDebugPrivilege`).
+- Keep the project strictly compliant with Microsoft Store and Windows App certification requirements at all times:
+  - **Store Identity Alignment**:
+    - **Package Name**: `birotech.JMDReader`
+    - **Publisher**: `CN=4B6200B3-DE4E-4F39-A6EA-B5DC049294B2`
+    - **PublisherDisplayName**: `birotech`
+    - **Package Family Name (PFN)**: `birotech.JMDReader_4spa8h579ffz6`
+  - **Multi-Architecture Support**:
+    - Every Store release (v1.0.2, v2.0, etc.) **must build and package native binaries for both `x64` and `arm64` (AArch64)** to ensure native performance on Intel/AMD and Snapdragon / Copilot+ PC devices.
+  - **MSIX Sandbox & Storage Isolation (WebView2 Protection)**:
+    - Because MSIX applications execute with a read-only install directory (`C:\Program Files\WindowsApps\...`), **WebView2 must never use the default userDataFolder**.
+    - All WebView2 instances must initialize with an isolated, writable user data folder in `%LocalAppData%\JMDReader\WebView2Data` via `CoreWebView2Environment.CreateWithOptionsAsync` to prevent fatal `0x8000FFFF / 0xc000027b` crashes.
+  - **Capability & Privacy Strictness**:
+    - Restricted capability `runFullTrust` is declared exclusively for native WinUI 3 desktop file operations and local system integration.
+    - Zero telemetry, zero analytics, zero external network calls: 100% offline, local-first execution.
+  - **XAML Theme Fallback**:
+    - All Resource Dictionaries must define `<ResourceDictionary x:Key="Default">` fallback dictionaries alongside `Light` and `Dark` to avoid missing brushes or crash on custom Windows themes.
+  - **Store Version Synchronization**:
+    - Keep `Package.appxmanifest`, `setup.iss`, and git tags synchronized on 4-part semantic versioning (`1.0.2.0`, `2.0.0.0`).
 
-## 13. Never Place Secrets in Source Code
+---
+
+## 13. Dual Task Registration & Tracking Policy (Linear.app & TASKS.md)
+
+**Mandatory for all AI agents and human developers:**
+
+1. **Every New Development Item Must Be Tracked**:
+   - Any new feature, enhancement, architectural refactoring, bug fix, or Store submission step **must be recorded in both**:
+     - `.project/TASKS.md` (Local project control layer)
+     - **Linear.app** (`linear.app/jmdreader` workspace, team `JMDReader`)
+2. **Task Synchronization Lifecycle**:
+   - **Backlog / Todo**: Identified requirement or future enhancement (e.g. Phase 2 paste handling `JMD-8`).
+   - **In Progress**: Actively being coded, tested, or packaged.
+   - **Done / Completed**: Verified with tests (`dotnet test`), clean build (`dotnet build`), and artifacts generated.
+3. **Traceability in Commits**:
+   - Git commits and pull requests must reference the Linear Issue ID (e.g. `JMD-5`, `JMD-6`, `JMD-7`) and the Phase Task ID (e.g. `P20-T005`).
+4. **No Ghost Features**:
+   - Writing code or introducing dependencies without a prior registered task in both Linear and `TASKS.md` is strictly prohibited.
+
+---
+
+## 14. Never Place Secrets in Source Code
 
 - No API keys, tokens, passwords, or connection strings in source files.
 - If a configuration secret is needed, use the `appsettings.json` + user-secrets pattern or environment variables — and **never commit** secret values.

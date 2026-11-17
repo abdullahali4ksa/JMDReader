@@ -137,15 +137,17 @@
                                 </StackPanel>
                             </Border>
 
-                            <!-- Export Group (Pill cluster) -->
+                            <!-- Export & Copy Group (Pill cluster) -->
                             <Border Background="{ThemeResource AppBackgroundBrush}" BorderBrush="{ThemeResource AppBorderBrush}" BorderThickness="1" CornerRadius="6" Padding="2">
                                 <StackPanel Orientation="Horizontal" Spacing="2">
                                     <Button Content="🖨️" Width="30" Height="28" Padding="0" FontSize="13" Click="ExportPdf_Click" ToolTipService.ToolTip="{Binding Strings.TooltipExportPdf, FallbackValue='Export to PDF'}" />
                                     <Button Content="🌐" Width="30" Height="28" Padding="0" FontSize="13" Click="ExportHtml_Click" ToolTipService.ToolTip="{Binding Strings.TooltipExportHtml, FallbackValue='Export to HTML'}" />
+                                    <Button x:Name="CopyDocumentButton" Content="📋" Width="30" Height="28" Padding="0" FontSize="13" Click="CopyDocument_Click" ToolTipService.ToolTip="Copy All Text / نسخ النص كاملاً (Ctrl+C)" />
                                 </StackPanel>
                             </Border>
 
-                            <!-- Path Toggle & Zen Mode -->
+                            <!-- Find, Path Toggle & Zen Mode -->
+                            <Button Content="🔍" Width="30" Height="28" Padding="0" FontSize="13" Click="FindButton_Click" ToolTipService.ToolTip="Find and Replace / البحث والاستبدال (Ctrl+F / Ctrl+H)" />
                             <Button Content="📍" Width="30" Height="28" Padding="0" FontSize="13" Command="{Binding TogglePathBarVisibilityCommand}" ToolTipService.ToolTip="{Binding Strings.TooltipShowPath, FallbackValue='Toggle File Path / إظهار أو إخفاء مسار الملف'}" />
                             <Button Content="⛶" Width="30" Height="28" Padding="0" FontSize="13" Command="{Binding ToggleZenModeCommand}" ToolTipService.ToolTip="{Binding Strings.TooltipFocus, FallbackValue='Focus Mode (F11)'}" />
                         </StackPanel>

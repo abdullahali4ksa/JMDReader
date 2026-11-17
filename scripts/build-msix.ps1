@@ -8,7 +8,8 @@
 
 param(
     [string]$Configuration = "Release",
-    [string]$OutputDir = "dist/msix"
+    [string]$OutputDir = "dist/msix",
+    [string]$Architecture = "all" # Options: x64, arm64, all
 )
 
 $ErrorActionPreference = "Stop"
@@ -28,37 +29,53 @@ if (-not $cert) {
 
 $fullOutputDir = (New-Item -ItemType Directory -Path $OutputDir -Force).FullName
 
-Write-Host "Packaging MSIX to $fullOutputDir with certificate thumbprint $($cert.Thumbprint)..." -ForegroundColor Cyan
-
-# 2. Publish MSIX Package
-dotnet publish src/MDReader.App/MDReader.App.csproj `
-    -c $Configuration `
-    -r win-x64 `
-    /p:GenerateAppxPackageOnBuild=true `
-    /p:AppxPackageDir="$fullOutputDir\" `
-    /p:AppxBundle=Never `
-    /p:UapAppxPackageBuildMode=SideloadOnly `
-    /p:AppxPackageSigningEnabled=true `
-    /p:PackageCertificateThumbprint="$($cert.Thumbprint)" `
-    /p:PublishTrimmed=false
-
-if ($LASTEXITCODE -ne 0) {
-    Write-Error "MSIX packaging failed with exit code $LASTEXITCODE"
+$archsToBuild = @()
+if ($Architecture -eq "all") {
+    $archsToBuild = @("win-x64", "win-arm64")
+} elseif ($Architecture -eq "arm64" -or $Architecture -eq "win-arm64") {
+    $archsToBuild = @("win-arm64")
+} else {
+    $archsToBuild = @("win-x64")
 }
 
-# 3. Locate generated msix
+foreach ($rid in $archsToBuild) {
+    Write-Host ""
+    Write-Host "----------------------------------------------------------" -ForegroundColor Yellow
+    Write-Host " Packaging MSIX for Runtime Identifier: $rid" -ForegroundColor Yellow
+    Write-Host "----------------------------------------------------------" -ForegroundColor Yellow
+
+    dotnet publish src/MDReader.App/MDReader.App.csproj `
+        -c $Configuration `
+        -r $rid `
+        /p:GenerateAppxPackageOnBuild=true `
+        /p:AppxPackageDir="$fullOutputDir\" `
+        /p:AppxBundle=Never `
+        /p:UapAppxPackageBuildMode=SideloadOnly `
+        /p:AppxPackageSigningEnabled=true `
+        /p:PackageCertificateThumbprint="$($cert.Thumbprint)" `
+        /p:PublishTrimmed=false
+
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "MSIX packaging for $rid failed with exit code $LASTEXITCODE"
+    }
+}
+
+# 3. Locate generated msix files
 $msixFiles = Get-ChildItem -Path $fullOutputDir -Filter "*.msix" -Recurse
 if ($msixFiles.Count -gt 0) {
-    $msix = $msixFiles[0]
-    $sizeMb = [Math]::Round($msix.Length / 1MB, 2)
-    $hash = (Get-FileHash -Path $msix.FullName -Algorithm SHA256).Hash
     Write-Host ""
     Write-Host "==========================================================" -ForegroundColor Green
-    Write-Host "  MSIX PACKAGE BUILT AND SIGNED SUCCESSFULLY!             " -ForegroundColor Green
+    Write-Host "  MSIX PACKAGES BUILT AND SIGNED SUCCESSFULLY!            " -ForegroundColor Green
     Write-Host "==========================================================" -ForegroundColor Green
-    Write-Host "Package: $msix" -ForegroundColor White
-    Write-Host "Size:    $sizeMb MB" -ForegroundColor White
-    Write-Host "SHA256:  $hash" -ForegroundColor White
+    foreach ($msix in $msixFiles) {
+        $sizeMb = [Math]::Round($msix.Length / 1MB, 2)
+        $hash = (Get-FileHash -Path $msix.FullName -Algorithm SHA256).Hash
+        Write-Host "Package: $($msix.Name)" -ForegroundColor White
+        Write-Host "Path:    $($msix.FullName)" -ForegroundColor Gray
+        Write-Host "Size:    $sizeMb MB" -ForegroundColor White
+        Write-Host "SHA256:  $hash" -ForegroundColor White
+        Write-Host "----------------------------------------------------------" -ForegroundColor DarkGray
+    }
 } else {
     Write-Warning "No .msix file found in $fullOutputDir. Check msix subdirectory output."
 }

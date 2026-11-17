@@ -103,6 +103,8 @@ public sealed partial class MainWindow : Window
             () => _shellViewModel.ToggleWorkspacePaneCommand.Execute(null));
         RegisterKeyboardAccelerator(VirtualKey.F, VirtualKeyModifiers.Control,
             () => (RootFrame.Content as MainPage)?.ShowFind());
+        RegisterKeyboardAccelerator(VirtualKey.H, VirtualKeyModifiers.Control,
+            () => (RootFrame.Content as MainPage)?.ShowReplace());
         RegisterKeyboardAccelerator(VirtualKey.R, VirtualKeyModifiers.Control,
             () => _shellViewModel.RefreshDocumentCommand.Execute(null));
         RegisterKeyboardAccelerator(VirtualKey.Number0, VirtualKeyModifiers.Control,

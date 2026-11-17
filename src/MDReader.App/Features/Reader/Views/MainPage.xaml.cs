@@ -139,11 +139,28 @@ public sealed partial class MainPage : Page
 
         try
         {
-            var markdown = _viewModel?.DocumentContent ?? string.Empty;
+            var content = _viewModel?.DocumentContent ?? string.Empty;
+            var currentPath = _viewModel?.SelectedTab?.FilePath ?? string.Empty;
+            var isJson = currentPath.EndsWith(".json", StringComparison.OrdinalIgnoreCase) ||
+                         currentPath.EndsWith(".jsonc", StringComparison.OrdinalIgnoreCase) ||
+                         currentPath.EndsWith(".jsonl", StringComparison.OrdinalIgnoreCase);
+
+            var targetUri = isJson
+                ? new Uri("https://appassets.local/json_viewer.html")
+                : new Uri("https://appassets.local/viewer.html");
+
+            if (AntigravityViewer.Source != targetUri)
+            {
+                AntigravityViewer.Source = targetUri;
+                return;
+            }
+
             var json = JsonSerializer.Serialize(new
             {
                 type = "setContent",
-                markdown = markdown
+                content = content,
+                markdown = content,
+                json = content
             });
             AntigravityViewer.CoreWebView2.PostWebMessageAsJson(json);
         }

@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JMDReader Interactive JSON Tree Viewer</title>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #1f2328;
+            --border-color: #d0d7de;
+            --toolbar-bg: #f6f8fa;
+            --badge-bg: #eaeef2;
+            --badge-text: #57606a;
+            --hover-bg: rgba(0, 0, 0, 0.04);
+            --key-color: #0969da;
+            --string-color: #0a8543;
+            --number-color: #953800;
+            --boolean-color: #8250df;
+            --null-color: #6e7781;
+            --highlight-bg: #fff8c5;
+            --highlight-active: #ff9800;
+        }
+
+        body[data-theme="dark"] {
+            --bg-color: #0d1117;
+            --text-color: #e6edf3;
+            --border-color: #30363d;
+            --toolbar-bg: #161b22;
+            --badge-bg: #21262d;
+            --badge-text: #8b949e;
+            --hover-bg: rgba(255, 255, 255, 0.06);
+            --key-color: #79c0ff;
+            --string-color: #7ee787;
+            --number-color: #ffa657;
+            --boolean-color: #d2a8ff;
+            --null-color: #8b949e;
+            --highlight-bg: #383200;
+            --highlight-active: #ff9800;
+        }
+
+        body[data-theme="sepia"] {
+            --bg-color: #fbf0d9;
+            --text-color: #433422;
+            --border-color: #e2d3b5;
+            --toolbar-bg: #f3e5c8;
+            --badge-bg: #ebdac0;
+            --badge-text: #6b583f;
+            --hover-bg: rgba(100, 70, 30, 0.07);
+            --key-color: #2b6cb0;
+            --string-color: #2e7d32;
+            --number-color: #d97706;
+            --boolean-color: #7c3aed;
+            --null-color: #78716c;
+            --highlight-bg: #fef08a;
+            --highlight-active: #ea580c;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: text;
+            -webkit-user-select: text;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI Variable", "Segoe UI", Cascadia Code, Consolas, monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+
+        /* Top sticky controls toolbar */
+        #toolbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            background: var(--toolbar-bg);
+            border-bottom: 1px solid var(--border-color);
+            font-size: 12px;
+        }
+
+        .btn {
+            background: var(--bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            padding: 4px 10px;
+            font-size: 11px;
+            cursor: pointer;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.15s ease;
+        }
+
+        .btn:hover {
+            background: var(--hover-bg);
+            border-color: var(--key-color);
+        }
+
+        #filterInput {
+            flex: 1;
+            max-width: 320px;
+            background: var(--bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            padding: 4px 10px;
+            font-size: 11px;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+
+        #filterInput:focus {
+            border-color: var(--key-color);
+        }
+
+        #statsBadge {
+            margin-left: auto;
+            color: var(--badge-text);
+            font-size: 11px;
+        }
+
+        #copiedToast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #10b981;
+            color: #ffffff;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.2s ease;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        #copiedToast.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Tree Container */
+        #treeContainer {
+            padding: 16px 20px 40px 20px;
+            overflow-x: auto;
+        }
+
+        .tree-node {
+            display: flex;
+            flex-direction: column;
+            margin: 1px 0;
+        }
+
+        .node-row {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 6px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: fit-content;
+            max-width: 100%;
+            transition: background-color 0.1s;
+        }
+
+        .node-row:hover {
+            background-color: var(--hover-bg);
+        }
+
+        .chevron {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            text-align: center;
+            font-size: 9px;
+            color: var(--badge-text);
+            transition: transform 0.15s ease;
+            cursor: pointer;
+            margin-right: 2px;
+        }
+
+        .chevron.collapsed {
+            transform: rotate(-90deg);
+        }
+
+        .chevron.leaf {
+            opacity: 0;
+            cursor: default;
+        }
+
+        .type-glyph {
+            display: inline-block;
+            padding: 0 4px;
+            font-size: 10px;
+            font-weight: 700;
+            margin-right: 6px;
+            opacity: 0.65;
+            border-radius: 3px;
+        }
+
+        .node-key {
+            color: var(--key-color);
+            font-weight: 600;
+            margin-right: 4px;
+        }
+
+        .node-colon {
+            color: var(--badge-text);
+            margin-right: 6px;
+        }
+
+        .node-value.string { color: var(--string-color); }
+        .node-value.number { color: var(--number-color); }
+        .node-value.boolean { color: var(--boolean-color); font-weight: 600; }
+        .node-value.null { color: var(--null-color); font-style: italic; }
+
+        .summary-badge {
+            font-size: 10px;
+            background: var(--badge-bg);
+            color: var(--badge-text);
+            padding: 1px 6px;
+            border-radius: 10px;
+            margin-left: 6px;
+            font-weight: 500;
+        }
+
+        .actions-pill {
+            display: none;
+            margin-left: 8px;
+            gap: 4px;
+        }
+
+        .node-row:hover .actions-pill {
+            display: inline-flex;
+        }
+
+        .mini-btn {
+            font-size: 9px;
+            background: var(--badge-bg);
+            color: var(--badge-text);
+            border: 1px solid var(--border-color);
+            border-radius: 3px;
+            padding: 0 5px;
+            cursor: pointer;
+        }
+
+        .mini-btn:hover {
+            color: var(--key-color);
+            border-color: var(--key-color);
+        }
+
+        .children-block {
+            margin-left: 20px;
+            border-left: 1px dashed var(--border-color);
+            padding-left: 6px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .children-block.hidden {
+            display: none;
+        }
+
+        .match-highlight {
+            background-color: var(--highlight-bg) !important;
+            border-radius: 2px;
+            padding: 0 2px;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body data-theme="dark">
+
+    <div id="toolbar">
+        <button class="btn" id="expandAllBtn" title="Expand All / توسيع الكل">⊞ Expand All</button>
+        <button class="btn" id="collapseAllBtn" title="Collapse All / طي الكل">⊟ Collapse All</button>
+        <input type="text" id="filterInput" placeholder="🔍 Search keys or values..." />
+        <button class="btn" id="copyRawBtn" title="Copy Raw JSON / نسخ المحتوى الخام">📋 Copy JSON</button>
+        <span id="statsBadge">0 items</span>
+    </div>
+
+    <div id="treeContainer"></div>
+    <div id="copiedToast">✓ Copied to clipboard!</div>
+
+    <script>
+        let rawData = null;
+        let totalCount = 0;
+
+        function showToast(msg) {
+            const toast = document.getElementById('copiedToast');
+            toast.textContent = msg || "✓ Copied to clipboard!";
+            toast.classList.add('visible');
+            setTimeout(() => toast.classList.remove('visible'), 1800);
+        }
+
+        function copyText(text, label) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast(label ? `✓ Copied ${label}` : "✓ Copied!");
+            });
+        }
+
+        function createNodeElement(key, value, path, depth) {
+            const isObject = value !== null && typeof value === 'object' && !Array.isArray(value);
+            const isArray = Array.isArray(value);
+            const isContainer = isObject || isArray;
+
+            const container = document.createElement('div');
+            container.className = 'tree-node';
+
+            const row = document.createElement('div');
+            row.className = 'node-row';
+            row.setAttribute('data-path', path);
+
+            // Chevron
+            const chevron = document.createElement('span');
+            chevron.className = isContainer ? 'chevron' : 'chevron leaf';
+            chevron.textContent = isContainer ? '▼' : '•';
+            row.appendChild(chevron);
+
+            // Type glyph
+            const glyph = document.createElement('span');
+            glyph.className = 'type-glyph';
+            if (isObject) glyph.textContent = '{}';
+            else if (isArray) glyph.textContent = '[]';
+            else if (typeof value === 'string') glyph.textContent = 'T';
+            else if (typeof value === 'number') glyph.textContent = '#';
+            else if (typeof value === 'boolean') glyph.textContent = '✓';
+            else glyph.textContent = '∅';
+            row.appendChild(glyph);
+
+            // Key
+            if (key !== '') {
+                const keyElem = document.createElement('span');
+                keyElem.className = 'node-key';
+                keyElem.textContent = key;
+                row.appendChild(keyElem);
+
+                const colon = document.createElement('span');
+                colon.className = 'node-colon';
+                colon.textContent = ':';
+                row.appendChild(colon);
+            }
+
+            // Value or Summary
+            if (isContainer) {
+                const count = isArray ? value.length : Object.keys(value).length;
+                totalCount += count;
+                const summary = document.createElement('span');
+                summary.className = 'summary-badge';
+                summary.textContent = isArray ? `[ ${count} items ]` : `{ ${count} keys }`;
+                row.appendChild(summary);
+            } else {
+                totalCount++;
+                const valElem = document.createElement('span');
+                let valType = typeof value;
+                if (value === null) valType = 'null';
+                valElem.className = `node-value ${valType}`;
+                valElem.textContent = valType === 'string' ? `"${value}"` : String(value);
+                row.appendChild(valElem);
+            }
+
+            // Action buttons on hover
+            const actions = document.createElement('span');
+            actions.className = 'actions-pill';
+
+            const copyPathBtn = document.createElement('button');
+            copyPathBtn.className = 'mini-btn';
+            copyPathBtn.textContent = 'Path';
+            copyPathBtn.title = `Copy JSONPath: ${path}`;
+            copyPathBtn.onclick = (e) => {
+                e.stopPropagation();
+                copyText(path, 'JSONPath');
+            };
+            actions.appendChild(copyPathBtn);
+
+            const copyValBtn = document.createElement('button');
+            copyValBtn.className = 'mini-btn';
+            copyValBtn.textContent = 'Value';
+            copyValBtn.title = 'Copy value';
+            copyValBtn.onclick = (e) => {
+                e.stopPropagation();
+                copyText(isContainer ? JSON.stringify(value, null, 2) : String(value), 'Value');
+            };
+            actions.appendChild(copyValBtn);
+
+            row.appendChild(actions);
+            container.appendChild(row);
+
+            // Child elements
+            if (isContainer) {
+                const childrenBlock = document.createElement('div');
+                childrenBlock.className = 'children-block';
+
+                if (isArray) {
+                    value.forEach((item, idx) => {
+                        childrenBlock.appendChild(createNodeElement(`[${idx}]`, item, `${path}[${idx}]`, depth + 1));
+                    });
+                } else {
+                    Object.keys(value).forEach(k => {
+                        const childPath = path === '$' ? `$.${k}` : `${path}.${k}`;
+                        childrenBlock.appendChild(createNodeElement(k, value[k], childPath, depth + 1));
+                    });
+                }
+
+                container.appendChild(childrenBlock);
+
+                // Click to toggle
+                row.onclick = () => {
+                    const isHidden = childrenBlock.classList.toggle('hidden');
+                    chevron.classList.toggle('collapsed', isHidden);
+                };
+            }
+
+            return container;
+        }
+
+        function renderJsonTree(jsonStr) {
+            const container = document.getElementById('treeContainer');
+            container.innerHTML = '';
+            totalCount = 0;
+
+            try {
+                rawData = typeof jsonStr === 'string' ? JSON.parse(jsonStr) : jsonStr;
+                const rootElem = createNodeElement('', rawData, '$', 0);
+                container.appendChild(rootElem);
+                document.getElementById('statsBadge').textContent = `${totalCount} items`;
+            } catch (err) {
+                container.innerHTML = `
+                    <div style="color: #ef4444; padding: 20px; font-weight: 600;">
+                        ⚠️ Invalid JSON Syntax: ${err.message}
+                    </div>
+                `;
+                document.getElementById('statsBadge').textContent = "Error";
+            }
+        }
+
+        // Toolbar Events
+        document.getElementById('expandAllBtn').onclick = () => {
+            document.querySelectorAll('.children-block').forEach(b => b.classList.remove('hidden'));
+            document.querySelectorAll('.chevron').forEach(c => c.classList.remove('collapsed'));
+        };
+
+        document.getElementById('collapseAllBtn').onclick = () => {
+            document.querySelectorAll('.children-block').forEach(b => b.classList.add('hidden'));
+            document.querySelectorAll('.chevron:not(.leaf)').forEach(c => c.classList.add('collapsed'));
+        };
+
+        document.getElementById('copyRawBtn').onclick = () => {
+            if (rawData) copyText(JSON.stringify(rawData, null, 2), "Raw JSON");
+        };
+
+        document.getElementById('filterInput').oninput = (e) => {
+            const query = e.target.value.toLowerCase().trim();
+            const nodes = document.querySelectorAll('.tree-node');
+
+            if (!query) {
+                nodes.forEach(n => {
+                    n.style.display = '';
+                    n.querySelector('.node-row')?.classList.remove('match-highlight');
+                });
+                return;
+            }
+
+            nodes.forEach(n => {
+                const text = n.querySelector('.node-row')?.textContent?.toLowerCase() || '';
+                const match = text.includes(query);
+                n.style.display = match ? '' : 'none';
+                if (match) {
+                    // Open ancestors
+                    let parent = n.parentElement;
+                    while (parent && parent.id !== 'treeContainer') {
+                        if (parent.classList.contains('children-block')) {
+                            parent.classList.remove('hidden');
+                            parent.previousElementSibling?.querySelector('.chevron')?.classList.remove('collapsed');
+                            parent.parentElement.style.display = '';
+                        }
+                        parent = parent.parentElement;
+                    }
+                }
+            });
+        };
+
+        // Bridge listener for messages from WinUI 3 C#
+        window.chrome?.webview?.addEventListener('message', event => {
+            const data = event.data;
+            if (!data) return;
+
+            if (data.type === 'setContent' || data.type === 'setJson') {
+                renderJsonTree(data.json || data.content || "");
+                window.chrome.webview.postMessage({ type: 'rendered', totalNodes: totalCount });
+            } else if (data.type === 'setTheme') {
+                document.body.setAttribute('data-theme', (data.theme || 'dark').toLowerCase());
+            } else if (data.type === 'expandAll') {
+                document.getElementById('expandAllBtn').click();
+            } else if (data.type === 'collapseAll') {
+                document.getElementById('collapseAllBtn').click();
+            }
+        });
+    </script>
+</body>
+</html>

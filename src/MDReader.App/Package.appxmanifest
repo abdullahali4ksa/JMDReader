@@ -57,6 +57,15 @@
               <uap:FileType>.markdown</uap:FileType>
             </uap:SupportedFileTypes>
           </uap:FileTypeAssociation>
+          <uap:FileTypeAssociation Name="json">
+            <uap:DisplayName>JSON Data Document</uap:DisplayName>
+            <uap:Logo>Assets\StoreLogo.png</uap:Logo>
+            <uap:SupportedFileTypes>
+              <uap:FileType>.json</uap:FileType>
+              <uap:FileType>.jsonc</uap:FileType>
+              <uap:FileType>.jsonl</uap:FileType>
+            </uap:SupportedFileTypes>
+          </uap:FileTypeAssociation>
         </uap:Extension>
       </Extensions>
     </Application>

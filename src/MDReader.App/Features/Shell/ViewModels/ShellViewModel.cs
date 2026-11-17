@@ -263,6 +263,11 @@ public sealed partial class ShellViewModel : ObservableObject
             var content = File.ReadAllText(filePath, Encoding.UTF8);
             _readerViewModel.LoadDocument(info, content);
             UpdateTitle();
+
+            if (App.MainWindow is MDReader.App.Features.Shell.Views.MainWindow mw)
+            {
+                mw.PopulateRecentFilesMenu();
+            }
         }
         catch (System.Exception ex)
         {

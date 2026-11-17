@@ -5,9 +5,14 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MDReader.Core.Analytics;
 using MDReader.Core.Documents;
+using MDReader.Core.Drafts;
 using MDReader.Core.Localization;
 using MDReader.Core.Markdown;
+using MDReader.Core.Recent;
+using MDReader.Core.Session;
+using MDReader.App.Features.Settings.Services;
 
 namespace MDReader.App.Features.Reader.ViewModels;
 
@@ -80,6 +85,7 @@ public sealed partial class ReaderViewModel : ObservableObject
 
     public ReaderViewModel()
     {
+        _currentTheme = UserPreferencesService.Instance.PreferredTheme;
         LocalizationService.Instance.PropertyChanged += (_, _) =>
         {
             OnPropertyChanged(nameof(Strings));
@@ -170,15 +176,20 @@ public sealed partial class ReaderViewModel : ObservableObject
 
     public string ThemeGlyph => CurrentTheme switch
     {
+        "System" => "💻",
         "Light" => "☀️",
+        "Dark" => "🌙",
+        "DarkSlate" => "🌑",
         "Sepia" => "📜",
-        _ => "🌙"
+        _ => "💻"
     };
 
     [RelayCommand]
     public void SetTheme(string theme)
     {
         CurrentTheme = theme;
+        UserPreferencesService.Instance.PreferredTheme = theme;
+        UserPreferencesService.Instance.Save();
     }
 
     [RelayCommand]
@@ -186,10 +197,103 @@ public sealed partial class ReaderViewModel : ObservableObject
     {
         CurrentTheme = CurrentTheme switch
         {
-            "Dark" => "Light",
-            "Light" => "Sepia",
-            _ => "Dark"
+            "System" => "Light",
+            "Light" => "Dark",
+            "Dark" => "DarkSlate",
+            "DarkSlate" => "Sepia",
+            _ => "System"
         };
+        UserPreferencesService.Instance.PreferredTheme = CurrentTheme;
+        UserPreferencesService.Instance.Save();
+    }
+
+    /// <summary>Gets or sets whether Typewriter focus scrolling mode is enabled.</summary>
+    public bool IsTypewriterMode
+    {
+        get => UserPreferencesService.Instance.TypewriterMode;
+        set
+        {
+            if (UserPreferencesService.Instance.TypewriterMode != value)
+            {
+                UserPreferencesService.Instance.TypewriterMode = value;
+                UserPreferencesService.Instance.Save();
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(TypewriterModeGlyph));
+            }
+        }
+    }
+
+    public string TypewriterModeGlyph => IsTypewriterMode ? "⌨️ [ON]" : "⌨️ [OFF]";
+
+    [RelayCommand]
+    public void ToggleTypewriterMode() => IsTypewriterMode = !IsTypewriterMode;
+
+    /// <summary>Gets or sets whether auto-save for drafts is enabled.</summary>
+    public bool IsAutoSaveDraftsEnabled
+    {
+        get => UserPreferencesService.Instance.AutoSaveDrafts;
+        set
+        {
+            if (UserPreferencesService.Instance.AutoSaveDrafts != value)
+            {
+                UserPreferencesService.Instance.AutoSaveDrafts = value;
+                UserPreferencesService.Instance.Save();
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    /// <summary>Gets or sets whether restoring session tabs on launch is enabled.</summary>
+    public bool IsRestoreSessionEnabled
+    {
+        get => UserPreferencesService.Instance.RestoreSession;
+        set
+        {
+            if (UserPreferencesService.Instance.RestoreSession != value)
+            {
+                UserPreferencesService.Instance.RestoreSession = value;
+                UserPreferencesService.Instance.Save();
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    /// <summary>Gets recent files for quick dashboard and menu display.</summary>
+    public IReadOnlyList<RecentFileInfo> RecentFiles => UserPreferencesService.Instance.RecentFiles.GetRecentFiles();
+
+    public void RefreshRecentFiles()
+    {
+        OnPropertyChanged(nameof(RecentFiles));
+    }
+
+    public int SelectedTabIndex => SelectedTab != null ? Tabs.IndexOf(SelectedTab) : -1;
+
+    public void TriggerDraftAutoSave()
+    {
+        if (!IsAutoSaveDraftsEnabled || SelectedTab == null || !SelectedTab.IsDirty) return;
+        try
+        {
+            var draft = new DraftModel
+            {
+                DraftId = SelectedTab.Id,
+                OriginalFilePath = SelectedTab.FilePath,
+                DocumentTitle = SelectedTab.Title,
+                Content = SelectedTab.Content,
+                SavedAtUtc = DateTime.UtcNow
+            };
+            DraftManager.SaveDraft(UserPreferencesService.Instance.DraftsDirectory, draft);
+        }
+        catch { }
+    }
+
+    public void ClearCurrentDraft()
+    {
+        if (SelectedTab == null) return;
+        try
+        {
+            DraftManager.DeleteDraft(UserPreferencesService.Instance.DraftsDirectory, SelectedTab.Id);
+        }
+        catch { }
     }
 
     /// <summary>Gets or sets whether auto-scroll is actively running.</summary>
@@ -545,11 +649,40 @@ public sealed partial class ReaderViewModel : ObservableObject
 
             SelectedTab = tab;
             ErrorMessage = null;
+
+            if (!string.IsNullOrEmpty(info.FilePath))
+            {
+                UserPreferencesService.Instance.RecentFiles.Add(info.FilePath);
+                RefreshRecentFiles();
+                SaveSessionState();
+            }
         }
         finally
         {
             IsLoading = false;
         }
+    }
+
+    public void SaveSessionState()
+    {
+        if (!IsRestoreSessionEnabled) return;
+        try
+        {
+            var openPaths = Tabs
+                .Where(t => !string.IsNullOrEmpty(t.FilePath) && System.IO.File.Exists(t.FilePath))
+                .Select(t => t.FilePath!)
+                .ToList();
+
+            var state = new SessionState
+            {
+                OpenDocumentPaths = openPaths,
+                ActiveDocumentPath = SelectedTab?.FilePath,
+                SelectedTabIndex = SelectedTabIndex,
+                LastSavedUtc = DateTime.UtcNow
+            };
+            SessionManager.SaveSession(state, UserPreferencesService.Instance.SessionFilePath);
+        }
+        catch { }
     }
 
     /// <summary>
@@ -587,6 +720,8 @@ public sealed partial class ReaderViewModel : ObservableObject
                 Clear();
             }
         }
+
+        SaveSessionState();
     }
 
     /// <summary>
@@ -606,6 +741,10 @@ public sealed partial class ReaderViewModel : ObservableObject
         {
             _selectedTab.MarkSaved(savePath, result.SavedAt);
             CurrentDocumentPath = savePath;
+            ClearCurrentDraft();
+            UserPreferencesService.Instance.RecentFiles.Add(savePath);
+            RefreshRecentFiles();
+            SaveSessionState();
             return true;
         }
 

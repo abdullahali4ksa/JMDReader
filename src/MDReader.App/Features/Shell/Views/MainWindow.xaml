@@ -33,6 +33,7 @@
                 <MenuFlyoutItem Text="{Binding Strings.MenuNew, FallbackValue='New  (Ctrl+N)'}" Command="{Binding NewDocumentCommand}" />
                 <MenuFlyoutItem Text="{Binding Strings.MenuOpenFile, FallbackValue='Open File...  (Ctrl+O)'}" Command="{Binding OpenDocumentCommand}" />
                 <MenuFlyoutItem Text="{Binding Strings.MenuOpenFolder, FallbackValue='Open Folder...  (Ctrl+Shift+O)'}" Command="{Binding OpenFolderCommand}" />
+                <MenuFlyoutSubItem x:Name="RecentFilesMenuSubItem" Text="🕒 Open Recent / الملفات المشاهدة مؤخراً" />
                 <MenuFlyoutSeparator />
                 <MenuFlyoutItem Text="{Binding Strings.MenuSave, FallbackValue='Save  (Ctrl+S)'}" Command="{Binding SaveDocumentCommand}" />
                 <MenuFlyoutItem Text="{Binding Strings.MenuSaveAs, FallbackValue='Save As...  (Ctrl+Shift+S)'}" Command="{Binding SaveDocumentAsCommand}" />
@@ -40,7 +41,10 @@
                 <MenuFlyoutItem Text="{Binding Strings.MenuCloseTab, FallbackValue='Close Tab  (Ctrl+W)'}" Command="{Binding CloseCurrentTabCommand}" />
             </MenuBarItem>
             <MenuBarItem Title="{Binding Strings.MenuView, FallbackValue='View'}">
+                <MenuFlyoutItem Text="⚡ Command Palette...  (Ctrl+Shift+P / F2)" Click="CommandPalette_Click" />
+                <MenuFlyoutSeparator />
                 <MenuFlyoutItem Text="{Binding Strings.MenuToggleSidebar, FallbackValue='Toggle Sidebar  (Ctrl+B)'}" Command="{Binding ToggleWorkspacePaneCommand}" />
+                <MenuFlyoutItem Text="⌨️ Toggle Typewriter Mode / وضع الآلة الكاتبة" Click="ToggleTypewriter_Click" />
                 <MenuFlyoutSeparator />
                 <MenuFlyoutItem Text="{Binding Strings.MenuRefresh, FallbackValue='Refresh  (Ctrl+R)'}" Command="{Binding RefreshDocumentCommand}" />
                 <MenuFlyoutSeparator />
@@ -49,9 +53,16 @@
             </MenuBarItem>
             <MenuBarItem Title="{Binding Strings.MenuSettings, FallbackValue='Settings'}">
                 <MenuFlyoutSubItem Text="{Binding Strings.MenuTheme, FallbackValue='🎨 Theme / المظهر'}">
+                    <MenuFlyoutItem Text="💻 System / حسب النظام" Command="{Binding SetThemeCommand}" CommandParameter="System" />
                     <MenuFlyoutItem Text="{Binding Strings.MenuThemeLight, FallbackValue='☀️ Light (أبيض)'}" Command="{Binding SetThemeCommand}" CommandParameter="Light" />
                     <MenuFlyoutItem Text="{Binding Strings.MenuThemeDark, FallbackValue='🌙 Dark (داكن / أسود)'}" Command="{Binding SetThemeCommand}" CommandParameter="Dark" />
+                    <MenuFlyoutItem Text="🌑 Dark Slate (رمادي غامق فاحم)" Command="{Binding SetThemeCommand}" CommandParameter="DarkSlate" />
                     <MenuFlyoutItem Text="{Binding Strings.MenuThemeSepia, FallbackValue='📜 Sepia (رمادي / بيج مريح للقراءة)'}" Command="{Binding SetThemeCommand}" CommandParameter="Sepia" />
+                </MenuFlyoutSubItem>
+                <MenuFlyoutSubItem Text="⚙️ Preferences &amp; Automation / الخيارات والأتمتة">
+                    <ToggleMenuFlyoutItem x:Name="AutoSaveToggleItem" Text="💾 Auto-Save Drafts / حفظ المسودات تلقائياً" Click="AutoSaveToggle_Click" />
+                    <ToggleMenuFlyoutItem x:Name="RestoreSessionToggleItem" Text="🔄 Restore Last Session Tabs / استئناف التابات السابقة" Click="RestoreSessionToggle_Click" />
+                    <ToggleMenuFlyoutItem x:Name="TypewriterToggleItem" Text="⌨️ Typewriter Focus Mode / وضع الآلة الكاتبة" Click="TypewriterToggle_Click" />
                 </MenuFlyoutSubItem>
                 <MenuFlyoutSubItem Text="{Binding Strings.MenuLanguage, FallbackValue='🌐 Language / اللغة'}">
                     <MenuFlyoutItem Text="العربية (Arabic)" Command="{Binding SetLanguageCommand}" CommandParameter="ar" />

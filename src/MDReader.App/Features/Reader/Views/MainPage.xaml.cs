@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -14,12 +15,17 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using Microsoft.Web.WebView2.Core;
 using MDReader.App.Features.Reader.ViewModels;
+using MDReader.App.Features.Settings.Services;
+using MDReader.App.Features.Shell.ViewModels;
+using MDReader.Core.Analytics;
 using MDReader.Core.Documents;
 using MDReader.Core.Markdown;
+using MDReader.Core.Recent;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
 using Windows.System;
 using Windows.UI;
+using Microsoft.UI.Text;
 
 namespace MDReader.App.Features.Reader.Views;
 
@@ -34,6 +40,7 @@ public sealed partial class MainPage : Page
     private int _currentFindIndex = -1;
     private bool _isWebViewInitialized;
     private readonly DispatcherTimer _renderDebounceTimer = new() { Interval = TimeSpan.FromMilliseconds(180) };
+    private readonly DispatcherTimer _draftAutoSaveTimer = new() { Interval = TimeSpan.FromSeconds(3) };
 
     public MainPage()
     {
@@ -43,6 +50,29 @@ public sealed partial class MainPage : Page
             _renderDebounceTimer.Stop();
             ExecuteUpdateWebViewContent();
         };
+
+        _draftAutoSaveTimer.Tick += (s, e) =>
+        {
+            _draftAutoSaveTimer.Stop();
+            _viewModel?.TriggerDraftAutoSave();
+        };
+
+        try
+        {
+            var uiSettings = new Windows.UI.ViewManagement.UISettings();
+            uiSettings.ColorValuesChanged += (s, e) =>
+            {
+                DispatcherQueue.TryEnqueue(() =>
+                {
+                    if (_viewModel?.CurrentTheme == "System")
+                    {
+                        ApplyTheme();
+                    }
+                });
+            };
+        }
+        catch { }
+
         Loaded += async (s, e) =>
         {
             try
@@ -169,23 +199,43 @@ public sealed partial class MainPage : Page
         catch { }
     }
 
+    private string ResolveTheme(string theme)
+    {
+        if (string.Equals(theme, "System", StringComparison.OrdinalIgnoreCase))
+        {
+            try
+            {
+                var uiSettings = new Windows.UI.ViewManagement.UISettings();
+                var bg = uiSettings.GetColorValue(Windows.UI.ViewManagement.UIColorType.Background);
+                bool isDark = (bg.R + bg.G + bg.B) < 384;
+                return isDark ? "Dark" : "Light";
+            }
+            catch
+            {
+                return "Light";
+            }
+        }
+        return theme;
+    }
+
     private void ApplyTheme()
     {
         if (_viewModel == null) return;
         var theme = _viewModel.CurrentTheme;
+        var effectiveTheme = ResolveTheme(theme);
 
         if (_isWebViewInitialized && AntigravityViewer.CoreWebView2 != null)
         {
             try
             {
-                var json = JsonSerializer.Serialize(new { type = "setTheme", theme = theme });
+                var json = JsonSerializer.Serialize(new { type = "setTheme", theme = effectiveTheme });
                 AntigravityViewer.CoreWebView2.PostWebMessageAsJson(json);
             }
             catch { }
         }
 
         // Synchronize page and window requested theme
-        var pageElementTheme = (theme == "Dark") ? ElementTheme.Dark : ElementTheme.Light;
+        var pageElementTheme = (effectiveTheme == "Dark" || effectiveTheme == "DarkSlate") ? ElementTheme.Dark : ElementTheme.Light;
         this.RequestedTheme = pageElementTheme;
         if (App.MainWindow?.Content is FrameworkElement rootElem)
         {
@@ -198,13 +248,19 @@ public sealed partial class MainPage : Page
             Color bgColor, fgColor, borderColor;
             ElementTheme editorTheme;
 
-            switch (theme)
+            switch (effectiveTheme)
             {
                 case "Light":
                     editorTheme = ElementTheme.Light;
                     bgColor = Color.FromArgb(255, 255, 255, 255);
                     fgColor = Color.FromArgb(255, 31, 35, 40);
                     borderColor = Color.FromArgb(255, 208, 215, 222);
+                    break;
+                case "DarkSlate":
+                    editorTheme = ElementTheme.Dark;
+                    bgColor = Color.FromArgb(255, 30, 34, 39);      // #1e2227
+                    fgColor = Color.FromArgb(255, 171, 178, 191);   // #abb2bf
+                    borderColor = Color.FromArgb(255, 40, 44, 52);  // #282c34
                     break;
                 case "Sepia":
                     editorTheme = ElementTheme.Light;
@@ -989,12 +1045,201 @@ public sealed partial class MainPage : Page
         else if (e.PropertyName == nameof(ReaderViewModel.DocumentContent))
         {
             UpdateWebViewContent(immediate: false);
+            _draftAutoSaveTimer.Stop();
+            _draftAutoSaveTimer.Start();
+            if (_viewModel?.IsTypewriterMode == true)
+            {
+                ApplyTypewriterScroll();
+            }
         }
         else if (e.PropertyName == nameof(ReaderViewModel.ZoomRatio))
         {
             ApplyZoom();
         }
     }
+
+    private void ApplyTypewriterScroll()
+    {
+        if (_viewModel?.IsTypewriterMode != true || MarkdownEditorTextBox == null) return;
+        try
+        {
+            var text = MarkdownEditorTextBox.Text;
+            var caret = MarkdownEditorTextBox.SelectionStart;
+            if (caret < 0 || caret > text.Length) return;
+
+            var lineIndex = text.AsSpan(0, caret).Count('\n');
+            var totalLines = text.AsSpan().Count('\n') + 1;
+            if (totalLines <= 1) return;
+
+            var sv = FindChild<ScrollViewer>(MarkdownEditorTextBox);
+            if (sv != null)
+            {
+                double targetOffset = (lineIndex / (double)totalLines) * sv.ExtentHeight - (sv.ViewportHeight / 2.0);
+                sv.ChangeView(null, Math.Max(0, targetOffset), null, true);
+            }
+        }
+        catch { }
+    }
+
+    private static T? FindChild<T>(DependencyObject parent) where T : DependencyObject
+    {
+        int count = VisualTreeHelper.GetChildrenCount(parent);
+        for (int i = 0; i < count; i++)
+        {
+            var child = VisualTreeHelper.GetChild(parent, i);
+            if (child is T typed) return typed;
+            var sub = FindChild<T>(child);
+            if (sub != null) return sub;
+        }
+        return null;
+    }
+
+    private void BreadcrumbButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (string.IsNullOrWhiteSpace(_viewModel?.CurrentDocumentPath)) return;
+        try
+        {
+            var currentPath = _viewModel.CurrentDocumentPath;
+            var dir = Path.GetDirectoryName(currentPath);
+            if (string.IsNullOrEmpty(dir) || !Directory.Exists(dir)) return;
+
+            var flyout = new MenuFlyout();
+
+            var openFolderItem = new MenuFlyoutItem
+            {
+                Text = $"📁 Open in Explorer: {Path.GetFileName(dir)}",
+                Icon = new FontIcon { Glyph = "\uED25" }
+            };
+            openFolderItem.Click += (s, args) =>
+            {
+                try { Process.Start(new ProcessStartInfo("explorer.exe", dir) { UseShellExecute = true }); } catch { }
+            };
+            flyout.Items.Add(openFolderItem);
+            flyout.Items.Add(new MenuFlyoutSeparator());
+
+            var files = Directory.GetFiles(dir)
+                .Where(f => MarkdownFileReader.IsSupportedExtension(f))
+                .OrderBy(f => Path.GetFileName(f))
+                .ToList();
+
+            foreach (var file in files)
+            {
+                var isCurrent = string.Equals(file, currentPath, StringComparison.OrdinalIgnoreCase);
+                var ext = Path.GetExtension(file).ToLowerInvariant();
+                var icon = ext == ".json" ? "🌳 " : (ext == ".txt" ? "📄 " : "📝 ");
+                var item = new MenuFlyoutItem
+                {
+                    Text = (isCurrent ? "✓ " : "  ") + icon + Path.GetFileName(file),
+                    Tag = file,
+                    FontWeight = isCurrent ? FontWeights.Bold : FontWeights.Normal
+                };
+                item.Click += (s, args) =>
+                {
+                    if (s is MenuFlyoutItem mfi && mfi.Tag is string targetPath)
+                    {
+                        if (App.MainWindow?.Content is FrameworkElement fe && fe.DataContext is ShellViewModel shellVm)
+                        {
+                            shellVm.OpenDocument(targetPath);
+                        }
+                    }
+                };
+                flyout.Items.Add(item);
+            }
+
+            if (sender is FrameworkElement feSender)
+            {
+                flyout.ShowAt(feSender);
+            }
+        }
+        catch { }
+    }
+
+    private async void ReadingStatsButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (_viewModel?.HasDocument != true) return;
+        try
+        {
+            var stats = ReadingAnalyticsCalculator.Calculate(_viewModel.DocumentContent);
+
+            var dialog = new ContentDialog
+            {
+                Title = "📊 Document Analytics / إحصائيات القراءة والتحليل",
+                CloseButtonText = "Close / إغلاق",
+                XamlRoot = this.XamlRoot
+            };
+
+            var sp = new StackPanel { Spacing = 8, MinWidth = 340 };
+
+            sp.Children.Add(CreateStatRow("📝 Total Words / الكلمات:", $"{stats.WordCount:N0}"));
+            sp.Children.Add(CreateStatRow("🔤 Characters (with spaces) / الأحرف مع المسافات:", $"{stats.CharacterCountWithSpaces:N0}"));
+            sp.Children.Add(CreateStatRow("🔤 Characters (no spaces) / الأحرف بدون مسافات:", $"{stats.CharacterCountWithoutSpaces:N0}"));
+            sp.Children.Add(CreateStatRow("📄 Lines / الأسطر:", $"{stats.LineCount:N0}"));
+            sp.Children.Add(CreateStatRow("📑 Paragraphs / الفقرات:", $"{stats.ParagraphCount:N0}"));
+            sp.Children.Add(new MenuFlyoutSeparator());
+            sp.Children.Add(CreateStatRow("⏱️ Silent Reading Time / وقت القراءة الصامتة:", stats.ReadingTimeDisplay));
+            sp.Children.Add(CreateStatRow("🎙️ Speaking / Presentation / وقت الإلقاء:", stats.SpeakingTimeDisplay));
+            sp.Children.Add(CreateStatRow("🧠 Complexity Level / مستوى القراءة:", stats.ReadabilityLevel));
+
+            dialog.Content = sp;
+            await dialog.ShowAsync();
+        }
+        catch { }
+    }
+
+    private static Grid CreateStatRow(string label, string value)
+    {
+        var grid = new Grid();
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+        var lbl = new TextBlock { Text = label, FontSize = 12, Opacity = 0.85, VerticalAlignment = VerticalAlignment.Center };
+        var val = new TextBlock { Text = value, FontSize = 12, FontWeight = FontWeights.SemiBold, VerticalAlignment = VerticalAlignment.Center };
+        Grid.SetColumn(lbl, 0);
+        Grid.SetColumn(val, 1);
+        grid.Children.Add(lbl);
+        grid.Children.Add(val);
+        return grid;
+    }
+
+    private void EmptyStateMarkdownGuide_Click(object sender, RoutedEventArgs e)
+    {
+        try { _viewModel?.OpenMarkdownGuide(); } catch { }
+    }
+
+    private void EmptyStateJsonGuide_Click(object sender, RoutedEventArgs e)
+    {
+        try { _viewModel?.OpenJsonGuide(); } catch { }
+    }
+
+    private void RecentFilesListView_ItemClick(object sender, ItemClickEventArgs e)
+    {
+        if (e.ClickedItem is RecentFileInfo item && !string.IsNullOrWhiteSpace(item.Path) && File.Exists(item.Path))
+        {
+            if (App.MainWindow?.Content is FrameworkElement fe && fe.DataContext is ShellViewModel shellVm)
+            {
+                shellVm.OpenDocument(item.Path);
+            }
+        }
+    }
+
+    private void PinRecentFileButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.Tag is string path)
+        {
+            UserPreferencesService.Instance.RecentFiles.TogglePin(path);
+            _viewModel?.RefreshRecentFiles();
+        }
+    }
+
+    private void ClearRecentFiles_Click(object sender, RoutedEventArgs e)
+    {
+        UserPreferencesService.Instance.RecentFiles.ClearAll();
+        _viewModel?.RefreshRecentFiles();
+    }
+
+    public void ExportPdf() => ExportPdf_Click(this, null!);
+    public void ExportHtml() => ExportHtml_Click(this, null!);
+    public void ShowReadingStats() => ReadingStatsButton_Click(this, null!);
 
     private void UpdateViewModeColumns()
     {

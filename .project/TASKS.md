@@ -1038,8 +1038,41 @@ The `FILES_SCOPE` on each original P01 task is the allowlist. Dependencies are d
 - **VERIFICATION:** Confirmed `DEVELOPMENT_RULES.md` (Section 12), `CODEBASE_GUIDE.md` (Section 6), adaptive `IsMarkdownFormattingVisible` / `IsCurrentDocumentJson` bindings, and comprehensive bilingual tooltips across all buttons.
 
 ### P25-T006 — Recent Documents & Quick Reopen on Launch (Linear: JMD-20)
-**ID:** P25-T006 · **FEATURE:** Shell / RecentFiles · **PRIORITY:** P1 · **LINEAR_ID:** JMD-20 · **STATUS:** PLANNED · **ESTIMATE:** 30 mins · **FILES_SCOPE:** `src/MDReader.Core/Recent/`, `src/MDReader.App/Features/Shell/ViewModels/RecentFilesViewModel.cs`, `src/MDReader.App/Features/Reader/Views/MainPage.xaml`, `src/MDReader.App/Features/Shell/Views/MainWindow.xaml`
+**ID:** P25-T006 · **FEATURE:** Shell / RecentFiles · **PRIORITY:** P1 · **LINEAR_ID:** JMD-20 · **STATUS:** DONE · **ESTIMATE:** 30 mins · **FILES_SCOPE:** `src/MDReader.Core/Recent/`, `src/MDReader.App/Features/Settings/Services/`, `src/MDReader.App/Features/Reader/Views/MainPage.xaml`, `src/MDReader.App/Features/Shell/Views/MainWindow.xaml`
 - **POLICY_REF:** `docs/DEVELOPMENT_RULES.md (Architecture, MVVM, Clean UI, Intuitive Iconography §12, Microsoft Store Standards)`
 - **SECURITY_REF:** `docs/DEVELOPMENT_RULES.md §11 (Zero-Crash Mandate, Protected Async Void, Safe Try/Catch, Non-Locking I/O, ReDoS Timeout)`
 - **GOAL:** Maintain a secure, privacy-respecting local Most Recently Used (MRU) list (`%LOCALAPPDATA%\MDReader\recent_history.json`). Display recent files cards on startup / empty state, populate `File -> Open Recent` in the menu bar, allow pinning favorite files (📌), and pre-validate `File.Exists` to ensure zero crash if files are moved or deleted.
 - **ACCEPTANCE CRITERIA:** Recent files persist across restarts; opening a file adds it to the top; pin/unpin works; clearing history cleans the file; opening missing file shows gentle warning without crash.
+- **VERIFICATION:** Confirmed `RecentFileManager` and `RecentFilesService` persistence, Start Dashboard in `MainPage.xaml` with pinning, and `RecentFilesMenuSubItem` in `MainWindow.xaml`.
+
+### P25-T007 — Auto-Save, Draft Recovery & Session Restore with Settings Toggles (Linear: JMD-21)
+**ID:** P25-T007 · **FEATURE:** Persistence / AutoSave · **PRIORITY:** P1 · **LINEAR_ID:** JMD-21 · **STATUS:** DONE · **ESTIMATE:** 30 mins · **FILES_SCOPE:** `src/MDReader.App/Features/Settings/`, `src/MDReader.App/Features/Reader/ViewModels/ReaderViewModel.cs`
+- **POLICY_REF:** `docs/DEVELOPMENT_RULES.md (Architecture, MVVM, Clean UI, Intuitive Iconography §12, Microsoft Store Standards)`
+- **SECURITY_REF:** `docs/DEVELOPMENT_RULES.md §11 (Zero-Crash Mandate, Protected Async Void, Safe Try/Catch, Non-Locking I/O, ReDoS Timeout)`
+- **GOAL:** Provide user-configurable auto-save drafts (`%LOCALAPPDATA%\MDReader\drafts\`) and session tab restoration (`session.json`), toggled via Settings options.
+- **ACCEPTANCE CRITERIA:** Unsaved edits cached safely; app crash or reboot allows clean draft recovery; previous tabs reloaded if session restore is enabled.
+- **VERIFICATION:** Confirmed `UserPreferencesService`, `DraftManager`, and `SessionManager` integration with `AutoSaveToggleItem` and `RestoreSessionToggleItem` in `MainWindow.xaml`.
+
+### P25-T008 — Command Palette Ctrl+Shift+P & Breadcrumb Quick Navigator (Linear: JMD-22)
+**ID:** P25-T008 · **FEATURE:** Shell / CommandPalette · **PRIORITY:** P1 · **LINEAR_ID:** JMD-22 · **STATUS:** DONE · **ESTIMATE:** 30 mins · **FILES_SCOPE:** `src/MDReader.App/Features/Shell/`, `src/MDReader.App/Features/Reader/Views/MainPage.xaml`
+- **POLICY_REF:** `docs/DEVELOPMENT_RULES.md (Architecture, MVVM, Clean UI, Intuitive Iconography §12, Microsoft Store Standards)`
+- **SECURITY_REF:** `docs/DEVELOPMENT_RULES.md §11 (Zero-Crash Mandate, Protected Async Void, Safe Try/Catch, Non-Locking I/O, ReDoS Timeout)`
+- **GOAL:** Implement floating Command Palette triggered by `Ctrl+Shift+P` / `F2` to execute any action or switch tabs instantly. Make the breadcrumb path bar interactive, letting users browse neighboring files in the same directory.
+- **ACCEPTANCE CRITERIA:** Pressing Ctrl+Shift+P opens search overlay; selecting an action executes immediately; breadcrumb folder dropdown lists sibling files.
+- **VERIFICATION:** Confirmed `ShowCommandPaletteAsync` in `MainWindow.xaml.cs` with search filtering and instant execution, plus `BreadcrumbButton_Click` directory explorer in `MainPage.xaml.cs`.
+
+### P25-T009 — Typewriter Mode & Detailed Reading Statistics Dialog (Linear: JMD-23)
+**ID:** P25-T009 · **FEATURE:** Reader / Productivity · **PRIORITY:** P1 · **LINEAR_ID:** JMD-23 · **STATUS:** DONE · **ESTIMATE:** 25 mins · **FILES_SCOPE:** `src/MDReader.App/Features/Reader/Views/MainPage.xaml.cs`, `src/MDReader.App/Features/Reader/ViewModels/ReaderViewModel.cs`
+- **POLICY_REF:** `docs/DEVELOPMENT_RULES.md (Architecture, MVVM, Clean UI, Intuitive Iconography §12, Microsoft Store Standards)`
+- **SECURITY_REF:** `docs/DEVELOPMENT_RULES.md §11 (Zero-Crash Mandate, Protected Async Void, Safe Try/Catch, Non-Locking I/O, ReDoS Timeout)`
+- **GOAL:** Provide Typewriter Scrolling Mode in editor keeping the active line vertically centered. Clicking the word count status bar opens a detailed Fluent Reading Statistics card (words, characters, sentences, speaking time, readability index).
+- **ACCEPTANCE CRITERIA:** Typewriter mode centers caret line on typing; clicking status bar displays formatted statistics dialog.
+- **VERIFICATION:** Confirmed `ApplyTypewriterScroll` centering editor caret dynamically, and `ReadingStatsButton_Click` presenting comprehensive dialog via `ReadingAnalyticsCalculator`.
+
+### P25-T010 — Dark Slate Charcoal Theme & Windows System Theme Auto-Sync (Linear: JMD-24)
+**ID:** P25-T010 · **FEATURE:** Theme / Design · **PRIORITY:** P1 · **LINEAR_ID:** JMD-24 · **STATUS:** DONE · **ESTIMATE:** 25 mins · **FILES_SCOPE:** `src/MDReader.App/Shared/Styles/App.xaml`, `src/MDReader.App/Assets/Renderer/viewer.html`, `src/MDReader.App/Assets/Renderer/json_viewer.html`, `src/MDReader.App/Features/Theme/Services/ThemeService.cs`, `src/MDReader.App/Features/Reader/Views/MainPage.xaml.cs`
+- **POLICY_REF:** `docs/DEVELOPMENT_RULES.md (Architecture, MVVM, Clean UI, Intuitive Iconography §12, Microsoft Store Standards)`
+- **SECURITY_REF:** `docs/DEVELOPMENT_RULES.md §11 (Zero-Crash Mandate, Protected Async Void, Safe Try/Catch, Non-Locking I/O, ReDoS Timeout)`
+- **GOAL:** Add Dark Slate (Charcoal `#1e2227`) theme for low-contrast eye comfort, and implement "System / حسب النظام" theme option that automatically follows Windows dark/light mode in real time.
+- **ACCEPTANCE CRITERIA:** Dark Slate theme applies across WinUI shell, markdown renderer, and JSON viewer; System theme switches dynamically when OS theme changes.
+- **VERIFICATION:** Confirmed `[data-theme="darkslate"]` in `viewer.html` and `json_viewer.html`, dynamic `UISettings.ColorValuesChanged` listener in `MainPage.xaml.cs`, and `System` / `DarkSlate` options in `MainWindow.xaml`.

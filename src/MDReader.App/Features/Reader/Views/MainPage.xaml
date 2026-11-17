@@ -245,6 +245,19 @@
                             <TextBlock Text="📋" FontSize="10" Opacity="0.6" VerticalAlignment="Center" Margin="2,0,0,0" />
                         </StackPanel>
                     </Button>
+                    <Button
+                        x:Name="BreadcrumbButton"
+                        Click="BreadcrumbButton_Click"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Padding="4,1"
+                        CornerRadius="3"
+                        ToolTipService.ToolTip="Browse sibling files in this folder / استعراض ملفات هذا المجلد">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <TextBlock Text="📁" FontSize="11" VerticalAlignment="Center" />
+                            <TextBlock Text="▾" FontSize="9" Opacity="0.7" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
                     <TextBlock
                         x:Name="PathCopiedBadge"
                         Text="{Binding Strings.TextPathCopied, FallbackValue='✓ تم نسخ المسار'}"
@@ -511,14 +524,23 @@
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <!-- Left stats -->
-                <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
-                    <TextBlock Text="{Binding WordCountDisplay}" FontSize="11" Foreground="{ThemeResource AppSecondaryTextBrush}" VerticalAlignment="Center" />
-                    <TextBlock Text="•" FontSize="11" Foreground="{ThemeResource AppSecondaryTextBrush}" VerticalAlignment="Center" />
-                    <TextBlock Text="{Binding LineCountDisplay}" FontSize="11" Foreground="{ThemeResource AppSecondaryTextBrush}" VerticalAlignment="Center" />
-                    <TextBlock Text="•" FontSize="11" Foreground="{ThemeResource AppSecondaryTextBrush}" VerticalAlignment="Center" />
-                    <TextBlock Text="{Binding ReadingTimeDisplay}" FontSize="11" Foreground="{ThemeResource AppSecondaryTextBrush}" VerticalAlignment="Center" />
-                </StackPanel>
+                <!-- Left stats (Clickable for Detailed Reading Analytics) -->
+                <Button
+                    x:Name="ReadingStatsButton"
+                    Click="ReadingStatsButton_Click"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Padding="0"
+                    ToolTipService.ToolTip="📊 Click for detailed reading &amp; speaking analytics / اضغط لعرض الإحصائيات الكاملة ووقت الإلقاء">
+                    <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding WordCountDisplay}" FontSize="11" Foreground="{ThemeResource AppSecondaryTextBrush}" VerticalAlignment="Center" />
+                        <TextBlock Text="•" FontSize="11" Foreground="{ThemeResource AppSecondaryTextBrush}" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding LineCountDisplay}" FontSize="11" Foreground="{ThemeResource AppSecondaryTextBrush}" VerticalAlignment="Center" />
+                        <TextBlock Text="•" FontSize="11" Foreground="{ThemeResource AppSecondaryTextBrush}" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding ReadingTimeDisplay}" FontSize="11" Foreground="{ThemeResource AppSecondaryTextBrush}" VerticalAlignment="Center" />
+                        <TextBlock Text="📊" FontSize="10" Opacity="0.7" VerticalAlignment="Center" Margin="4,0,0,0" />
+                    </StackPanel>
+                </Button>
                 <!-- Right quick toggles (Icon-only pill cluster) -->
                 <Border Grid.Column="1" Background="{ThemeResource AppSubtleBackgroundBrush}" BorderBrush="{ThemeResource AppBorderBrush}" BorderThickness="1" CornerRadius="6" Padding="2" VerticalAlignment="Center">
                     <StackPanel Orientation="Horizontal" Spacing="2">
@@ -530,33 +552,83 @@
             </Grid>
         </Border>
 
-        <!-- Empty / welcome state -->
-        <StackPanel
-            x:Name="EmptyStatePanel"
+        <!-- Empty / welcome state with Recent Files Dashboard -->
+        <ScrollViewer
             Grid.Row="3"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-            Spacing="12"
-            MaxWidth="480"
             Visibility="{Binding IsEmpty, Converter={StaticResource BoolToVisibilityConverter}}"
-            AutomationProperties.Name="Empty reader state">
-            <TextBlock
-                Text="MDReader"
-                FontSize="{StaticResource AppHeadingFontSize}"
-                FontWeight="SemiBold"
-                Foreground="{ThemeResource AppTextBrush}"
+            VerticalScrollBarVisibility="Auto">
+            <StackPanel
+                x:Name="EmptyStatePanel"
                 HorizontalAlignment="Center"
-                AutomationProperties.HeadingLevel="Level1" />
-            <TextBlock
-                Text="No document open"
-                Style="{StaticResource AppBodyTextStyle}"
-                HorizontalAlignment="Center" />
-            <TextBlock
-                Text="Select a Markdown file to read or click + to create a new one."
-                Style="{StaticResource AppSecondaryTextStyle}"
-                HorizontalAlignment="Center"
-                TextAlignment="Center" />
-        </StackPanel>
+                VerticalAlignment="Center"
+                Spacing="14"
+                MaxWidth="620"
+                Padding="24"
+                AutomationProperties.Name="Empty reader state">
+                <TextBlock
+                    Text="JMDReader"
+                    FontSize="30"
+                    FontWeight="Bold"
+                    Foreground="{ThemeResource AppTextBrush}"
+                    HorizontalAlignment="Center"
+                    AutomationProperties.HeadingLevel="Level1" />
+                <TextBlock
+                    Text="Fast, Offline &amp; Distraction-Free Markdown &amp; JSON Workspace"
+                    FontSize="12"
+                    Foreground="{ThemeResource AppSecondaryTextBrush}"
+                    HorizontalAlignment="Center" />
+
+                <!-- Quick Action Buttons -->
+                <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center" Margin="0,4,0,8">
+                    <Button Content="📄 New Document" Command="{Binding CreateNewDocumentCommand}" ToolTipService.ToolTip="Create a new untitled document (Ctrl+N)" />
+                    <Button Content="📖 Markdown Guide" Click="EmptyStateMarkdownGuide_Click" ToolTipService.ToolTip="Open interactive Markdown Guide" />
+                    <Button Content="🌳 JSON Guide" Click="EmptyStateJsonGuide_Click" ToolTipService.ToolTip="Open interactive JSON Guide" />
+                </StackPanel>
+
+                <!-- Recent Files Section -->
+                <Border
+                    Background="{ThemeResource AppSubtleBackgroundBrush}"
+                    BorderBrush="{ThemeResource AppBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="14">
+                    <StackPanel Spacing="8">
+                        <Grid>
+                            <TextBlock Text="🕒 RECENT DOCUMENTS / الملفات المشاهدة مؤخراً" FontWeight="Bold" FontSize="11" Foreground="{ThemeResource AppSecondaryTextBrush}" VerticalAlignment="Center" />
+                            <Button Content="Clear / مسح" Click="ClearRecentFiles_Click" HorizontalAlignment="Right" Padding="6,2" FontSize="10" Background="Transparent" BorderThickness="0" />
+                        </Grid>
+
+                        <ListView
+                            x:Name="RecentFilesListView"
+                            ItemsSource="{Binding RecentFiles}"
+                            SelectionMode="None"
+                            IsItemClickEnabled="True"
+                            ItemClick="RecentFilesListView_ItemClick"
+                            MaxHeight="260">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Padding="4,6" ColumnSpacing="10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="{Binding PinGlyph}" FontSize="12" VerticalAlignment="Center" />
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="12" />
+                                            <TextBlock Text="{Binding Path}" FontSize="10" Opacity="0.6" TextTrimming="CharacterEllipsis" />
+                                        </StackPanel>
+                                        <TextBlock Grid.Column="2" Text="{Binding DisplayTime}" FontSize="10" Opacity="0.5" VerticalAlignment="Center" />
+                                        <Button Grid.Column="3" Content="📌" Click="PinRecentFileButton_Click" Tag="{Binding Path}" Padding="4,2" FontSize="10" Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Pin / Unpin" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
 
         <!-- Loading state -->
         <StackPanel

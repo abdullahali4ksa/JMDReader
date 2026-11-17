@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -7,8 +10,11 @@ using Microsoft.UI.Xaml.Media;
 using Windows.ApplicationModel.DataTransfer;
 using MDReader.App.Features.Reader.ViewModels;
 using MDReader.App.Features.Reader.Views;
+using MDReader.App.Features.Settings.Services;
 using MDReader.App.Features.Shell.ViewModels;
 using MDReader.App.Shared.Helpers;
+using MDReader.Core.Recent;
+using MDReader.Core.Session;
 using Windows.System;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -74,17 +80,35 @@ public sealed partial class MainWindow : Window
         // Navigate the root frame to the main page, passing the ReaderViewModel
         RootFrame.Navigate(typeof(MainPage), readerViewModel);
 
-        // Handle command-line file argument (mdreader.exe <path>).
-        // Deferred until the window is activated: building the rendered visual
-        // tree inside the constructor (before Activate) races with WinUI
-        // activation and can intermittently crash the process. Enqueuing the
-        // open on the dispatcher runs it after activation, on the UI thread.
+        // Handle command-line file argument (mdreader.exe <path>) or restore session.
         var cliArgs = System.Environment.GetCommandLineArgs();
         if (cliArgs.Length > 1 && !string.IsNullOrWhiteSpace(cliArgs[1]))
         {
             var cliPath = cliArgs[1];
             DispatcherQueue.TryEnqueue(() => _shellViewModel.OpenDocument(cliPath));
         }
+        else
+        {
+            DispatcherQueue.TryEnqueue(RestoreSessionTabs);
+        }
+
+        Closed += (s, e) =>
+        {
+            try
+            {
+                _shellViewModel.Reader.SaveSessionState();
+            }
+            catch { }
+        };
+
+        try
+        {
+            AutoSaveToggleItem.IsChecked = UserPreferencesService.Instance.AutoSaveDrafts;
+            RestoreSessionToggleItem.IsChecked = UserPreferencesService.Instance.RestoreSession;
+            TypewriterToggleItem.IsChecked = UserPreferencesService.Instance.TypewriterMode;
+            PopulateRecentFilesMenu();
+        }
+        catch { }
     }
 
     private void RegisterKeyboardAccelerators(ReaderViewModel readerViewModel)
@@ -101,6 +125,10 @@ public sealed partial class MainWindow : Window
             () => _shellViewModel.CloseCurrentTabCommand.Execute(null));
         RegisterKeyboardAccelerator(VirtualKey.B, VirtualKeyModifiers.Control,
             () => _shellViewModel.ToggleWorkspacePaneCommand.Execute(null));
+        RegisterKeyboardAccelerator(VirtualKey.P, VirtualKeyModifiers.Control | VirtualKeyModifiers.Shift,
+            async () => await ShowCommandPaletteAsync());
+        RegisterKeyboardAccelerator(VirtualKey.F2, VirtualKeyModifiers.None,
+            async () => await ShowCommandPaletteAsync());
         RegisterKeyboardAccelerator(VirtualKey.F, VirtualKeyModifiers.Control,
             () => (RootFrame.Content as MainPage)?.ShowFind());
         RegisterKeyboardAccelerator(VirtualKey.H, VirtualKeyModifiers.Control,
@@ -333,5 +361,250 @@ public sealed partial class MainWindow : Window
                 // Ignore drop failures
             }
         }
+    }
+
+    private async void CommandPalette_Click(object sender, RoutedEventArgs e)
+    {
+        await ShowCommandPaletteAsync();
+    }
+
+    private void AutoSaveToggle_Click(object sender, RoutedEventArgs e)
+    {
+        UserPreferencesService.Instance.AutoSaveDrafts = AutoSaveToggleItem.IsChecked;
+        UserPreferencesService.Instance.Save();
+        _shellViewModel.Reader.IsAutoSaveDraftsEnabled = AutoSaveToggleItem.IsChecked;
+    }
+
+    private void RestoreSessionToggle_Click(object sender, RoutedEventArgs e)
+    {
+        UserPreferencesService.Instance.RestoreSession = RestoreSessionToggleItem.IsChecked;
+        UserPreferencesService.Instance.Save();
+        _shellViewModel.Reader.IsRestoreSessionEnabled = RestoreSessionToggleItem.IsChecked;
+    }
+
+    private void TypewriterToggle_Click(object sender, RoutedEventArgs e)
+    {
+        UserPreferencesService.Instance.TypewriterMode = TypewriterToggleItem.IsChecked;
+        UserPreferencesService.Instance.Save();
+        _shellViewModel.Reader.IsTypewriterMode = TypewriterToggleItem.IsChecked;
+    }
+
+    private void ToggleTypewriter_Click(object sender, RoutedEventArgs e)
+    {
+        _shellViewModel.Reader.ToggleTypewriterMode();
+        TypewriterToggleItem.IsChecked = _shellViewModel.Reader.IsTypewriterMode;
+    }
+
+    public void PopulateRecentFilesMenu()
+    {
+        if (RecentFilesMenuSubItem == null) return;
+        RecentFilesMenuSubItem.Items.Clear();
+
+        var recentFiles = UserPreferencesService.Instance.RecentFiles.GetRecentFiles();
+        if (recentFiles.Count == 0)
+        {
+            var emptyItem = new MenuFlyoutItem { Text = "No recent files / لا توجد ملفات حديثة", IsEnabled = false };
+            RecentFilesMenuSubItem.Items.Add(emptyItem);
+            return;
+        }
+
+        foreach (var file in recentFiles)
+        {
+            var icon = file.IsPinned ? "📌 " : (file.TypeGlyph + " ");
+            var item = new MenuFlyoutItem
+            {
+                Text = $"{icon}{file.Title}  ({file.DisplayTime})",
+                Tag = file.Path
+            };
+            ToolTipService.SetToolTip(item, file.Path);
+            item.Click += (s, e) =>
+            {
+                if (s is MenuFlyoutItem mfi && mfi.Tag is string path && File.Exists(path))
+                {
+                    _shellViewModel.OpenDocument(path);
+                    PopulateRecentFilesMenu();
+                }
+            };
+            RecentFilesMenuSubItem.Items.Add(item);
+        }
+
+        RecentFilesMenuSubItem.Items.Add(new MenuFlyoutSeparator());
+        var clearItem = new MenuFlyoutItem { Text = "🗑️ Clear History / تفريغ السجل" };
+        clearItem.Click += (s, e) =>
+        {
+            UserPreferencesService.Instance.RecentFiles.ClearAll();
+            PopulateRecentFilesMenu();
+            _shellViewModel.Reader.RefreshRecentFiles();
+        };
+        RecentFilesMenuSubItem.Items.Add(clearItem);
+    }
+
+    private void RestoreSessionTabs()
+    {
+        if (!UserPreferencesService.Instance.RestoreSession) return;
+        try
+        {
+            var state = SessionManager.LoadSession(UserPreferencesService.Instance.SessionFilePath);
+            if (state != null && state.OpenDocumentPaths != null && state.OpenDocumentPaths.Count > 0)
+            {
+                foreach (var path in state.OpenDocumentPaths)
+                {
+                    if (File.Exists(path))
+                    {
+                        _shellViewModel.OpenDocument(path);
+                    }
+                }
+            }
+        }
+        catch { }
+    }
+
+    private sealed class CommandPaletteItem
+    {
+        public string Title { get; set; } = string.Empty;
+        public string Category { get; set; } = string.Empty;
+        public string Shortcut { get; set; } = string.Empty;
+        public string Icon { get; set; } = string.Empty;
+        public Action Execute { get; set; } = () => { };
+    }
+
+    public async Task ShowCommandPaletteAsync()
+    {
+        try
+        {
+            var allCommands = new List<CommandPaletteItem>
+            {
+                new() { Title = "New Document / مستند جديد", Category = "File", Shortcut = "Ctrl+N", Icon = "📄", Execute = () => _shellViewModel.NewDocument() },
+                new() { Title = "Open File... / فتح ملف", Category = "File", Shortcut = "Ctrl+O", Icon = "📂", Execute = () => _shellViewModel.OpenDocumentCommand.Execute(null) },
+                new() { Title = "Open Folder... / فتح مجلد", Category = "File", Shortcut = "Ctrl+Shift+O", Icon = "📁", Execute = () => _shellViewModel.OpenFolderCommand.Execute(null) },
+                new() { Title = "Save / حفظ", Category = "File", Shortcut = "Ctrl+S", Icon = "💾", Execute = () => _shellViewModel.SaveDocumentCommand.Execute(null) },
+                new() { Title = "Save As... / حفظ باسم", Category = "File", Shortcut = "Ctrl+Shift+S", Icon = "💾", Execute = () => _shellViewModel.SaveDocumentAsCommand.Execute(null) },
+                new() { Title = "Export to PDF / تصدير PDF", Category = "Export", Shortcut = "Ctrl+P", Icon = "🖨️", Execute = () => (RootFrame.Content as MainPage)?.ExportPdf() },
+                new() { Title = "Export Standalone HTML / تصدير كصفحة ويب", Category = "Export", Shortcut = "", Icon = "🌐", Execute = () => (RootFrame.Content as MainPage)?.ExportHtml() },
+                new() { Title = "Find in Document / بحث", Category = "Edit", Shortcut = "Ctrl+F", Icon = "🔍", Execute = () => (RootFrame.Content as MainPage)?.ShowFind() },
+                new() { Title = "Replace in Document / استبدال", Category = "Edit", Shortcut = "Ctrl+H", Icon = "🔁", Execute = () => (RootFrame.Content as MainPage)?.ShowReplace() },
+                new() { Title = "Toggle Split View / وضع العرض المنقسم", Category = "View", Shortcut = "Ctrl+E", Icon = "◫", Execute = () => _shellViewModel.Reader.SwitchViewMode("Split") },
+                new() { Title = "Toggle Fullscreen Focus / وضع التركيز", Category = "View", Shortcut = "F11", Icon = "🖥️", Execute = () => _shellViewModel.Reader.ToggleZenModeCommand.Execute(null) },
+                new() { Title = "Toggle Typewriter Mode / وضع الآلة الكاتبة", Category = "View", Shortcut = "", Icon = "⌨️", Execute = () => ToggleTypewriter_Click(this, null!) },
+                new() { Title = "Theme: System / المظهر حسب النظام", Category = "Theme", Shortcut = "", Icon = "💻", Execute = () => _shellViewModel.SetTheme("System") },
+                new() { Title = "Theme: Light / المظهر الفاتح", Category = "Theme", Shortcut = "", Icon = "☀️", Execute = () => _shellViewModel.SetTheme("Light") },
+                new() { Title = "Theme: Dark / المظهر الداكن", Category = "Theme", Shortcut = "", Icon = "🌙", Execute = () => _shellViewModel.SetTheme("Dark") },
+                new() { Title = "Theme: Dark Slate / رمادي فاحم", Category = "Theme", Shortcut = "", Icon = "🌑", Execute = () => _shellViewModel.SetTheme("DarkSlate") },
+                new() { Title = "Theme: Sepia / مظهر الورق", Category = "Theme", Shortcut = "", Icon = "📜", Execute = () => _shellViewModel.SetTheme("Sepia") },
+                new() { Title = "JSON: Beautify & Format / تجميل الكود", Category = "JSON", Shortcut = "", Icon = "✨", Execute = () => _shellViewModel.Reader.BeautifyJsonCommand.Execute(null) },
+                new() { Title = "JSON: Minify / ضغط الكود", Category = "JSON", Shortcut = "", Icon = "⚡", Execute = () => _shellViewModel.Reader.MinifyJsonCommand.Execute(null) },
+                new() { Title = "JSON: Convert to Markdown Table / تحويل لجدول", Category = "JSON", Shortcut = "", Icon = "📊", Execute = () => _shellViewModel.Reader.ConvertJsonToTableCommand.Execute(null) },
+                new() { Title = "Document Reading Analytics / إحصائيات القراءة", Category = "Tools", Shortcut = "", Icon = "📊", Execute = () => (RootFrame.Content as MainPage)?.ShowReadingStats() },
+                new() { Title = "Interactive Markdown Guide / دليل الماركداون", Category = "Help", Shortcut = "", Icon = "📖", Execute = () => MarkdownGuide_Click(this, null!) },
+                new() { Title = "Interactive JSON Guide / دليل الجيسون", Category = "Help", Shortcut = "", Icon = "🌳", Execute = () => JsonGuide_Click(this, null!) },
+                new() { Title = "Keyboard Shortcuts Cheat Sheet / الاختصارات", Category = "Help", Shortcut = "F1", Icon = "⌨️", Execute = () => KeyboardShortcuts_Click(this, null!) },
+                new() { Title = "About JMDReader / عن البرنامج", Category = "Help", Shortcut = "", Icon = "ℹ️", Execute = () => About_Click(this, null!) }
+            };
+
+            foreach (var tab in _shellViewModel.Reader.Tabs)
+            {
+                var targetTab = tab;
+                allCommands.Insert(0, new CommandPaletteItem
+                {
+                    Title = $"Switch to Tab: {targetTab.Title}",
+                    Category = "Open Tabs",
+                    Shortcut = targetTab.IsDirty ? "● Unsaved" : "",
+                    Icon = targetTab.IsJsonDocument ? "🌳" : "📝",
+                    Execute = () => _shellViewModel.Reader.SelectedTab = targetTab
+                });
+            }
+
+            var dialog = new ContentDialog
+            {
+                Title = "⚡ Command Palette / لوحة الأوامر السريعة",
+                CloseButtonText = "Cancel / إلغاء",
+                XamlRoot = this.Content.XamlRoot
+            };
+
+            var sp = new StackPanel { Spacing = 10, MinWidth = 460, MaxHeight = 420 };
+            var searchBox = new TextBox
+            {
+                PlaceholderText = "Type a command or tab name... / ابحث عن أمر...",
+                Margin = new Thickness(0, 0, 0, 4)
+            };
+
+            var listView = new ListView
+            {
+                SelectionMode = ListViewSelectionMode.Single,
+                IsItemClickEnabled = true,
+                MaxHeight = 320
+            };
+
+            void UpdateList(string query)
+            {
+                var filtered = string.IsNullOrWhiteSpace(query)
+                    ? allCommands
+                    : allCommands.Where(c => c.Title.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+                                             c.Category.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+                                             c.Shortcut.Contains(query, StringComparison.OrdinalIgnoreCase)).ToList();
+
+                listView.ItemsSource = filtered;
+                if (filtered.Count > 0) listView.SelectedIndex = 0;
+            }
+
+            UpdateList("");
+            searchBox.TextChanged += (s, e) => UpdateList(searchBox.Text);
+
+            listView.ItemTemplate = (DataTemplate)Microsoft.UI.Xaml.Markup.XamlReader.Load(@"
+                <DataTemplate xmlns=""http://schemas.microsoft.com/winfx/2006/xaml/presentation"">
+                    <Grid Padding=""6,4"" ColumnSpacing=""10"">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width=""Auto"" />
+                            <ColumnDefinition Width=""*"" />
+                            <ColumnDefinition Width=""Auto"" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text=""{Binding Icon}"" FontSize=""14"" VerticalAlignment=""Center"" />
+                        <StackPanel Grid.Column=""1"" VerticalAlignment=""Center"">
+                            <TextBlock Text=""{Binding Title}"" FontSize=""12"" FontWeight=""SemiBold"" />
+                            <TextBlock Text=""{Binding Category}"" FontSize=""10"" Opacity=""0.6"" />
+                        </StackPanel>
+                        <TextBlock Grid.Column=""2"" Text=""{Binding Shortcut}"" FontSize=""11"" Opacity=""0.7"" VerticalAlignment=""Center"" />
+                    </Grid>
+                </DataTemplate>");
+
+            searchBox.KeyDown += (s, e) =>
+            {
+                if (e.Key == VirtualKey.Enter)
+                {
+                    if (listView.SelectedItem is CommandPaletteItem selected)
+                    {
+                        dialog.Hide();
+                        selected.Execute();
+                    }
+                }
+                else if (e.Key == VirtualKey.Down)
+                {
+                    if (listView.SelectedIndex < (listView.ItemsSource as List<CommandPaletteItem>)?.Count - 1)
+                        listView.SelectedIndex++;
+                }
+                else if (e.Key == VirtualKey.Up)
+                {
+                    if (listView.SelectedIndex > 0)
+                        listView.SelectedIndex--;
+                }
+            };
+
+            listView.ItemClick += (s, e) =>
+            {
+                if (e.ClickedItem is CommandPaletteItem selected)
+                {
+                    dialog.Hide();
+                    selected.Execute();
+                }
+            };
+
+            sp.Children.Add(searchBox);
+            sp.Children.Add(listView);
+            dialog.Content = sp;
+
+            dialog.Opened += (s, e) => searchBox.Focus(FocusState.Programmatic);
+            await dialog.ShowAsync();
+        }
+        catch { }
     }
 }

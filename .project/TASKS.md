@@ -975,3 +975,9 @@ The `FILES_SCOPE` on each original P01 task is the allowlist. Dependencies are d
 - **GOAL:** One-click conversion of tabular JSON arrays into GitHub-flavored Markdown tables, and 1-click export of the colored JSON tree into a self-contained offline HTML file.
 - **ACCEPTANCE CRITERIA:** Exported HTML preserves full tree interactivity, colors, and folding offline.
 - **VERIFICATION:** Confirmed `ConvertJsonToMarkdownTable` generating valid GFM tables and `exportStandaloneHtml` client-side exporter in `json_viewer.html`.
+
+### P23-T005 — Multi-Format File Open & Save Integration (.json, .jsonc, .jsonl, .txt)
+**ID:** P23-T005 · **FEATURE:** Shell / FileOpen · **PRIORITY:** P0 · **STATUS:** DONE · **ESTIMATE:** 15 mins · **FILES_SCOPE:** `src/MDReader.App/Features/FileOpen/ViewModels/FileOpenViewModel.cs`, `src/MDReader.Core/Documents/MarkdownFileReader.cs`, `src/MDReader.Core/Documents/MarkdownFileWriter.cs`, `src/MDReader.App/Features/Shell/ViewModels/ShellViewModel.cs`, `src/MDReader.App/Features/Shell/ViewModels/FolderNodeViewModel.cs`, `src/MDReader.App/Features/Shell/Views/MainWindow.xaml.cs`, `src/MDReader.App/Assets/Renderer/viewer.html`
+- **GOAL:** Enable seamless opening and saving of JSON (.json, .jsonc, .jsonl) and plain text (.txt) files across all app entrypoints: Ctrl+O picker dialog, drag-and-drop, workspace sidebar tree, and Save As dialog. Plain text renders with exact whitespace preservation in reader view, while JSON automatically routes to the interactive tree viewer.
+- **ACCEPTANCE CRITERIA:** Users can open and edit .json and .txt files via Ctrl+O without restriction or crash; file associations registered in manifest.
+- **VERIFICATION:** Confirmed 130 unit tests passing; FileTypeFilter includes .json, .jsonc, .jsonl, .txt; MarkdownFileReader.IsSupportedExtension validated across all types.

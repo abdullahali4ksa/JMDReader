@@ -34,17 +34,35 @@ public partial class App : Application
     public App()
     {
         InitializeComponent();
+
         UnhandledException += (sender, e) =>
         {
             e.Handled = true;
-            try
-            {
-                var logPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "MDReader", "crash.log");
-                System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(logPath)!);
-                System.IO.File.WriteAllText(logPath, $"[CRASH] {DateTime.Now}: {e.Message}\n{e.Exception}\n{e.Exception?.StackTrace}\nInner: {e.Exception?.InnerException}");
-            }
-            catch { }
+            LogDiagnosticCrash("CRASH_XAML", e.Message, e.Exception);
         };
+
+        TaskScheduler.UnobservedTaskException += (sender, e) =>
+        {
+            e.SetObserved();
+            LogDiagnosticCrash("UNOBSERVED_TASK", e.Exception?.Message ?? "Unobserved task fault", e.Exception);
+        };
+
+        AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
+        {
+            LogDiagnosticCrash("APPDOMAIN_UNHANDLED", e.ExceptionObject?.ToString() ?? "AppDomain fault", e.ExceptionObject as Exception);
+        };
+    }
+
+    private static void LogDiagnosticCrash(string category, string message, Exception? ex)
+    {
+        try
+        {
+            var logPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "MDReader", "crash.log");
+            var dir = System.IO.Path.GetDirectoryName(logPath);
+            if (!string.IsNullOrEmpty(dir)) System.IO.Directory.CreateDirectory(dir);
+            System.IO.File.AppendAllText(logPath, $"[{category}] {DateTime.Now:yyyy-MM-dd HH:mm:ss}: {message}\n{ex}\n{ex?.StackTrace}\nInner: {ex?.InnerException}\n---\n");
+        }
+        catch { }
     }
 
     /// <summary>

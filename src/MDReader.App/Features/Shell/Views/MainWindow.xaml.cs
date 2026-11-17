@@ -144,7 +144,11 @@ public sealed partial class MainWindow : Window
 
     private async void KeyboardShortcuts_Click(object sender, RoutedEventArgs e)
     {
-        await ShowKeyboardShortcutsDialogAsync();
+        try
+        {
+            await ShowKeyboardShortcutsDialogAsync();
+        }
+        catch { }
     }
 
     private async System.Threading.Tasks.Task ShowKeyboardShortcutsDialogAsync()

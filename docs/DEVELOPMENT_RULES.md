@@ -203,6 +203,33 @@ Layer (`.project/`):
 
 ---
 
+## 11. Zero-Crash Architecture & Anti-Hang Guidelines (قواعد الحماية من الانهيار والتهنيج)
+
+To guarantee 100% stability, zero process exits, and silky-smooth responsiveness under all conditions, all developers and AI agents must adhere to the following rules:
+
+### 11.1 The Zero-Crash Mandate (منع الانهيار والإغلاق المفاجئ)
+- **Global Exception Boundaries:** `App.UnhandledException`, `TaskScheduler.UnobservedTaskException`, and `AppDomain.CurrentDomain.UnhandledException` must always be trapped with `e.Handled = true` / `e.SetObserved()` and diagnostic details logged to `crash.log`. No unhandled exception may terminate the process.
+- **Fail-Safe UI:** In the event of a recoverable component failure, display an in-app error notification (`ShowError` banner or InfoBar) and keep the application running. Never exit abruptly.
+
+### 11.2 The Strict `async void` Ban (حظر async void)
+- **Rule:** Never author `async void` methods. Use `async Task` for all asynchronous workflows.
+- **UI Event Handler Exception:** WinUI 3 event handlers (such as `Click`, `KeyDown`, `Drop`) require a `void` return signature. Any `async void` event handler **MUST** enclose its entire method body within a comprehensive `try { ... } catch (Exception ex) { ... }` block. In .NET, an unhandled exception escaping an `async void` method bypasses all catch blocks up the call stack and immediately terminates the process (fail-fast crash).
+
+### 11.3 Anti-Hang & Responsiveness Standards (منع التهنيج وتجمد الواجهة)
+- **Debounced Rendering:** Rapid keystrokes and scroll events must be throttled/debounced using `DispatcherTimer` (e.g., 180ms delay) to avoid choking the rendering pipeline during fast user input.
+- **ReDoS Protection:** All regular expression evaluations must specify an explicit execution timeout: `TimeSpan.FromSeconds(1)`. Catch `RegexMatchTimeoutException` gracefully to prevent thread starvation.
+- **Asynchronous File I/O:** File reads and writes must never block the UI thread. Use `await File.ReadAllTextAsync` or background worker tasks for large payloads.
+
+### 11.4 Out-of-Process / WebView2 Isolation (حماية محرك العرض)
+- `CoreWebView2` runs in an independent child process (`msedgewebview2.exe`).
+- All calls to `PostWebMessageAsJson`, `ExecuteScriptAsync`, and virtual host mappings must be guarded with `try/catch`. If WebView2 crashes, restarts, or navigates, the host WinUI 3 shell must remain completely stable.
+
+### 11.5 Safe Atomic File Operations & Non-Locking Sharing (أمان الملفات)
+- **Non-Locking Reads:** Always open files with `FileShare.ReadWrite` so concurrent tools (Git, external text editors, cloud sync) do not block or crash MDReader.
+- **Atomic Writes:** Save files via temporary staging files (`.tmp`) followed by atomic replace/rename to prevent file truncation or corruption if power is interrupted.
+
+---
+
 ## Developer Setup Checklist
 
 Before writing code, ensure:

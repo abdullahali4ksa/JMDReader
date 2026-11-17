@@ -486,6 +486,71 @@ public sealed partial class MainPage : Page
         }
     }
 
+    private void DocumentTabs_TabDragStarting(TabView sender, TabViewTabDragStartingEventArgs args)
+    {
+        try
+        {
+            if (args.Item is DocumentTabViewModel tab)
+            {
+                var content = tab.Content ?? string.Empty;
+                var path = tab.FilePath;
+
+                args.Data.RequestedOperation = DataPackageOperation.Copy | DataPackageOperation.Link;
+
+                // 1. Text payload: Enables dragging directly into chat text boxes, comments, or web inputs
+                if (!string.IsNullOrEmpty(content))
+                {
+                    args.Data.SetText(content);
+                }
+
+                // 2. Storage items payload: Enables dragging files into Windows Explorer, web upload zones, and chat attachments
+                args.Data.SetDataProvider(StandardDataFormats.StorageItems, async request =>
+                {
+                    var deferral = request.GetDeferral();
+                    try
+                    {
+                        StorageFile file;
+                        if (!string.IsNullOrEmpty(path) && File.Exists(path))
+                        {
+                            file = await StorageFile.GetFileFromPathAsync(path);
+                        }
+                        else
+                        {
+                            var tempFolder = Path.Combine(Path.GetTempPath(), "MDReader_DragDrop");
+                            Directory.CreateDirectory(tempFolder);
+
+                            var safeTitle = string.IsNullOrWhiteSpace(tab.Title) ? "Untitled.md" : tab.Title.Replace(" *", "");
+                            if (!safeTitle.EndsWith(".md", StringComparison.OrdinalIgnoreCase) &&
+                                !safeTitle.EndsWith(".json", StringComparison.OrdinalIgnoreCase) &&
+                                !safeTitle.EndsWith(".txt", StringComparison.OrdinalIgnoreCase))
+                            {
+                                safeTitle += ".md";
+                            }
+
+                            var tempPath = Path.Combine(tempFolder, safeTitle);
+                            await File.WriteAllTextAsync(tempPath, content, Encoding.UTF8);
+                            file = await StorageFile.GetFileFromPathAsync(tempPath);
+                        }
+
+                        request.SetData(new[] { file });
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"[TabDragStarting] DataProvider error: {ex}");
+                    }
+                    finally
+                    {
+                        deferral.Complete();
+                    }
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[MainPage] TabDragStarting error: {ex}");
+        }
+    }
+
     private void FindOption_Changed(object sender, RoutedEventArgs e)
     {
         RunFindQuery();
@@ -713,16 +778,23 @@ public sealed partial class MainPage : Page
 
     private async void MarkdownEditorTextBox_Drop(object sender, DragEventArgs e)
     {
-        if (e.DataView.Contains(StandardDataFormats.StorageItems))
+        try
         {
-            var items = await e.DataView.GetStorageItemsAsync();
-            foreach (var item in items)
+            if (e.DataView.Contains(StandardDataFormats.StorageItems))
             {
-                if (item is StorageFile file && MarkdownEditorUtilities.IsImageFile(file.FileType))
+                var items = await e.DataView.GetStorageItemsAsync();
+                foreach (var item in items)
                 {
-                    await InsertImageFileAsync(file);
+                    if (item is StorageFile file && MarkdownEditorUtilities.IsImageFile(file.FileType))
+                    {
+                        await InsertImageFileAsync(file);
+                    }
                 }
             }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[MainPage] MarkdownEditorTextBox_Drop error: {ex}");
         }
     }
 

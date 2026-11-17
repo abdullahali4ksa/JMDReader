@@ -981,3 +981,21 @@ The `FILES_SCOPE` on each original P01 task is the allowlist. Dependencies are d
 - **GOAL:** Enable seamless opening and saving of JSON (.json, .jsonc, .jsonl) and plain text (.txt) files across all app entrypoints: Ctrl+O picker dialog, drag-and-drop, workspace sidebar tree, and Save As dialog. Plain text renders with exact whitespace preservation in reader view, while JSON automatically routes to the interactive tree viewer.
 - **ACCEPTANCE CRITERIA:** Users can open and edit .json and .txt files via Ctrl+O without restriction or crash; file associations registered in manifest.
 - **VERIFICATION:** Confirmed 130 unit tests passing; FileTypeFilter includes .json, .jsonc, .jsonl, .txt; MarkdownFileReader.IsSupportedExtension validated across all types.
+
+---
+
+## Phase 24 — Zero-Crash Error Hardening, Anti-Hang Guidelines & Tab Drag-Out (الأمان البرمجي الشامل والسحب الخارجي)
+
+**Status:** DONE (2/2 tasks: P24-T001..P24-T002 verified) · **Depends on:** Phase 23 · **Linear Issues:** JMD-13, JMD-14
+
+### P24-T001 — Zero-Crash Architecture, Try/Catch Guidelines & Anti-Hang Defense (Linear: JMD-13)
+**ID:** P24-T001 · **FEATURE:** Security / Reliability · **PRIORITY:** P0 · **LINEAR_ID:** JMD-13 · **STATUS:** DONE · **ESTIMATE:** 30 mins · **FILES_SCOPE:** `docs/DEVELOPMENT_RULES.md`, `docs/CODEBASE_GUIDE.md`, `src/MDReader.App/App.xaml.cs`, `src/MDReader.App/Features/Reader/Views/MainPage.xaml.cs`
+- **GOAL:** Author rigorous enterprise crash and hang defense guidelines (ban on unprotected async void, mandatory try/catch boundaries on all COM/WebView2/IO operations, Dispatcher debouncing, and ReDoS timeout protections). Audit and harden all entrypoints in code with zero silent exits and non-intrusive diagnostic error reporting.
+- **ACCEPTANCE CRITERIA:** Complete Zero-Crash rule documentation committed; all unhandled exception hooks verified; no unhandled crashes during stress or corrupted inputs.
+- **VERIFICATION:** `DEVELOPMENT_RULES.md` and `CODEBASE_GUIDE.md` updated with Section 11 & Section 5; `App.xaml.cs` hardened with XAML, TaskScheduler, and AppDomain exception logging; `async void` handlers protected across ViewModels and Views.
+
+### P24-T002 — Tab Drag-Out to Web Browsers, Windows Folders & Chat Applications (Linear: JMD-14)
+**ID:** P24-T002 · **FEATURE:** Shell / DragDrop · **PRIORITY:** P1 · **LINEAR_ID:** JMD-14 · **STATUS:** DONE · **ESTIMATE:** 25 mins · **FILES_SCOPE:** `src/MDReader.App/Features/Reader/Views/MainPage.xaml`, `src/MDReader.App/Features/Reader/Views/MainPage.xaml.cs`
+- **GOAL:** Enable dragging any document tab out of JMDReader directly into external Windows targets: web dropzones (browsers, Gmail, Discord, GitHub), Windows Explorer folders/desktop, and chat apps (Teams, Slack, Telegram, WhatsApp). Construct rich multi-format DataPackage with StorageFile items and plain text.
+- **ACCEPTANCE CRITERIA:** User can drag any tab out of the app; dropping into Windows Explorer copies the document; dropping into browser or chat attaches the file or pastes the text seamlessly.
+- **VERIFICATION:** Confirmed `CanDragTabs="True"`, `CanReorderTabs="True"`, and `DocumentTabs_TabDragStarting` delivering lazy `SetDataProvider` StorageItems and plain text payloads with `DataPackageOperation.Copy | Link`.

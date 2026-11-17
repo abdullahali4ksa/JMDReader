@@ -86,7 +86,7 @@ public static class MarkdownEditorUtilities
             try
             {
                 var options = matchCase ? RegexOptions.None : RegexOptions.IgnoreCase;
-                var matches = Regex.Matches(content, query, options);
+                var matches = Regex.Matches(content, query, options, TimeSpan.FromSeconds(1));
                 foreach (Match m in matches)
                 {
                     if (m.Success && m.Length > 0)
@@ -95,9 +95,9 @@ public static class MarkdownEditorUtilities
                     }
                 }
             }
-            catch (ArgumentException)
+            catch (Exception ex) when (ex is ArgumentException or RegexMatchTimeoutException)
             {
-                // Invalid regex pattern provided by user: return empty results safely
+                // Invalid regex pattern or catastrophic backtracking timeout: return empty results safely
             }
         }
         else
@@ -149,11 +149,12 @@ public static class MarkdownEditorUtilities
             try
             {
                 var options = matchCase ? RegexOptions.None : RegexOptions.IgnoreCase;
-                var count = Regex.Matches(content, query, options).Count;
-                var updated = Regex.Replace(content, query, replacement, options);
+                var timeout = TimeSpan.FromSeconds(1);
+                var count = Regex.Matches(content, query, options, timeout).Count;
+                var updated = Regex.Replace(content, query, replacement, options, timeout);
                 return (updated, count);
             }
-            catch (ArgumentException)
+            catch (Exception ex) when (ex is ArgumentException or RegexMatchTimeoutException)
             {
                 return (content, 0);
             }

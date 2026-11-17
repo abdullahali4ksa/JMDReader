@@ -146,6 +146,7 @@ public sealed partial class ReaderViewModel : ObservableObject
                 OnPropertyChanged(nameof(IsEditorVisible));
                 OnPropertyChanged(nameof(IsPreviewVisible));
                 OnPropertyChanged(nameof(IsSplitMode));
+                OnPropertyChanged(nameof(IsMarkdownFormattingVisible));
             }
         }
     }
@@ -339,6 +340,9 @@ public sealed partial class ReaderViewModel : ObservableObject
                 OnPropertyChanged(nameof(IsEmpty));
                 OnPropertyChanged(nameof(HasDocument));
                 OnPropertyChanged(nameof(HasError));
+                OnPropertyChanged(nameof(IsCurrentDocumentJson));
+                OnPropertyChanged(nameof(IsCurrentDocumentMarkdown));
+                OnPropertyChanged(nameof(IsMarkdownFormattingVisible));
                 UpdateOutlineAndAnalytics();
             }
         }
@@ -356,6 +360,9 @@ public sealed partial class ReaderViewModel : ObservableObject
                 OnPropertyChanged(nameof(IsEmpty));
                 OnPropertyChanged(nameof(HasDocument));
                 OnPropertyChanged(nameof(HasError));
+                OnPropertyChanged(nameof(IsCurrentDocumentJson));
+                OnPropertyChanged(nameof(IsCurrentDocumentMarkdown));
+                OnPropertyChanged(nameof(IsMarkdownFormattingVisible));
                 UpdateOutlineAndAnalytics();
             }
         }
@@ -404,6 +411,9 @@ public sealed partial class ReaderViewModel : ObservableObject
                 OnPropertyChanged(nameof(IsEmpty));
                 OnPropertyChanged(nameof(HasDocument));
                 OnPropertyChanged(nameof(HasError));
+                OnPropertyChanged(nameof(IsCurrentDocumentJson));
+                OnPropertyChanged(nameof(IsCurrentDocumentMarkdown));
+                OnPropertyChanged(nameof(IsMarkdownFormattingVisible));
                 UpdateOutlineAndAnalytics();
             }
         }
@@ -429,6 +439,9 @@ public sealed partial class ReaderViewModel : ObservableObject
                 OnPropertyChanged(nameof(IsEmpty));
                 OnPropertyChanged(nameof(HasDocument));
                 OnPropertyChanged(nameof(HasError));
+                OnPropertyChanged(nameof(IsCurrentDocumentJson));
+                OnPropertyChanged(nameof(IsCurrentDocumentMarkdown));
+                OnPropertyChanged(nameof(IsMarkdownFormattingVisible));
                 UpdateOutlineAndAnalytics();
             }
         }

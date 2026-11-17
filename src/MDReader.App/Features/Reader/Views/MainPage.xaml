@@ -94,16 +94,25 @@
                                 </StackPanel>
                             </Border>
 
-                            <!-- Formatting Group (Pill cluster, visible in Split & Editor) -->
-                            <Border Background="{ThemeResource AppBackgroundBrush}" BorderBrush="{ThemeResource AppBorderBrush}" BorderThickness="1" CornerRadius="6" Padding="2" Visibility="{Binding IsEditorVisible, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <!-- Markdown Formatting Group (Pill cluster, visible when editing Markdown) -->
+                            <Border Background="{ThemeResource AppBackgroundBrush}" BorderBrush="{ThemeResource AppBorderBrush}" BorderThickness="1" CornerRadius="6" Padding="2" Visibility="{Binding IsMarkdownFormattingVisible, Converter={StaticResource BoolToVisibilityConverter}}">
                                 <StackPanel Orientation="Horizontal" Spacing="2">
-                                    <Button Content="B" FontWeight="Bold" Width="28" Height="28" Padding="0" FontSize="12" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="bold" ToolTipService.ToolTip="{Binding Strings.TooltipBold, FallbackValue='Bold (**text**)'}" />
-                                    <Button Content="I" FontStyle="Italic" Width="28" Height="28" Padding="0" FontSize="12" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="italic" ToolTipService.ToolTip="{Binding Strings.TooltipItalic, FallbackValue='Italic (*text*)'}" />
-                                    <Button Content="H" Width="28" Height="28" Padding="0" FontSize="12" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="heading" ToolTipService.ToolTip="{Binding Strings.TooltipHeading, FallbackValue='Heading (# Title)'}" />
-                                    <Button Content="&lt;&gt;" Width="28" Height="28" Padding="0" FontSize="11" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="code" ToolTipService.ToolTip="{Binding Strings.TooltipCode, FallbackValue='Code Block (```)'}" />
-                                    <Button Content="📊" Width="28" Height="28" Padding="0" FontSize="12" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="mermaid" ToolTipService.ToolTip="{Binding Strings.TooltipMermaid, FallbackValue='Mermaid Diagram'}" />
-                                    <Button Content="💡" Width="28" Height="28" Padding="0" FontSize="12" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="alert" ToolTipService.ToolTip="{Binding Strings.TooltipAlert, FallbackValue='Alert ([!NOTE])'}" />
-                                    <Button Content="∑" Width="28" Height="28" Padding="0" FontSize="13" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="math" ToolTipService.ToolTip="{Binding Strings.TooltipMath, FallbackValue='Math ($$)'}" />
+                                    <Button Content="B" FontWeight="Bold" Width="28" Height="28" Padding="0" FontSize="12" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="bold" ToolTipService.ToolTip="{Binding Strings.TooltipBold, FallbackValue='Bold / خط عريض (**text**)'}" />
+                                    <Button Content="I" FontStyle="Italic" Width="28" Height="28" Padding="0" FontSize="12" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="italic" ToolTipService.ToolTip="{Binding Strings.TooltipItalic, FallbackValue='Italic / خط مائل (*text*)'}" />
+                                    <Button Content="H" Width="28" Height="28" Padding="0" FontSize="12" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="heading" ToolTipService.ToolTip="{Binding Strings.TooltipHeading, FallbackValue='Heading / عنوان (# Title)'}" />
+                                    <Button Content="&lt;&gt;" Width="28" Height="28" Padding="0" FontSize="11" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="code" ToolTipService.ToolTip="{Binding Strings.TooltipCode, FallbackValue='Code Block / كتلة كود (```)'}" />
+                                    <Button Content="📊" Width="28" Height="28" Padding="0" FontSize="12" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="mermaid" ToolTipService.ToolTip="{Binding Strings.TooltipMermaid, FallbackValue='Mermaid Diagram / رسم بياني'}" />
+                                    <Button Content="💡" Width="28" Height="28" Padding="0" FontSize="12" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="alert" ToolTipService.ToolTip="{Binding Strings.TooltipAlert, FallbackValue='Alert / تنبيه ([!NOTE])'}" />
+                                    <Button Content="∑" Width="28" Height="28" Padding="0" FontSize="13" Command="{Binding InsertMarkdownSyntaxCommand}" CommandParameter="math" ToolTipService.ToolTip="{Binding Strings.TooltipMath, FallbackValue='Math / معادلة رياضية ($$)'}" />
+                                </StackPanel>
+                            </Border>
+
+                            <!-- JSON Tools Group (Pill cluster, visible when viewing JSON files) -->
+                            <Border Background="{ThemeResource AppBackgroundBrush}" BorderBrush="{ThemeResource AppBorderBrush}" BorderThickness="1" CornerRadius="6" Padding="2" Visibility="{Binding IsCurrentDocumentJson, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <StackPanel Orientation="Horizontal" Spacing="2">
+                                    <Button Content="✨" Width="28" Height="28" Padding="0" FontSize="12" Command="{Binding BeautifyJsonCommand}" ToolTipService.ToolTip="✨ Beautify JSON / تنسيق وتجميل الكود (2 Spaces)" />
+                                    <Button Content="⚡" Width="28" Height="28" Padding="0" FontSize="12" Command="{Binding MinifyJsonCommand}" ToolTipService.ToolTip="⚡ Minify JSON / ضغط وتصغير الكود (سطر واحد)" />
+                                    <Button Content="📊" Width="28" Height="28" Padding="0" FontSize="12" Command="{Binding ConvertJsonToTableCommand}" ToolTipService.ToolTip="📊 Convert to Markdown Table &amp; Copy / تحويل لجدول ماركداون ونسخه" />
                                 </StackPanel>
                             </Border>
 

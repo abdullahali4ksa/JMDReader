@@ -65,8 +65,14 @@
                     <MenuFlyoutItem Text="日本語 (Japanese)" Command="{Binding SetLanguageCommand}" CommandParameter="ja" />
                     <MenuFlyoutItem Text="Português (Portuguese)" Command="{Binding SetLanguageCommand}" CommandParameter="pt" />
                 </MenuFlyoutSubItem>
+            </MenuBarItem>
+            <MenuBarItem Title="Help / مساعدة">
+                <MenuFlyoutItem Text="📖 Markdown Syntax Guide / دليل الماركداون" Click="MarkdownGuide_Click" />
+                <MenuFlyoutItem Text="🌳 JSON &amp; JSONPath Guide / دليل الجيسون" Click="JsonGuide_Click" />
                 <MenuFlyoutSeparator />
                 <MenuFlyoutItem Text="{Binding Strings.MenuShortcuts, FallbackValue='⌨️ Keyboard Shortcuts  (F1)'}" Click="KeyboardShortcuts_Click" />
+                <MenuFlyoutSeparator />
+                <MenuFlyoutItem Text="ℹ️ About JMDReader / عن البرنامج" Click="About_Click" />
             </MenuBarItem>
         </MenuBar>
 

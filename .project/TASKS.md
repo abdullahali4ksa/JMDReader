@@ -999,3 +999,38 @@ The `FILES_SCOPE` on each original P01 task is the allowlist. Dependencies are d
 - **GOAL:** Enable dragging any document tab out of JMDReader directly into external Windows targets: web dropzones (browsers, Gmail, Discord, GitHub), Windows Explorer folders/desktop, and chat apps (Teams, Slack, Telegram, WhatsApp). Construct rich multi-format DataPackage with StorageFile items and plain text.
 - **ACCEPTANCE CRITERIA:** User can drag any tab out of the app; dropping into Windows Explorer copies the document; dropping into browser or chat attaches the file or pastes the text seamlessly.
 - **VERIFICATION:** Confirmed `CanDragTabs="True"`, `CanReorderTabs="True"`, and `DocumentTabs_TabDragStarting` delivering lazy `SetDataProvider` StorageItems and plain text payloads with `DataPackageOperation.Copy | Link`.
+
+---
+
+## Phase 25 — UI Iconography, Help Center, Learning Guides & Split-View Sync (الأيقونات التفاعلية ودليل المساعدة وشروح MD و JSON ومزامنة العرض)
+
+**Status:** IN_PROGRESS · **Depends on:** Phase 24 · **Linear Issues:** JMD-15, JMD-16, JMD-17, JMD-18, JMD-19
+
+### P25-T001 — Split-View Real-Time Scroll Sync & Visual Edit Marker (Linear: JMD-15)
+**ID:** P25-T001 · **FEATURE:** Reader / Sync · **PRIORITY:** P1 · **LINEAR_ID:** JMD-15 · **STATUS:** PLANNED · **ESTIMATE:** 35 mins · **FILES_SCOPE:** `src/MDReader.App/Features/Reader/Views/MainPage.xaml.cs`, `src/MDReader.App/Assets/Renderer/viewer.html`
+- **GOAL:** Synchronize editor caret position with preview scroll position in Split View. Automatically scroll the preview to the line or heading being actively edited and briefly pulse-highlight the edited block (`.edit-highlight-pulse`) so the user immediately sees where the modification is reflected.
+- **ACCEPTANCE CRITERIA:** Editing in left pane scrolls right pane to matching block and briefly highlights it; debounced to maintain 60 FPS.
+
+### P25-T002 — About Dialog & Interactive Help Center (Linear: JMD-16)
+**ID:** P25-T002 · **FEATURE:** Shell / Help · **PRIORITY:** P0 · **LINEAR_ID:** JMD-16 · **STATUS:** DONE · **ESTIMATE:** 20 mins · **FILES_SCOPE:** `src/MDReader.App/Features/Shell/Views/MainWindow.xaml`, `src/MDReader.App/Features/Shell/Views/MainWindow.xaml.cs`
+- **GOAL:** Provide an elegant Fluent About dialog and Help menu (`Help / مساعدة`) explaining JMDReader, its capabilities, offline security, zero telemetry, developer information (birotech), and direct access to guides.
+- **ACCEPTANCE CRITERIA:** Clicking "About JMDReader" opens the dialog; version and offline policy clearly presented.
+- **VERIFICATION:** Confirmed `Help / مساعدة` menu with `About_Click` showing Fluent `ContentDialog` with developer metadata and offline privacy guarantee.
+
+### P25-T003 — Interactive Markdown Syntax Guide & Live Cheat Sheet (Linear: JMD-17)
+**ID:** P25-T003 · **FEATURE:** Documentation / Guide · **PRIORITY:** P0 · **LINEAR_ID:** JMD-17 · **STATUS:** DONE · **ESTIMATE:** 20 mins · **FILES_SCOPE:** `src/MDReader.App/Features/Shell/Views/MainWindow.xaml.cs`, `src/MDReader.App/Features/Reader/ViewModels/ReaderViewModel.cs`
+- **GOAL:** One-click launcher from Help menu that opens a live, editable document tab `Markdown-Guide.md` demonstrating all syntax: headings, task lists, code blocks, tables, LaTeX math, alerts, and Mermaid diagrams.
+- **ACCEPTANCE CRITERIA:** Selecting "Markdown Guide" from Help opens interactive tutorial tab immediately.
+- **VERIFICATION:** Confirmed `OpenMarkdownGuideCommand` creates live editable `Markdown-Guide.md` tab rendering rich formatting.
+
+### P25-T004 — Interactive JSON & JSONPath Guide & Live Cheat Sheet (Linear: JMD-18)
+**ID:** P25-T004 · **FEATURE:** Documentation / Guide · **PRIORITY:** P0 · **LINEAR_ID:** JMD-18 · **STATUS:** DONE · **ESTIMATE:** 20 mins · **FILES_SCOPE:** `src/MDReader.App/Features/Shell/Views/MainWindow.xaml.cs`, `src/MDReader.App/Features/Reader/ViewModels/ReaderViewModel.cs`
+- **GOAL:** One-click launcher from Help menu that opens a live JSON dataset tab `JSON-Guide.json` demonstrating data types, JSONPath queries (`$.store.book[*]`, `$..author`), JSONC comments, and tree formatting tools.
+- **ACCEPTANCE CRITERIA:** Selecting "JSON Guide" opens tutorial tab in interactive colored tree view immediately.
+- **VERIFICATION:** Confirmed `OpenJsonGuideCommand` creates `JSON-Guide.json` tab rendering in `json_viewer.html` tree.
+
+### P25-T005 — Intuitive Iconography, Tooltip Hover & Long-Press Accessibility Policy & Unified Toolbar (Linear: JMD-19)
+**ID:** P25-T005 · **FEATURE:** UI / UX · **PRIORITY:** P0 · **LINEAR_ID:** JMD-19 · **STATUS:** DONE · **ESTIMATE:** 25 mins · **FILES_SCOPE:** `docs/DEVELOPMENT_RULES.md`, `docs/CODEBASE_GUIDE.md`, `src/MDReader.App/Features/Reader/Views/MainPage.xaml`, `src/MDReader.App/Features/Reader/ViewModels/DocumentTabViewModel.cs`, `src/MDReader.App/Features/Reader/ViewModels/ReaderViewModel.cs`
+- **GOAL:** Establish strict policy for intuitive icons and comprehensive bilingual tooltips supporting mouse hover and touch long-press (`ToolTipService.ToolTip`). Unify toolbar controls: show JSON tools (Beautify, Minify, To Table, Expand/Collapse) when viewing JSON, and Markdown formatting tools when viewing Markdown.
+- **ACCEPTANCE CRITERIA:** Every icon has a bilingual explanatory tooltip; toolbar adapts cleanly between Markdown and JSON documents.
+- **VERIFICATION:** Confirmed `DEVELOPMENT_RULES.md` (Section 12), `CODEBASE_GUIDE.md` (Section 6), adaptive `IsMarkdownFormattingVisible` / `IsCurrentDocumentJson` bindings, and comprehensive bilingual tooltips across all buttons.

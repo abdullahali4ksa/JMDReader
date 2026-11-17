@@ -142,6 +142,76 @@ public sealed partial class MainWindow : Window
     private void Find_Click(object sender, RoutedEventArgs e) => (RootFrame.Content as MainPage)?.ShowFind();
     private void Replace_Click(object sender, RoutedEventArgs e) => (RootFrame.Content as MainPage)?.ShowReplace();
 
+    private void MarkdownGuide_Click(object sender, RoutedEventArgs e)
+    {
+        try { _shellViewModel.Reader.OpenMarkdownGuide(); }
+        catch { }
+    }
+
+    private void JsonGuide_Click(object sender, RoutedEventArgs e)
+    {
+        try { _shellViewModel.Reader.OpenJsonGuide(); }
+        catch { }
+    }
+
+    private async void About_Click(object sender, RoutedEventArgs e)
+    {
+        try { await ShowAboutDialogAsync(); }
+        catch { }
+    }
+
+    private async System.Threading.Tasks.Task ShowAboutDialogAsync()
+    {
+        if (Content?.XamlRoot == null) return;
+
+        var stack = new StackPanel { Spacing = 10, MaxWidth = 460 };
+
+        var title = new TextBlock
+        {
+            Text = "JMDReader v2.0 (birotech)",
+            FontWeight = Microsoft.UI.Text.FontWeights.Bold,
+            FontSize = 18
+        };
+        stack.Children.Add(title);
+
+        var subtitle = new TextBlock
+        {
+            Text = "Modern Markdown, JSON & Text Workspace for Windows 11",
+            FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
+            FontSize = 13,
+            Opacity = 0.85
+        };
+        stack.Children.Add(subtitle);
+
+        var desc = new TextBlock
+        {
+            Text = "قارئ ومحرر ماركداون متقدم ومستعرض JSON الشجري الملون.\n\nمعايير الأمان الرقمي:\n• يعمل بدون اتصال بالإنترنت بنسبة 100% (100% Offline).\n• خالي تماماً من جمع البيانات أو التتبع (Zero Telemetry).\n• أداء أصيل وسلس على معالجات x64 و Arm64 الحديثة.",
+            TextWrapping = TextWrapping.Wrap,
+            FontSize = 12,
+            LineHeight = 20
+        };
+        stack.Children.Add(desc);
+
+        var copyright = new TextBlock
+        {
+            Text = "Developed by birotech (Abdullah Ali Khaled Moqbel)\nLicensed under the MIT License.",
+            FontSize = 11,
+            Opacity = 0.65,
+            Margin = new Thickness(0, 10, 0, 0)
+        };
+        stack.Children.Add(copyright);
+
+        var dialog = new ContentDialog
+        {
+            Title = "About JMDReader / عن البرنامج",
+            Content = stack,
+            CloseButtonText = "Close / إغلاق",
+            XamlRoot = Content.XamlRoot
+        };
+
+        await dialog.ShowAsync();
+    }
+
     private async void KeyboardShortcuts_Click(object sender, RoutedEventArgs e)
     {
         try

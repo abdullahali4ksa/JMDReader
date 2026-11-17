@@ -230,6 +230,23 @@ To guarantee 100% stability, zero process exits, and silky-smooth responsiveness
 
 ---
 
+## 12. Intuitive Iconography, Tooltips & Touch Accessibility (معايير الأيقونات وتلميحات الاستخدام واللمس المطول)
+
+To ensure JMDReader is universally accessible, easy to use, and self-explanatory for beginners and experts alike:
+
+1. **Intuitive Icon Selection (أيقونات بديهية وواضحة):**
+   - Always choose standard, recognized symbols (e.g. `◫` Split, `✏️` Edit, `📖` Read, `✨` Beautify, `⚡` Minify, `📊` Table, `📋` Copy, `🖨️` PDF, `🔍` Search).
+   - Avoid ambiguous, esoteric, or cluttered icons.
+2. **Mandatory Bilingual Tooltips on Hover & Touch Long-Press (تلميحات التمرير واللمس المطول):**
+   - Every single interactive button or icon **MUST** have a descriptive `ToolTipService.ToolTip`.
+   - Tooltips must explain the exact function and its keyboard shortcut (e.g. `ToolTipService.ToolTip="Split View / وضع العرض المنقسم (Ctrl+E)"`).
+   - WinUI 3's `ToolTipService` automatically triggers on mouse hover and on **touch long-press** for tablets, 2-in-1 laptops, and touchscreens.
+3. **Adaptive Toolbar Unification (توحيد وتناسق شريط الأدوات بين MD و JSON):**
+   - Core productivity controls (Zoom, Themes, Copy, Zen Mode, File Path Toggle) remain persistent across all document types.
+   - Context-sensitive controls adapt seamlessly: Markdown formatting tools (`B`, `I`, `H`, `Code`, `Mermaid`) display when editing Markdown; JSON productivity tools (`Beautify`, `Minify`, `To Table`, `Expand`, `Collapse`) display when viewing JSON.
+
+---
+
 ## Developer Setup Checklist
 
 Before writing code, ensure:

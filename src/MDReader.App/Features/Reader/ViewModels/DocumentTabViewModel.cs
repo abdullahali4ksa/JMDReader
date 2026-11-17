@@ -44,6 +44,14 @@ public sealed partial class DocumentTabViewModel : ObservableObject
 
     public bool IsDirty => _session.IsDirty;
 
+    public bool IsJsonDocument =>
+        !string.IsNullOrEmpty(Title) &&
+        (Title.EndsWith(".json", StringComparison.OrdinalIgnoreCase) ||
+         Title.EndsWith(".jsonc", StringComparison.OrdinalIgnoreCase) ||
+         Title.EndsWith(".jsonl", StringComparison.OrdinalIgnoreCase));
+
+    public bool IsMarkdownDocument => !IsJsonDocument;
+
     public MarkdownDocumentElement? Elements
     {
         get => _elements;

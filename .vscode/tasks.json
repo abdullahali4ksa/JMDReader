@@ -2,7 +2,16 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "stop-running-app",
+            "type": "shell",
+            "command": "powershell -NoProfile -Command \"Stop-Process -Name 'MDReader.App', 'netcoredbg' -Force -ErrorAction SilentlyContinue\"",
+            "presentation": {
+                "reveal": "silent"
+            }
+        },
+        {
             "label": "build",
+            "dependsOn": "stop-running-app",
             "command": "dotnet",
             "type": "shell",
             "args": [

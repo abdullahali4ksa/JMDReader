@@ -38,5 +38,7 @@
     "breadcrumbs.around": true,
     "breadcrumbs.icons": true,
     "telemetry.enableTelemetry": false,
-    "telemetry.enableCrashReporter": false
+    "telemetry.enableCrashReporter": false,
+    "go.useLanguageServer": false,
+    "go.toolsManagement.checkForUpdates": "off"
 }

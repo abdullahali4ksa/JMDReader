@@ -84,6 +84,12 @@ public sealed partial class MainPage : Page
                 Debug.WriteLine($"[MainPage] Loaded InitializeWebViewAsync failed: {ex}");
             }
         };
+
+        MDReader.Core.Localization.LocalizationService.Instance.PropertyChanged += (s, e) =>
+        {
+            DispatcherQueue.TryEnqueue(OnLanguageChanged);
+        };
+        OnLanguageChanged();
     }
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -163,6 +169,7 @@ public sealed partial class MainPage : Page
                 UpdateWebViewContent(immediate: true);
                 ApplyTheme();
                 ApplyZoom();
+                OnLanguageChanged();
             };
 
             AntigravityViewer.Source = new Uri("https://appassets.local/viewer.html");
@@ -222,9 +229,33 @@ public sealed partial class MainPage : Page
                 content = content,
                 markdown = content,
                 json = content,
-                isText = isTxt
+                isText = isTxt,
+                language = MDReader.Core.Localization.LocalizationService.Instance.CurrentLanguage
             });
             AntigravityViewer.CoreWebView2.PostWebMessageAsJson(json);
+        }
+        catch { }
+    }
+
+    private void OnLanguageChanged()
+    {
+        try
+        {
+            var s = MDReader.Core.Localization.LocalizationService.Instance;
+            if (FindTextBox != null)
+            {
+                FindTextBox.PlaceholderText = s.SearchPlaceholder;
+            }
+
+            if (_isWebViewInitialized && AntigravityViewer?.CoreWebView2 != null)
+            {
+                var msg = JsonSerializer.Serialize(new
+                {
+                    type = "setLanguage",
+                    language = s.CurrentLanguage
+                });
+                AntigravityViewer.CoreWebView2.PostWebMessageAsJson(msg);
+            }
         }
         catch { }
     }

@@ -29,47 +29,47 @@
 
         <!-- Menu bar: File, View, Settings, Help -->
         <MenuBar Grid.Row="1" Background="{ThemeResource AppBackgroundBrush}" AutomationProperties.Name="Application menu bar">
-            <MenuBarItem Title="📁 File / ملف">
-                <MenuFlyoutItem Text="📄 New / جديد  (Ctrl+N)" Command="{Binding NewDocumentCommand}" />
-                <MenuFlyoutItem Text="📂 Open File... / فتح ملف  (Ctrl+O)" Command="{Binding OpenDocumentCommand}" />
-                <MenuFlyoutItem Text="📁 Open Folder... / فتح مجلد  (Ctrl+Shift+O)" Command="{Binding OpenFolderCommand}" />
-                <MenuFlyoutSubItem x:Name="RecentFilesMenuSubItem" Text="🕒 Open Recent / الملفات المشاهدة مؤخراً" />
+            <MenuBarItem x:Name="FileMenuBarItem" Title="ملف">
+                <MenuFlyoutItem x:Name="MenuNewItem" Text="📄 جديد  (Ctrl+N)" Command="{Binding NewDocumentCommand}" />
+                <MenuFlyoutItem x:Name="MenuOpenItem" Text="📂 فتح ملف...  (Ctrl+O)" Command="{Binding OpenDocumentCommand}" />
+                <MenuFlyoutItem x:Name="MenuOpenFolderItem" Text="📁 فتح مجلد...  (Ctrl+Shift+O)" Command="{Binding OpenFolderCommand}" />
+                <MenuFlyoutSubItem x:Name="RecentFilesMenuSubItem" Text="🕒 الملفات المشاهدة مؤخراً" />
                 <MenuFlyoutSeparator />
-                <MenuFlyoutItem Text="💾 Save / حفظ  (Ctrl+S)" Command="{Binding SaveDocumentCommand}" />
-                <MenuFlyoutItem Text="💾 Save As... / حفظ باسم  (Ctrl+Shift+S)" Command="{Binding SaveDocumentAsCommand}" />
+                <MenuFlyoutItem x:Name="MenuSaveItem" Text="💾 حفظ  (Ctrl+S)" Command="{Binding SaveDocumentCommand}" />
+                <MenuFlyoutItem x:Name="MenuSaveAsItem" Text="💾 حفظ باسم...  (Ctrl+Shift+S)" Command="{Binding SaveDocumentAsCommand}" />
                 <MenuFlyoutSeparator />
-                <MenuFlyoutItem Text="❌ Close Tab / إغلاق التاب  (Ctrl+W)" Command="{Binding CloseCurrentTabCommand}" />
+                <MenuFlyoutItem x:Name="MenuCloseTabItem" Text="❌ إغلاق التاب  (Ctrl+W)" Command="{Binding CloseCurrentTabCommand}" />
             </MenuBarItem>
-            <MenuBarItem Title="👁️ View / عرض">
-                <MenuFlyoutItem Text="⚡ Command Palette... / لوحة الأوامر  (Ctrl+Shift+P / F2)" Click="CommandPalette_Click" />
+            <MenuBarItem x:Name="ViewMenuBarItem" Title="عرض">
+                <MenuFlyoutItem x:Name="MenuCommandPaletteItem" Text="⚡ لوحة الأوامر...  (Ctrl+Shift+P / F2)" Click="CommandPalette_Click" />
                 <MenuFlyoutSeparator />
-                <MenuFlyoutItem Text="📑 Toggle Sidebar / الشريط الجانبي  (Ctrl+B)" Command="{Binding ToggleWorkspacePaneCommand}" />
-                <MenuFlyoutItem Text="⌨️ Toggle Typewriter Mode / وضع الآلة الكاتبة" Click="ToggleTypewriter_Click" />
+                <MenuFlyoutItem x:Name="MenuToggleSidebarItem" Text="📑 الشريط الجانبي  (Ctrl+B)" Command="{Binding ToggleWorkspacePaneCommand}" />
+                <MenuFlyoutItem x:Name="MenuToggleTypewriterItem" Text="⌨️ وضع الآلة الكاتبة" Click="ToggleTypewriter_Click" />
                 <MenuFlyoutSeparator />
-                <MenuFlyoutItem Text="🔄 Refresh / تحديث  (Ctrl+R)" Command="{Binding RefreshDocumentCommand}" />
+                <MenuFlyoutItem x:Name="MenuRefreshItem" Text="🔄 تحديث  (Ctrl+R)" Command="{Binding RefreshDocumentCommand}" />
                 <MenuFlyoutSeparator />
-                <MenuFlyoutItem Text="🔍 Find... / بحث في الملف  (Ctrl+F)" Click="Find_Click" />
-                <MenuFlyoutItem Text="✏️ Replace... / استبدال  (Ctrl+H)" Click="Replace_Click" />
+                <MenuFlyoutItem x:Name="MenuFindItem" Text="🔍 بحث في الملف...  (Ctrl+F)" Click="Find_Click" />
+                <MenuFlyoutItem x:Name="MenuReplaceItem" Text="✏️ استبدال...  (Ctrl+H)" Click="Replace_Click" />
             </MenuBarItem>
-            <MenuBarItem Title="⚙️ Settings / إعدادات">
-                <MenuFlyoutSubItem Text="🎨 Theme / المظهر">
-                    <MenuFlyoutItem Text="💻 System / حسب النظام" Command="{Binding SetThemeCommand}" CommandParameter="System" />
-                    <MenuFlyoutItem Text="☀️ Light / فاتح (أبيض)" Command="{Binding SetThemeCommand}" CommandParameter="Light" />
-                    <MenuFlyoutItem Text="🌙 Dark / داكن (أسود)" Command="{Binding SetThemeCommand}" CommandParameter="Dark" />
-                    <MenuFlyoutItem Text="🌑 Dark Slate / رمادي غامق فاحم" Command="{Binding SetThemeCommand}" CommandParameter="DarkSlate" />
-                    <MenuFlyoutItem Text="📜 Sepia / مريح للقراءة (بيج)" Command="{Binding SetThemeCommand}" CommandParameter="Sepia" />
+            <MenuBarItem x:Name="SettingsMenuBarItem" Title="الإعدادات">
+                <MenuFlyoutSubItem x:Name="MenuThemeSubItem" Text="🎨 المظهر">
+                    <MenuFlyoutItem x:Name="MenuThemeSystemItem" Text="💻 حسب النظام" Command="{Binding SetThemeCommand}" CommandParameter="System" />
+                    <MenuFlyoutItem x:Name="MenuThemeLightItem" Text="☀️ فاتح (أبيض)" Command="{Binding SetThemeCommand}" CommandParameter="Light" />
+                    <MenuFlyoutItem x:Name="MenuThemeDarkItem" Text="🌙 داكن (أسود)" Command="{Binding SetThemeCommand}" CommandParameter="Dark" />
+                    <MenuFlyoutItem x:Name="MenuThemeDarkSlateItem" Text="🌑 رمادي غامق فاحم" Command="{Binding SetThemeCommand}" CommandParameter="DarkSlate" />
+                    <MenuFlyoutItem x:Name="MenuThemeSepiaItem" Text="📜 مريح للقراءة (بيج)" Command="{Binding SetThemeCommand}" CommandParameter="Sepia" />
                 </MenuFlyoutSubItem>
-                <MenuFlyoutSubItem Text="⚙️ Preferences &amp; Automation / الخيارات والأتمتة">
-                    <ToggleMenuFlyoutItem x:Name="AutoSaveToggleItem" Text="💾 Auto-Save Drafts / حفظ المسودات تلقائياً" Click="AutoSaveToggle_Click" />
-                    <ToggleMenuFlyoutItem x:Name="RestoreSessionToggleItem" Text="🔄 Restore Last Session Tabs / استئناف التابات السابقة" Click="RestoreSessionToggle_Click" />
-                    <ToggleMenuFlyoutItem x:Name="TypewriterToggleItem" Text="⌨️ Typewriter Focus Mode / وضع الآلة الكاتبة" Click="TypewriterToggle_Click" />
+                <MenuFlyoutSubItem x:Name="MenuPreferencesSubItem" Text="⚙️ الخيارات والأتمتة">
+                    <ToggleMenuFlyoutItem x:Name="AutoSaveToggleItem" Text="💾 حفظ المسودات تلقائياً" Click="AutoSaveToggle_Click" />
+                    <ToggleMenuFlyoutItem x:Name="RestoreSessionToggleItem" Text="🔄 استئناف التابات السابقة" Click="RestoreSessionToggle_Click" />
+                    <ToggleMenuFlyoutItem x:Name="TypewriterToggleItem" Text="⌨️ وضع الآلة الكاتبة" Click="TypewriterToggle_Click" />
                 </MenuFlyoutSubItem>
-                <MenuFlyoutSubItem Text="🌐 Language / اللغة">
+                <MenuFlyoutSubItem x:Name="MenuLanguageSubItem" Text="🌐 اللغة">
                     <MenuFlyoutItem Text="العربية (Arabic)" Command="{Binding SetLanguageCommand}" CommandParameter="ar" />
                     <MenuFlyoutItem Text="English" Command="{Binding SetLanguageCommand}" CommandParameter="en" />
-                    <MenuFlyoutItem Text="中文 (Chinese Simplified)" Command="{Binding SetLanguageCommand}" CommandParameter="zh" />
-                    <MenuFlyoutItem Text="हिन्दी (Hindi)" Command="{Binding SetLanguageCommand}" CommandParameter="hi" />
                     <MenuFlyoutItem Text="Español (Spanish)" Command="{Binding SetLanguageCommand}" CommandParameter="es" />
+                    <MenuFlyoutItem Text="हिन्दी (Hindi)" Command="{Binding SetLanguageCommand}" CommandParameter="hi" />
+                    <MenuFlyoutItem Text="中文 (Chinese Simplified)" Command="{Binding SetLanguageCommand}" CommandParameter="zh" />
                     <MenuFlyoutItem Text="Français (French)" Command="{Binding SetLanguageCommand}" CommandParameter="fr" />
                     <MenuFlyoutItem Text="Deutsch (German)" Command="{Binding SetLanguageCommand}" CommandParameter="de" />
                     <MenuFlyoutItem Text="Русский (Russian)" Command="{Binding SetLanguageCommand}" CommandParameter="ru" />
@@ -77,13 +77,13 @@
                     <MenuFlyoutItem Text="Português (Portuguese)" Command="{Binding SetLanguageCommand}" CommandParameter="pt" />
                 </MenuFlyoutSubItem>
             </MenuBarItem>
-            <MenuBarItem Title="❓ Help / مساعدة">
-                <MenuFlyoutItem Text="📖 Markdown Syntax Guide / دليل الماركداون" Click="MarkdownGuide_Click" />
-                <MenuFlyoutItem Text="🌳 JSON &amp; JSONPath Guide / دليل الجيسون" Click="JsonGuide_Click" />
+            <MenuBarItem x:Name="HelpMenuBarItem" Title="مساعدة">
+                <MenuFlyoutItem x:Name="MenuMarkdownGuideItem" Text="📖 دليل الماركداون" Click="MarkdownGuide_Click" />
+                <MenuFlyoutItem x:Name="MenuJsonGuideItem" Text="🌳 دليل الجيسون ومسار JSONPath" Click="JsonGuide_Click" />
                 <MenuFlyoutSeparator />
-                <MenuFlyoutItem Text="⌨️ Keyboard Shortcuts / اختصارات لوحة المفاتيح  (F1)" Click="KeyboardShortcuts_Click" />
+                <MenuFlyoutItem x:Name="MenuShortcutsItem" Text="⌨️ اختصارات لوحة المفاتيح  (F1)" Click="KeyboardShortcuts_Click" />
                 <MenuFlyoutSeparator />
-                <MenuFlyoutItem Text="ℹ️ About JMDReader / عن البرنامج" Click="About_Click" />
+                <MenuFlyoutItem x:Name="MenuAboutItem" Text="ℹ️ عن البرنامج" Click="About_Click" />
             </MenuBarItem>
         </MenuBar>
 

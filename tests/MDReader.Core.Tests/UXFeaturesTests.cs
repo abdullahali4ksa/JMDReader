@@ -135,22 +135,71 @@ Here is a second paragraph in English to verify bilingual word counting, line co
     }
 
     [Fact]
-    public void LocalizationService_LanguageRoundtripAndBilingualMetrics()
+    public void LocalizationService_PureMultiLanguageSupportAcross10Languages()
     {
         var service = MDReader.Core.Localization.LocalizationService.Instance;
+
+        // 1. Arabic (Default)
         service.SetLanguage("ar");
         Assert.Equal("ar", service.CurrentLanguage);
         Assert.True(service.IsRtl);
         Assert.Equal("ملف", service.MenuFile);
         Assert.Equal("عرض", service.MenuView);
         Assert.Equal("كلمة", service.StatusWords);
+        Assert.DoesNotContain("/", service.MenuFile);
 
+        // 2. English
         service.SetLanguage("en");
         Assert.Equal("en", service.CurrentLanguage);
         Assert.False(service.IsRtl);
         Assert.Equal("File", service.MenuFile);
         Assert.Equal("View", service.MenuView);
         Assert.Equal("words", service.StatusWords);
+        Assert.DoesNotContain("/", service.MenuFile);
+
+        // 3. Spanish
+        service.SetLanguage("es");
+        Assert.Equal("es", service.CurrentLanguage);
+        Assert.Equal("Archivo", service.MenuFile);
+        Assert.Equal("Ver", service.MenuView);
+        Assert.Equal("palabras", service.StatusWords);
+        Assert.DoesNotContain("/", service.MenuFile);
+
+        // 4. Hindi
+        service.SetLanguage("hi");
+        Assert.Equal("hi", service.CurrentLanguage);
+        Assert.Equal("फ़ाइल", service.MenuFile);
+        Assert.Equal("देखें", service.MenuView);
+        Assert.Equal("शब्द", service.StatusWords);
+        Assert.DoesNotContain("/", service.MenuFile);
+
+        // 5. Chinese
+        service.SetLanguage("zh");
+        Assert.Equal("zh", service.CurrentLanguage);
+        Assert.Equal("文件", service.MenuFile);
+        Assert.Equal("视图", service.MenuView);
+        Assert.Equal("字", service.StatusWords);
+        Assert.DoesNotContain("/", service.MenuFile);
+
+        // 6. French
+        service.SetLanguage("fr");
+        Assert.Equal("Fichier", service.MenuFile);
+
+        // 7. German
+        service.SetLanguage("de");
+        Assert.Equal("Datei", service.MenuFile);
+
+        // 8. Russian
+        service.SetLanguage("ru");
+        Assert.Equal("Файл", service.MenuFile);
+
+        // 9. Japanese
+        service.SetLanguage("ja");
+        Assert.Equal("ファイル", service.MenuFile);
+
+        // 10. Portuguese
+        service.SetLanguage("pt");
+        Assert.Equal("Arquivo", service.MenuFile);
 
         // Reset to default
         service.SetLanguage("ar");

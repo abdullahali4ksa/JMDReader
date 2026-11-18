@@ -3,6 +3,7 @@
 using System;
 using CommunityToolkit.Mvvm.ComponentModel;
 using MDReader.Core.Documents;
+using MDReader.Core.Localization;
 using MDReader.Core.Markdown;
 
 namespace MDReader.App.Features.Reader.ViewModels;
@@ -40,7 +41,12 @@ public sealed partial class DocumentTabViewModel : ObservableObject
 
     public string TabGlyph => IsPinned ? "\uE840" : (IsJsonDocument ? "\uE943" : "\uE8A5");
 
-    public string PinMenuText => IsPinned ? "📌 Unpin Tab / إلغاء تثبيت التاب" : "📌 Pin Tab / تثبيت في المفضلة";
+    public string PinMenuText => IsPinned ? $"📌 {LocalizationService.Instance.TabUnpin}" : $"📌 {LocalizationService.Instance.TabPin}";
+    public string FavoriteMenuText => $"⭐ {LocalizationService.Instance.TabFavorite}";
+    public string CloseTabMenuText => $"❌ {LocalizationService.Instance.TabClose}";
+    public string CloseRightMenuText => $"➡️ {LocalizationService.Instance.TabCloseRight}";
+    public string CloseOthersMenuText => $"👥 {LocalizationService.Instance.TabCloseOthers}";
+    public string CloseAllMenuText => $"🚫 {LocalizationService.Instance.TabCloseAll}";
 
     public string Header => (IsPinned ? "📌 " : "") + _session.Title + (_session.IsDirty ? " *" : "");
 
@@ -83,6 +89,15 @@ public sealed partial class DocumentTabViewModel : ObservableObject
     public DocumentTabViewModel(DocumentSession session)
     {
         _session = session;
+        LocalizationService.Instance.PropertyChanged += (s, e) =>
+        {
+            OnPropertyChanged(nameof(PinMenuText));
+            OnPropertyChanged(nameof(FavoriteMenuText));
+            OnPropertyChanged(nameof(CloseTabMenuText));
+            OnPropertyChanged(nameof(CloseRightMenuText));
+            OnPropertyChanged(nameof(CloseOthersMenuText));
+            OnPropertyChanged(nameof(CloseAllMenuText));
+        };
         UpdateParsedElements();
     }
 

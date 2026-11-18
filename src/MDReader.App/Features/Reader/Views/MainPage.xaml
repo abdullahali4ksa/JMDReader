@@ -67,29 +67,29 @@
                                         <FontIcon Glyph="&#xE840;" />
                                     </MenuFlyoutItem.Icon>
                                 </MenuFlyoutItem>
-                                <MenuFlyoutItem Text="⭐ Add to Favorites / إضافة إلى المفضلة" Click="TabContextMenu_Favorite_Click" Tag="{Binding}">
+                                <MenuFlyoutItem Text="{Binding FavoriteMenuText}" Click="TabContextMenu_Favorite_Click" Tag="{Binding}">
                                     <MenuFlyoutItem.Icon>
                                         <FontIcon Glyph="&#xE734;" />
                                     </MenuFlyoutItem.Icon>
                                 </MenuFlyoutItem>
                                 <MenuFlyoutSeparator />
-                                <MenuFlyoutItem Text="❌ Close Tab / إغلاق التاب (Ctrl+W)" Click="TabContextMenu_Close_Click" Tag="{Binding}">
+                                <MenuFlyoutItem Text="{Binding CloseTabMenuText}" Click="TabContextMenu_Close_Click" Tag="{Binding}">
                                     <MenuFlyoutItem.Icon>
                                         <FontIcon Glyph="&#xE711;" />
                                     </MenuFlyoutItem.Icon>
                                 </MenuFlyoutItem>
-                                <MenuFlyoutItem Text="➡️ Close Tabs to the Right / إغلاق التابات لليمين" Click="TabContextMenu_CloseRight_Click" Tag="{Binding}">
+                                <MenuFlyoutItem Text="{Binding CloseRightMenuText}" Click="TabContextMenu_CloseRight_Click" Tag="{Binding}">
                                     <MenuFlyoutItem.Icon>
                                         <FontIcon Glyph="&#xE76C;" />
                                     </MenuFlyoutItem.Icon>
                                 </MenuFlyoutItem>
-                                <MenuFlyoutItem Text="👥 Close Other Tabs / إغلاق التابات الأخرى" Click="TabContextMenu_CloseOthers_Click" Tag="{Binding}">
+                                <MenuFlyoutItem Text="{Binding CloseOthersMenuText}" Click="TabContextMenu_CloseOthers_Click" Tag="{Binding}">
                                     <MenuFlyoutItem.Icon>
                                         <FontIcon Glyph="&#xE8D4;" />
                                     </MenuFlyoutItem.Icon>
                                 </MenuFlyoutItem>
                                 <MenuFlyoutSeparator />
-                                <MenuFlyoutItem Text="🚫 Close All Tabs / إغلاق جميع التابات" Click="TabContextMenu_CloseAll_Click" Tag="{Binding}">
+                                <MenuFlyoutItem Text="{Binding CloseAllMenuText}" Click="TabContextMenu_CloseAll_Click" Tag="{Binding}">
                                     <MenuFlyoutItem.Icon>
                                         <FontIcon Glyph="&#xE74D;" />
                                     </MenuFlyoutItem.Icon>
@@ -146,11 +146,11 @@
                             <!-- JSON Tools Group (Pill cluster, visible when viewing JSON files) -->
                             <Border Background="{ThemeResource AppBackgroundBrush}" BorderBrush="{ThemeResource AppBorderBrush}" BorderThickness="1" CornerRadius="6" Padding="2" Visibility="{Binding IsCurrentDocumentJson, Converter={StaticResource BoolToVisibilityConverter}}">
                                 <StackPanel Orientation="Horizontal" Spacing="2">
-                                    <Button Content="⊞" Width="28" Height="28" Padding="0" FontSize="13" Command="{Binding ExpandAllJsonCommand}" ToolTipService.ToolTip="⊞ Expand All / توسيع كافة الفروع" />
-                                    <Button Content="⊟" Width="28" Height="28" Padding="0" FontSize="13" Command="{Binding CollapseAllJsonCommand}" ToolTipService.ToolTip="⊟ Collapse All / طي كافة الفروع" />
-                                    <Button Content="✨" Width="28" Height="28" Padding="0" FontSize="12" Command="{Binding BeautifyJsonCommand}" ToolTipService.ToolTip="✨ Format JSON / تنسيق وتجميل الكود (2 Spaces)" />
-                                    <Button Content="⚡" Width="28" Height="28" Padding="0" FontSize="12" Command="{Binding MinifyJsonCommand}" ToolTipService.ToolTip="⚡ Minify JSON / ضغط وتصغير الكود (سطر واحد)" />
-                                    <Button Content="📊" Width="28" Height="28" Padding="0" FontSize="12" Command="{Binding ConvertJsonToTableCommand}" ToolTipService.ToolTip="📊 Convert to Markdown Table &amp; Copy / تحويل لجدول ماركداون ونسخه" />
+                                    <Button Content="⊞" Width="28" Height="28" Padding="0" FontSize="13" Command="{Binding ExpandAllJsonCommand}" ToolTipService.ToolTip="{Binding Strings.JsonExpandAll, FallbackValue='Expand All'}" />
+                                    <Button Content="⊟" Width="28" Height="28" Padding="0" FontSize="13" Command="{Binding CollapseAllJsonCommand}" ToolTipService.ToolTip="{Binding Strings.JsonCollapseAll, FallbackValue='Collapse All'}" />
+                                    <Button Content="✨" Width="28" Height="28" Padding="0" FontSize="12" Command="{Binding BeautifyJsonCommand}" ToolTipService.ToolTip="{Binding Strings.JsonFormat, FallbackValue='Format'}" />
+                                    <Button Content="⚡" Width="28" Height="28" Padding="0" FontSize="12" Command="{Binding MinifyJsonCommand}" ToolTipService.ToolTip="{Binding Strings.JsonMinify, FallbackValue='Minify'}" />
+                                    <Button Content="📊" Width="28" Height="28" Padding="0" FontSize="12" Command="{Binding ConvertJsonToTableCommand}" ToolTipService.ToolTip="{Binding Strings.JsonTable, FallbackValue='Convert to Markdown Table'}" />
                                 </StackPanel>
                             </Border>
 
@@ -192,12 +192,12 @@
                                 <StackPanel Orientation="Horizontal" Spacing="2">
                                     <Button Content="🖨️" Width="30" Height="28" Padding="0" FontSize="13" Click="ExportPdf_Click" ToolTipService.ToolTip="{Binding Strings.TooltipExportPdf, FallbackValue='Export to PDF'}" />
                                     <Button Content="🌐" Width="30" Height="28" Padding="0" FontSize="13" Click="ExportHtml_Click" ToolTipService.ToolTip="{Binding Strings.TooltipExportHtml, FallbackValue='Export to HTML'}" />
-                                    <Button x:Name="CopyDocumentButton" Content="📋" Width="30" Height="28" Padding="0" FontSize="13" Click="CopyDocument_Click" ToolTipService.ToolTip="Copy All Text / نسخ النص كاملاً (Ctrl+C)" />
+                                    <Button x:Name="CopyDocumentButton" Content="📋" Width="30" Height="28" Padding="0" FontSize="13" Click="CopyDocument_Click" ToolTipService.ToolTip="{Binding Strings.CopyAll, FallbackValue='Copy All Text'}" />
                                 </StackPanel>
                             </Border>
 
                             <!-- Path Toggle & Zen Mode -->
-                            <Button Content="📍" Width="30" Height="28" Padding="0" FontSize="13" Command="{Binding TogglePathBarVisibilityCommand}" ToolTipService.ToolTip="{Binding Strings.TooltipShowPath, FallbackValue='Toggle File Path / إظهار أو إخفاء مسار الملف'}" />
+                            <Button Content="📍" Width="30" Height="28" Padding="0" FontSize="13" Command="{Binding TogglePathBarVisibilityCommand}" ToolTipService.ToolTip="{Binding Strings.TooltipShowPath, FallbackValue='Toggle File Path'}" />
                             <Button Content="⛶" Width="30" Height="28" Padding="0" FontSize="13" Command="{Binding ToggleZenModeCommand}" ToolTipService.ToolTip="{Binding Strings.TooltipFocus, FallbackValue='Focus Mode (F11)'}" />
                         </StackPanel>
                     </ScrollViewer>
@@ -338,13 +338,13 @@
                         TextChanged="FindTextBox_TextChanged"
                         KeyDown="FindTextBox_KeyDown"
                         AutomationProperties.Name="Search text" />
-                    <ToggleButton x:Name="MatchCaseToggle" Content="Aa" Click="FindOption_Changed" ToolTipService.ToolTip="Match Case (حساس لحالة الأحرف)" Width="30" Height="28" Padding="0" FontSize="11" />
-                    <ToggleButton x:Name="RegexToggle" Content=".*" Click="FindOption_Changed" ToolTipService.ToolTip="Regular Expression (تعبيرات نمطية)" Width="30" Height="28" Padding="0" FontSize="11" />
-                    <Button Content="▲" Width="30" Height="28" Padding="0" FontSize="11" Click="FindPrevious_Click" ToolTipService.ToolTip="Previous match / النتيجة السابقة (Shift+Enter)" />
-                    <Button Content="▼" Width="30" Height="28" Padding="0" FontSize="11" Click="FindNext_Click" ToolTipService.ToolTip="Next match / النتيجة التالية (Enter)" />
+                    <ToggleButton x:Name="MatchCaseToggle" Content="Aa" Click="FindOption_Changed" ToolTipService.ToolTip="Match Case" Width="30" Height="28" Padding="0" FontSize="11" />
+                    <ToggleButton x:Name="RegexToggle" Content=".*" Click="FindOption_Changed" ToolTipService.ToolTip="Regular Expression" Width="30" Height="28" Padding="0" FontSize="11" />
+                    <Button Content="▲" Width="30" Height="28" Padding="0" FontSize="11" Click="FindPrevious_Click" ToolTipService.ToolTip="Previous match (Shift+Enter)" />
+                    <Button Content="▼" Width="30" Height="28" Padding="0" FontSize="11" Click="FindNext_Click" ToolTipService.ToolTip="Next match (Enter)" />
                     <TextBlock x:Name="FindStatusText" VerticalAlignment="Center" MinWidth="70" Foreground="{ThemeResource AppSecondaryTextBrush}" FontSize="12" />
                     <TextBlock x:Name="FindPreviewText" VerticalAlignment="Center" MaxWidth="320" TextTrimming="CharacterEllipsis" Foreground="{ThemeResource AppSecondaryTextBrush}" FontSize="12" />
-                    <Button Content="✕" Width="26" Height="26" Padding="0" FontSize="11" Click="CloseFind_Click" ToolTipService.ToolTip="Close / إغلاق (Esc)" />
+                    <Button Content="✕" Width="26" Height="26" Padding="0" FontSize="11" Click="CloseFind_Click" ToolTipService.ToolTip="Close (Esc)" />
                 </StackPanel>
                 <!-- Replace row -->
                 <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
@@ -353,8 +353,8 @@
                         PlaceholderText="Replace with..."
                         KeyDown="ReplaceTextBox_KeyDown"
                         AutomationProperties.Name="Replace text" />
-                    <Button Content="🔂" Width="30" Height="28" Padding="0" FontSize="12" Click="Replace_Click" ToolTipService.ToolTip="Replace Current Match / استبدال النتيجة الحالية" />
-                    <Button Content="🔁" Width="30" Height="28" Padding="0" FontSize="12" Click="ReplaceAll_Click" ToolTipService.ToolTip="Replace All Matches / استبدال الكل في المستند" />
+                    <Button Content="🔂" Width="30" Height="28" Padding="0" FontSize="12" Click="Replace_Click" ToolTipService.ToolTip="Replace Current Match" />
+                    <Button Content="🔁" Width="30" Height="28" Padding="0" FontSize="12" Click="ReplaceAll_Click" ToolTipService.ToolTip="Replace All Matches" />
                     <TextBlock x:Name="ReplaceStatusText" VerticalAlignment="Center" Foreground="{ThemeResource AppSecondaryTextBrush}" Margin="8,0,0,0" FontSize="12" />
                 </StackPanel>
             </StackPanel>
@@ -632,8 +632,8 @@
                     Padding="14">
                     <StackPanel Spacing="8">
                         <Grid>
-                            <TextBlock Text="⭐ FAVORITES &amp; RECENT / المفضلة والملفات المشاهدة مؤخراً" FontWeight="Bold" FontSize="11" Foreground="{ThemeResource AppSecondaryTextBrush}" VerticalAlignment="Center" />
-                            <Button Content="Clear / مسح" Click="ClearRecentFiles_Click" HorizontalAlignment="Right" Padding="6,2" FontSize="10" Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Clear recent history / مسح السجل" />
+                            <TextBlock Text="{Binding Strings.DashboardFavoritesTitle, FallbackValue='FAVORITES &amp; RECENT'}" FontWeight="Bold" FontSize="11" Foreground="{ThemeResource AppSecondaryTextBrush}" VerticalAlignment="Center" />
+                            <Button Content="{Binding Strings.ClearHistory, FallbackValue='Clear'}" Click="ClearRecentFiles_Click" HorizontalAlignment="Right" Padding="6,2" FontSize="10" Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="{Binding Strings.ClearHistory, FallbackValue='Clear History'}" />
                         </Grid>
 
                         <ListView

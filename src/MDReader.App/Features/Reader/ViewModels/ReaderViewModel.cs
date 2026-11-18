@@ -97,17 +97,9 @@ public sealed partial class ReaderViewModel : ObservableObject
     }
 
     public string AnalyticsSummary => _analytics.FormattedSummary;
-    public string WordCountDisplay => Strings.CurrentLanguage == "ar"
-        ? $"{_analytics.WordCount:N0} كلمة / words"
-        : $"{_analytics.WordCount:N0} {Strings.StatusWords}";
-
-    public string ReadingTimeDisplay => Strings.CurrentLanguage == "ar"
-        ? $"⏱ ~{_analytics.EstimatedReadingMinutes} دقيقة قراءة / min read"
-        : $"⏱ ~{_analytics.EstimatedReadingMinutes} {Strings.StatusMinRead}";
-
-    public string LineCountDisplay => Strings.CurrentLanguage == "ar"
-        ? $"{_analytics.LineCount:N0} سطر / lines"
-        : $"{_analytics.LineCount:N0} {Strings.StatusLines}";
+    public string WordCountDisplay => $"{_analytics.WordCount:N0} {Strings.StatusWords}";
+    public string ReadingTimeDisplay => $"⏱ ~{_analytics.EstimatedReadingMinutes} {Strings.StatusMinRead}";
+    public string LineCountDisplay => $"{_analytics.LineCount:N0} {Strings.StatusLines}";
 
     public bool IsZenMode
     {

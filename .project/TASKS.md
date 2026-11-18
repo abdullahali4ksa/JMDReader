@@ -1100,3 +1100,16 @@ The `FILES_SCOPE` on each original P01 task is the allowlist. Dependencies are d
 - **GOAL:** Establish strict policy for bilingual and multilingual support across the entire app; resolve inconsistent top menu bar titles (File, View, Settings vs Help/مساعدة) to be completely bilingual or localized; persist language selection in `preferences.json` so user's choice survives app restarts.
 - **ACCEPTANCE CRITERIA:** Menus dual-labeled or fully reactive without orphan English labels; user language preference persists across app restart; status bar and dialogs bilingual.
 - **VERIFICATION:** Confirmed Sections 14, 15, and 16 in `DEVELOPMENT_RULES.md`, persistent `PreferredLanguage` in `UserPreferencesService.cs`, fully bilingual dual-labeled MenuBar in `MainWindow.xaml`, and bilingual reading metrics in `ReaderViewModel.cs`.
+
+### P28-T014 — Pure Multi-Language (i18n) Architecture, 10 Languages & Dynamic Switching (Linear: JMD-28)
+**ID:** P28-T014 · **FEATURE:** Localization / i18n · **PRIORITY:** P0 · **LINEAR_ID:** JMD-28 · **STATUS:** DONE · **ESTIMATE:** 35 mins · **FILES_SCOPE:** `docs/DEVELOPMENT_RULES.md`, `src/MDReader.Core/Localization/LocalizationService.cs`, `src/MDReader.App/Features/Shell/Views/MainWindow.xaml`, `src/MDReader.App/Features/Shell/Views/MainWindow.xaml.cs`, `src/MDReader.App/Features/Reader/Views/MainPage.xaml`, `src/MDReader.App/Features/Reader/Views/MainPage.xaml.cs`, `src/MDReader.App/Assets/Renderer/json_viewer.html`
+- **POLICY_REF:** `docs/DEVELOPMENT_RULES.md (Architecture, MVVM, Clean UI, Intuitive Iconography §12, Microsoft Store Standards)`
+- **SECURITY_REF:** `docs/DEVELOPMENT_RULES.md §11 (Zero-Crash Mandate, Protected Async Void, Safe Try/Catch, Non-Locking I/O, ReDoS Timeout)`
+- **GOAL:** Eliminate cluttered compound/dual strings (no more 'File / ملف' or 'New / جديد'). Deliver clean, pure internationalization across the top 10 global languages (Arabic, English, Spanish, Hindi, Chinese, French, German, Russian, Japanese, Portuguese) with dynamic instantaneous switching and persistent preferences.
+- **ACCEPTANCE CRITERIA:**
+  1. No dual-language compound strings in menus, buttons, tooltips, or badges.
+  2. Pure Arabic when Arabic is selected, pure English when English is selected, pure Spanish when Spanish is selected, pure Hindi when Hindi is selected, etc.
+  3. Seamless instant switching from Settings > Language across all UI components without app restart.
+  4. Preferences saved in `preferences.json` and restored on startup.
+  5. JSON viewer toolbars and search placeholders update language dynamically.
+- **VERIFICATION:** Unit tests pass; switching language dynamically alters menus and toolbars to single clean target language; build and installation verified.

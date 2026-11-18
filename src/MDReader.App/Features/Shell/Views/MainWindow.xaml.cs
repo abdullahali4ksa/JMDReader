@@ -106,7 +106,13 @@ public sealed partial class MainWindow : Window
             AutoSaveToggleItem.IsChecked = UserPreferencesService.Instance.AutoSaveDrafts;
             RestoreSessionToggleItem.IsChecked = UserPreferencesService.Instance.RestoreSession;
             TypewriterToggleItem.IsChecked = UserPreferencesService.Instance.TypewriterMode;
-            PopulateRecentFilesMenu();
+
+            // Subscribe to language changes for dynamic instant UI translation across 10 languages
+            MDReader.Core.Localization.LocalizationService.Instance.PropertyChanged += (s, e) =>
+            {
+                DispatcherQueue.TryEnqueue(ApplyLanguage);
+            };
+            ApplyLanguage();
         }
         catch { }
     }
@@ -395,15 +401,63 @@ public sealed partial class MainWindow : Window
         TypewriterToggleItem.IsChecked = _shellViewModel.Reader.IsTypewriterMode;
     }
 
+    public void ApplyLanguage()
+    {
+        var s = MDReader.Core.Localization.LocalizationService.Instance;
+
+        // File Menu
+        if (FileMenuBarItem != null) FileMenuBarItem.Title = s.MenuFile;
+        if (MenuNewItem != null) MenuNewItem.Text = $"📄 {s.MenuNew}";
+        if (MenuOpenItem != null) MenuOpenItem.Text = $"📂 {s.MenuOpenFile}";
+        if (MenuOpenFolderItem != null) MenuOpenFolderItem.Text = $"📁 {s.MenuOpenFolder}";
+        if (RecentFilesMenuSubItem != null) RecentFilesMenuSubItem.Text = $"🕒 {s.MenuRecentFiles}";
+        if (MenuSaveItem != null) MenuSaveItem.Text = $"💾 {s.MenuSave}";
+        if (MenuSaveAsItem != null) MenuSaveAsItem.Text = $"💾 {s.MenuSaveAs}";
+        if (MenuCloseTabItem != null) MenuCloseTabItem.Text = $"❌ {s.MenuCloseTab}";
+
+        // View Menu
+        if (ViewMenuBarItem != null) ViewMenuBarItem.Title = s.MenuView;
+        if (MenuCommandPaletteItem != null) MenuCommandPaletteItem.Text = $"⚡ {s.MenuCommandPalette}";
+        if (MenuToggleSidebarItem != null) MenuToggleSidebarItem.Text = $"📑 {s.MenuToggleSidebar}";
+        if (MenuToggleTypewriterItem != null) MenuToggleTypewriterItem.Text = $"⌨️ {s.MenuTypewriter}";
+        if (MenuRefreshItem != null) MenuRefreshItem.Text = $"🔄 {s.MenuRefresh}";
+        if (MenuFindItem != null) MenuFindItem.Text = $"🔍 {s.MenuFind}";
+        if (MenuReplaceItem != null) MenuReplaceItem.Text = $"✏️ {s.MenuReplace}";
+
+        // Settings Menu
+        if (SettingsMenuBarItem != null) SettingsMenuBarItem.Title = s.MenuSettings;
+        if (MenuThemeSubItem != null) MenuThemeSubItem.Text = $"🎨 {s.MenuTheme}";
+        if (MenuThemeSystemItem != null) MenuThemeSystemItem.Text = $"💻 {s.MenuThemeSystem}";
+        if (MenuThemeLightItem != null) MenuThemeLightItem.Text = $"☀️ {s.MenuThemeLight}";
+        if (MenuThemeDarkItem != null) MenuThemeDarkItem.Text = $"🌙 {s.MenuThemeDark}";
+        if (MenuThemeDarkSlateItem != null) MenuThemeDarkSlateItem.Text = $"🌑 {s.MenuThemeDarkSlate}";
+        if (MenuThemeSepiaItem != null) MenuThemeSepiaItem.Text = $"📜 {s.MenuThemeSepia}";
+        if (MenuPreferencesSubItem != null) MenuPreferencesSubItem.Text = $"⚙️ {s.MenuPreferences}";
+        if (AutoSaveToggleItem != null) AutoSaveToggleItem.Text = $"💾 {s.MenuAutoSave}";
+        if (RestoreSessionToggleItem != null) RestoreSessionToggleItem.Text = $"🔄 {s.MenuRestoreSession}";
+        if (TypewriterToggleItem != null) TypewriterToggleItem.Text = $"⌨️ {s.MenuTypewriter}";
+        if (MenuLanguageSubItem != null) MenuLanguageSubItem.Text = $"🌐 {s.MenuLanguage}";
+
+        // Help Menu
+        if (HelpMenuBarItem != null) HelpMenuBarItem.Title = s.MenuHelp;
+        if (MenuMarkdownGuideItem != null) MenuMarkdownGuideItem.Text = $"📖 {s.MenuMarkdownGuide}";
+        if (MenuJsonGuideItem != null) MenuJsonGuideItem.Text = $"🌳 {s.MenuJsonGuide}";
+        if (MenuShortcutsItem != null) MenuShortcutsItem.Text = $"⌨️ {s.MenuShortcuts}";
+        if (MenuAboutItem != null) MenuAboutItem.Text = $"ℹ️ {s.MenuAbout}";
+
+        PopulateRecentFilesMenu();
+    }
+
     public void PopulateRecentFilesMenu()
     {
         if (RecentFilesMenuSubItem == null) return;
         RecentFilesMenuSubItem.Items.Clear();
 
+        var s = MDReader.Core.Localization.LocalizationService.Instance;
         var recentFiles = UserPreferencesService.Instance.RecentFiles.GetRecentFiles();
         if (recentFiles.Count == 0)
         {
-            var emptyItem = new MenuFlyoutItem { Text = "No recent files / لا توجد ملفات حديثة", IsEnabled = false };
+            var emptyItem = new MenuFlyoutItem { Text = s.NoRecentFiles, IsEnabled = false };
             RecentFilesMenuSubItem.Items.Add(emptyItem);
             return;
         }
@@ -417,9 +471,9 @@ public sealed partial class MainWindow : Window
                 Tag = file.Path
             };
             ToolTipService.SetToolTip(item, file.Path);
-            item.Click += (s, e) =>
+            item.Click += (sSender, eArgs) =>
             {
-                if (s is MenuFlyoutItem mfi && mfi.Tag is string path && File.Exists(path))
+                if (sSender is MenuFlyoutItem mfi && mfi.Tag is string path && File.Exists(path))
                 {
                     _shellViewModel.OpenDocument(path);
                     PopulateRecentFilesMenu();
@@ -429,8 +483,8 @@ public sealed partial class MainWindow : Window
         }
 
         RecentFilesMenuSubItem.Items.Add(new MenuFlyoutSeparator());
-        var clearItem = new MenuFlyoutItem { Text = "🗑️ Clear History / تفريغ السجل" };
-        clearItem.Click += (s, e) =>
+        var clearItem = new MenuFlyoutItem { Text = $"🗑️ {s.ClearHistory}" };
+        clearItem.Click += (sSender, eArgs) =>
         {
             UserPreferencesService.Instance.RecentFiles.ClearAll();
             PopulateRecentFilesMenu();

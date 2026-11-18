@@ -267,23 +267,37 @@ Any proposed feature, backlog item, or agent prompt lacking these two lines must
 
 ---
 
-## 14. Full Bilingual Architecture, Localization & Language Persistence (سياسة دعم تعدد اللغات وثنائية الواجهة وحفظ تفضيل المستخدم)
+## 14. Pure Multi-Language (i18n) Architecture, Dynamic Switching & Persistence (سياسة دعم تعدد اللغات والترجمة النظيفة والتبديل الفوري)
 
-To ensure JMDReader delivers a world-class experience for Arabic and international users:
+To ensure JMDReader delivers a professional, polished global experience across all international markets:
 
-1. **Strict Zero-Orphan English Rule in Menus (حظر التسميات الإنجليزية المنفردة):**
-   - No top-level menu item or sub-menu may ever be left in English only while others are bilingual.
-   - All main menus must be clearly dual-labeled and culturally intuitive:
-     - `📁 File / ملف`
-     - `👁️ View / عرض`
-     - `⚙️ Settings / إعدادات`
-     - `❓ Help / مساعدة`
-2. **Persistent Language Selection (حفظ لغة المستخدم):**
-   - The user's chosen language MUST be serialized into `UserPreferencesService` (`preferences.json`) upon selection and reloaded immediately on launch.
-   - Dynamic language switching must immediately refresh all UI bindings without requiring an app restart.
-3. **Bilingual Metrics & Status Bar (ثنائية شريط الحالة):**
-   - Reading metrics (word counts, line numbers, reading time) must support bilingual or locale-appropriate formatting (`١,٤٨٧ كلمة / 1,487 words • ٥٢٩ سطراً / 529 lines`).
-4. **Bidirectional (RTL / LTR) Respect:**
+1. **Strict Prohibition of Compound/Dual-Language Labels (حظر الدمج اللغوي المزدوج):**
+   - UI elements must NEVER concatenate two languages on the same label (e.g., writing `📁 File / ملف`, `📄 New / جديد`, or `Expand / توسيع` is strictly forbidden).
+   - The user interface must render exclusively and cleanly in the single currently active language.
+
+2. **Native Support for the Top 10 Global Languages (دعم أهم 10 لغات عالمية):**
+   - The application natively includes comprehensive, curated translations for:
+     1. **العربية (Arabic - `ar`)** [Default language, full RTL layout support]
+     2. **English (`en`)** [Standard English terminology]
+     3. **Español (`es`)** [Spanish]
+     4. **हिन्दी (`hi`)** [Hindi]
+     5. **中文 (`zh`)** [Chinese Simplified]
+     6. **Français (`fr`)** [French]
+     7. **Deutsch (`de`)** [German]
+     8. **Русский (`ru`)** [Russian]
+     9. **日本語 (`ja`)** [Japanese]
+     10. **Português (`pt`)** [Portuguese]
+
+3. **Dynamic Seamless Language Switching (التبديل اللحظي الفوري للغة):**
+   - When the user selects a language from `Settings > Language`, the entire user interface MUST switch instantaneously without requiring an application restart.
+   - Every top-level menu (`MenuBarItem`), sub-menu, context menu flyout, adaptive toolbar, tooltip, status bar, and dialog must update immediately.
+   - The embedded viewer (Markdown and JSON) must be notified of language changes via webview messaging (`setLanguage`) to adapt its internal buttons and placeholders.
+
+4. **Persistent Preference Across Launches (استمرارية حفظ تفضيل المستخدم):**
+   - The chosen language is stored in `preferences.json` (`PreferredLanguage`) via `UserPreferencesService`.
+   - On application startup, the saved language is loaded before the UI renders to guarantee zero text flickering or wrong language fallback.
+
+5. **Bidirectional (RTL / LTR) Respect:**
    - Arabic text, markdown headings, lists, and JSON string values must render with natural RTL alignment (`dir="rtl"`) and modern Arabic system fonts (`Segoe UI Variable`, `Segoe UI`, `Cairo`, `Tahoma`).
 
 ---

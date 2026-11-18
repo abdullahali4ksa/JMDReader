@@ -441,54 +441,159 @@
     <div id="toolbar">
         <!-- Tree View Expansion -->
         <div class="btn-group">
-            <button class="btn" id="expandAllBtn" title="Expand All / توسيع كافة الفروع">
-                <span>⊞</span> Expand All / توسيع
+            <button class="btn" id="expandAllBtn" title="Expand All">
+                <span>⊞</span> <span id="lblExpand">توسيع الكل</span>
             </button>
-            <button class="btn" id="collapseAllBtn" title="Collapse All / طي كافة الفروع">
-                <span>⊟</span> Collapse All / طي
+            <button class="btn" id="collapseAllBtn" title="Collapse All">
+                <span>⊟</span> <span id="lblCollapse">طي الكل</span>
             </button>
         </div>
 
         <!-- Formatting & Productivity -->
         <div class="btn-group">
-            <button class="btn" id="beautifyBtn" title="Format & Beautify (2 Spaces) / تنسيق وتجميل الكود">
-                <span>✨</span> Format / تنسيق
+            <button class="btn" id="beautifyBtn" title="Format">
+                <span>✨</span> <span id="lblFormat">تنسيق</span>
             </button>
-            <button class="btn" id="minifyBtn" title="Minify & Compact / ضغط وتصغير الكود">
-                <span>⚡</span> Minify / ضغط
+            <button class="btn" id="minifyBtn" title="Minify">
+                <span>⚡</span> <span id="lblMinify">ضغط</span>
             </button>
-            <button class="btn" id="toMdTableBtn" title="Convert Array to Markdown Table / تحويل لجدول ماركداون ونسخه">
-                <span>📊</span> Table / جدول
+            <button class="btn" id="toMdTableBtn" title="Markdown Table">
+                <span>📊</span> <span id="lblTable">جدول</span>
             </button>
         </div>
 
         <!-- Export & Copy -->
         <div class="btn-group">
-            <button class="btn" id="exportHtmlBtn" title="Export Offline HTML / تصدير كصفحة ويب مستقلة دون إنترنت">
-                <span>💾</span> Export / تصدير
+            <button class="btn" id="exportHtmlBtn" title="Export HTML">
+                <span>💾</span> <span id="lblExport">تصدير</span>
             </button>
-            <button class="btn" id="copyRawBtn" title="Copy Full Raw JSON / نسخ المحتوى الخام كاملاً">
-                <span>📋</span> Copy / نسخ
+            <button class="btn" id="copyRawBtn" title="Copy Raw">
+                <span>📋</span> <span id="lblCopy">نسخ</span>
             </button>
         </div>
 
         <!-- Delightful Shared Search Box -->
-        <div class="search-box-wrapper" title="بحث فوري أو استعلام JSONPath (Ctrl+F)">
+        <div class="search-box-wrapper" title="Search (Ctrl+F)">
             <span class="search-icon">🔍</span>
-            <input type="text" id="filterInput" placeholder="بحث فوري أو مسار (e.g. $.store or text)..." />
-            <span id="matchCounter" class="match-badge">0 results</span>
-            <button id="prevMatchBtn" class="search-nav-btn" title="السابق / Previous match (Shift+Enter)">▲</button>
-            <button id="nextMatchBtn" class="search-nav-btn" title="التالي / Next match (Enter)">▼</button>
-            <button id="clearSearchBtn" class="search-clear-btn" title="مسح البحث / Clear search (Esc)">✕</button>
+            <input type="text" id="filterInput" placeholder="بحث فوري أو مسار JSONPath (Ctrl+F)..." />
+            <span id="matchCounter" class="match-badge">0</span>
+            <button id="prevMatchBtn" class="search-nav-btn" title="Previous (Shift+Enter)">▲</button>
+            <button id="nextMatchBtn" class="search-nav-btn" title="Next (Enter)">▼</button>
+            <button id="clearSearchBtn" class="search-clear-btn" title="Clear (Esc)">✕</button>
         </div>
 
-        <span id="statsBadge">0 items</span>
+        <span id="statsBadge">0</span>
     </div>
 
     <div id="treeContainer"></div>
     <div id="copiedToast">✓ Copied to clipboard!</div>
 
     <script>
+
+        const I18N = {
+            ar: {
+                expand: "توسيع الكل", collapse: "طي الكل", format: "تنسيق", minify: "ضغط", table: "جدول", export: "تصدير", copy: "نسخ",
+                searchPlaceholder: "بحث فوري أو مسار JSONPath (Ctrl+F)...",
+                copied: "✓ تم النسخ إلى الحافظة!", copiedTarget: (t) => `✓ تم نسخ ${t}`,
+                items: "عناصر", keys: "مفاتيح",
+                typeObj: "كائن", typeArr: "مصفوفة", typeStr: "نص", typeNum: "رقم", typeBool: "قيمة منطقية", typeNull: "فارغ",
+                statsItems: (n) => `${n} عنصر`, results: "مطابقة"
+            },
+            en: {
+                expand: "Expand All", collapse: "Collapse All", format: "Format", minify: "Minify", table: "Table", export: "Export", copy: "Copy",
+                searchPlaceholder: "Quick search or JSONPath (Ctrl+F)...",
+                copied: "✓ Copied to clipboard!", copiedTarget: (t) => `✓ Copied ${t}`,
+                items: "items", keys: "keys",
+                typeObj: "Object", typeArr: "Array", typeStr: "String", typeNum: "Number", typeBool: "Boolean", typeNull: "Null",
+                statsItems: (n) => `${n} items`, results: "results"
+            },
+            es: {
+                expand: "Expandir todo", collapse: "Contraer todo", format: "Formatear", minify: "Comprimir", table: "Tabla", export: "Exportar", copy: "Copiar",
+                searchPlaceholder: "Búsqueda rápida o JSONPath (Ctrl+F)...",
+                copied: "✓ ¡Copiado al portapapeles!", copiedTarget: (t) => `✓ Copiado ${t}`,
+                items: "elementos", keys: "claves",
+                typeObj: "Objeto", typeArr: "Matriz", typeStr: "Cadena", typeNum: "Número", typeBool: "Booleano", typeNull: "Nulo",
+                statsItems: (n) => `${n} elementos`, results: "resultados"
+            },
+            hi: {
+                expand: "सभी विस्तृत करें", collapse: "सभी संकुचित करें", format: "प्रारूपित करें", minify: "छोटा करें", table: "तालिका", export: "निर्यात करें", copy: "कॉपी करें",
+                searchPlaceholder: "त्वरित खोज या JSONPath (Ctrl+F)...",
+                copied: "✓ क्लिपबोर्ड पर कॉपी किया गया!", copiedTarget: (t) => `✓ कॉपी किया गया ${t}`,
+                items: "आइटम", keys: "कुंजियाँ",
+                typeObj: "ऑब्जेक्ट", typeArr: "सरणी", typeStr: "स्ट्रिंग", typeNum: "संख्या", typeBool: "बूलियन", typeNull: "रिक्त",
+                statsItems: (n) => `${n} आइटम`, results: "परिणाम"
+            },
+            zh: {
+                expand: "全部展开", collapse: "全部折叠", format: "美化格式", minify: "压缩单行", table: "转为表格", export: "导出网页", copy: "复制内容",
+                searchPlaceholder: "快速搜索或 JSONPath (Ctrl+F)...",
+                copied: "✓ 已复制到剪贴板！", copiedTarget: (t) => `✓ 已复制 ${t}`,
+                items: "项", keys: "键",
+                typeObj: "对象", typeArr: "数组", typeStr: "字符串", typeNum: "数字", typeBool: "布尔值", typeNull: "空值",
+                statsItems: (n) => `${n} 项`, results: "条结果"
+            },
+            fr: {
+                expand: "Tout développer", collapse: "Tout réduire", format: "Formater", minify: "Compresser", table: "Tableau", export: "Exporter", copy: "Copier",
+                searchPlaceholder: "Recherche rapide ou JSONPath (Ctrl+F)...",
+                copied: "✓ Copié dans le presse-papiers !", copiedTarget: (t) => `✓ Copié ${t}`,
+                items: "éléments", keys: "clés",
+                typeObj: "Objet", typeArr: "Tableau", typeStr: "Chaîne", typeNum: "Nombre", typeBool: "Booléen", typeNull: "Nul",
+                statsItems: (n) => `${n} éléments`, results: "résultats"
+            },
+            de: {
+                expand: "Alle erweitern", collapse: "Alle einklappen", format: "Formatieren", minify: "Komprimieren", table: "Tabelle", export: "Exportieren", copy: "Kopieren",
+                searchPlaceholder: "Schnellsuche oder JSONPath (Ctrl+F)...",
+                copied: "✓ In Zwischenablage kopiert!", copiedTarget: (t) => `✓ ${t} kopiert`,
+                items: "Elemente", keys: "Schlüssel",
+                typeObj: "Objekt", typeArr: "Array", typeStr: "Zeichenkette", typeNum: "Zahl", typeBool: "Boolesch", typeNull: "Null",
+                statsItems: (n) => `${n} Elemente`, results: "Ergebnisse"
+            },
+            ru: {
+                expand: "Развернуть все", collapse: "Свернуть все", format: "Форматировать", minify: "Сжать", table: "Таблица", export: "Экспорт", copy: "Копировать",
+                searchPlaceholder: "Быстрый поиск или JSONPath (Ctrl+F)...",
+                copied: "✓ Скопировано в буфер обмена!", copiedTarget: (t) => `✓ Скопировано: ${t}`,
+                items: "элементов", keys: "ключей",
+                typeObj: "Объект", typeArr: "Массив", typeStr: "Строка", typeNum: "Число", typeBool: "Логическое", typeNull: "Null",
+                statsItems: (n) => `${n} элементов`, results: "совпадений"
+            },
+            ja: {
+                expand: "すべて展開", collapse: "すべて折りたたむ", format: "整形", minify: "圧縮", table: "表に変換", export: "エクスポート", copy: "コピー",
+                searchPlaceholder: "クイック検索または JSONPath (Ctrl+F)...",
+                copied: "✓ クリップボードにコピーしました！", copiedTarget: (t) => `✓ ${t} をコピーしました`,
+                items: "項目", keys: "キー",
+                typeObj: "オブジェクト", typeArr: "配列", typeStr: "文字列", typeNum: "数値", typeBool: "真偽値", typeNull: "Null",
+                statsItems: (n) => `${n} 項目`, results: "件"
+            },
+            pt: {
+                expand: "Expandir tudo", collapse: "Recolher tudo", format: "Formatar", minify: "Compactar", table: "Tabela", export: "Exportar", copy: "Copiar",
+                searchPlaceholder: "Busca rápida ou JSONPath (Ctrl+F)...",
+                copied: "✓ Copiado para a área de transferência!", copiedTarget: (t) => `✓ Copiado ${t}`,
+                items: "itens", keys: "chaves",
+                typeObj: "Objeto", typeArr: "Matriz", typeStr: "Texto", typeNum: "Número", typeBool: "Booleano", typeNull: "Nulo",
+                statsItems: (n) => `${n} itens`, results: "resultados"
+            }
+        };
+
+        let currentLang = "ar";
+
+        function getI18n() {
+            return I18N[currentLang] || I18N["en"];
+        }
+
+        function applyLanguage(lang) {
+            if (!I18N[lang]) lang = "en";
+            currentLang = lang;
+            const t = getI18n();
+            const elExp = document.getElementById('lblExpand'); if (elExp) elExp.textContent = t.expand;
+            const elCol = document.getElementById('lblCollapse'); if (elCol) elCol.textContent = t.collapse;
+            const elFmt = document.getElementById('lblFormat'); if (elFmt) elFmt.textContent = t.format;
+            const elMin = document.getElementById('lblMinify'); if (elMin) elMin.textContent = t.minify;
+            const elTbl = document.getElementById('lblTable'); if (elTbl) elTbl.textContent = t.table;
+            const elExp2 = document.getElementById('lblExport'); if (elExp2) elExp2.textContent = t.export;
+            const elCpy = document.getElementById('lblCopy'); if (elCpy) elCpy.textContent = t.copy;
+            const elInp = document.getElementById('filterInput'); if (elInp) elInp.placeholder = t.searchPlaceholder;
+            const elStats = document.getElementById('statsBadge'); if (elStats) elStats.textContent = t.statsItems(totalCount);
+        }
+
         let rawData = null;
         let totalCount = 0;
         let matchingNodes = [];
@@ -502,9 +607,11 @@
         }
 
         function copyText(text, label) {
+            const t = getI18n();
             navigator.clipboard.writeText(text).then(() => {
-                showToast(label ? `✓ Copied ${label} / تم النسخ` : "✓ Copied / تم النسخ!");
+                showToast(label ? t.copiedTarget(label) : t.copied);
             });
+        });
         }
 
         function createNodeElement(key, value, path, depth) {
@@ -525,32 +632,33 @@
             chevron.textContent = isContainer ? '▼' : '•';
             row.appendChild(chevron);
 
-            // Refined Type Pill Badge
+            // Refined Type Pill Badge (Pure i18n)
+            const t = getI18n();
             const pill = document.createElement('span');
             if (isObject) {
                 pill.className = 'type-pill pill-object';
                 pill.textContent = '{ }';
-                pill.title = 'Object / كائن';
+                pill.title = t.typeObj;
             } else if (isArray) {
                 pill.className = 'type-pill pill-array';
                 pill.textContent = '[ ]';
-                pill.title = 'Array / مصفوفة';
+                pill.title = t.typeArr;
             } else if (typeof value === 'string') {
                 pill.className = 'type-pill pill-string';
                 pill.textContent = 'abc';
-                pill.title = 'String / نص';
+                pill.title = t.typeStr;
             } else if (typeof value === 'number') {
                 pill.className = 'type-pill pill-number';
                 pill.textContent = '123';
-                pill.title = 'Number / رقم';
+                pill.title = t.typeNum;
             } else if (typeof value === 'boolean') {
                 pill.className = 'type-pill pill-boolean';
                 pill.textContent = value ? '✓ true' : '✕ false';
-                pill.title = 'Boolean / قيمة منطقية';
+                pill.title = t.typeBool;
             } else {
                 pill.className = 'type-pill pill-null';
                 pill.textContent = '∅ null';
-                pill.title = 'Null / فارغ';
+                pill.title = t.typeNull;
             }
             row.appendChild(pill);
 
@@ -573,7 +681,7 @@
                 totalCount += count;
                 const summary = document.createElement('span');
                 summary.className = 'summary-badge';
-                summary.textContent = isArray ? `[ ${count} items / عناصر ]` : `{ ${count} keys / مفاتيح }`;
+                summary.textContent = isArray ? `[ ${count} ${t.items} ]` : `{ ${count} ${t.keys} }`;
                 row.appendChild(summary);
             } else {
                 totalCount++;
@@ -867,7 +975,10 @@
             const data = event.data;
             if (!data) return;
 
-            if (data.type === 'setContent' || data.type === 'setJson') {
+            if (data.type === 'setLanguage') {
+                applyLanguage(data.language || 'ar');
+            } else if (data.type === 'setContent' || data.type === 'setJson') {
+                if (data.language) applyLanguage(data.language);
                 renderJsonTree(data.json || data.content || "");
                 window.chrome.webview.postMessage({ type: 'rendered', totalNodes: totalCount });
             } else if (data.type === 'setTheme') {
